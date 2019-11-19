@@ -1,0 +1,26 @@
+{
+  "name": "diagnostics",
+  "version": "0.0.0",
+  "description": "Various diagnostics functions to help analyze connections to Twilio",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -r ts-node/register test/",
+    "build": "mkdir -p build && browserify src/bundle.ts -p [ tsify ] > build/bundle.js"
+  },
+  "contributors": [
+    "Michael Huynh",
+    "Ryan Rowland",
+    "Charlie Santos"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@types/events": "^3.0.0",
+    "browserify": "^16.5.0",
+    "events": "^3.0.0",
+    "mocha": "^6.2.2",
+    "ts-node": "^8.5.2",
+    "tsify": "^4.0.1",
+    "typescript": "^3.7.2"
+  },
+  "private": true
+}
