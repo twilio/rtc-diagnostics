@@ -216,7 +216,7 @@ class InputTest extends EventEmitter {
  */
 export const testInputDevice = (
   deviceId?: string,
-  options?: InputTestOptions
+  options?: Partial<InputTestOptions>
 ) => (
   new InputTest(deviceId, options)
 );
