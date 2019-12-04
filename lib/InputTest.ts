@@ -1,51 +1,8 @@
 import { EventEmitter } from 'events';
-
-import { DiagnosticError } from './error';
-
-/**
- * Possible events that an `InputTest` might emit.
- */
-export enum InputTestEvents {
-  End = 'end',
-  Volume = 'volume',
-  Error = 'error',
-}
-
-/**
- * Report that will be emitted by the `InputTest` once the test has finished.
- */
-export interface InputTestReport {
-  startTime: number;
-  endTime: number;
-  testName: 'input-volume',
-  deviceId: string | undefined, // TODO should this be undefined?
-  // when we pass no device id to getusermedia, we get the device id of the
-  // default device, so there is always a device id
-  didPass: boolean,
-  errors: DiagnosticError[],
-  values: number[],
-}
-
-/**
- * Options that can be passed to the `InputTest`.
- */
-export interface InputTestOptions {
-  fftSize: number,
-  pollingRate: number,
-  smoothingTimeConstant: number,
-  ttl: number, // Duration of time to run the test in ms
-  mediaStream?: MediaStream,
-}
-
-/**
- * Default options for the `InputTest`.
- */
-const defaultInputTestOptions: InputTestOptions = {
-  pollingRate: 100,
-  smoothingTimeConstant: 0.8,
-  fftSize: 1024,
-  ttl: 5000,
-};
+import {
+  AlreadyStoppedError,
+  DiagnosticError,
+} from './error';
 
 /**
  * Supervises an input device test utilizing a `MediaStream` passed to it, or an
@@ -56,47 +13,115 @@ const defaultInputTestOptions: InputTestOptions = {
  * acquire media), then the constructor will throw the `DOMError` from
  * `getUserMedia`.
  *
- * The entry point of the test is the [[start]] function. The events defined in
- * the enum [[InputTestEvents]] are emitted as the test runs.
+ * The events defined in the enum [[Events]] are emitted as the test
+ * runs.
  */
-class InputTest extends EventEmitter {
-  private userMediaPromise: Promise<MediaStream>;
-  private options: InputTestOptions;
+export class InputTest extends EventEmitter {
+  /**
+   * Default options for the `InputTest`.
+   */
+  static defaultOptions: InputTest.Options = {
+    duration: 5000,
+    pollIntervalMs: 100,
+  };
+  static testName = 'input-volume' as const;
 
-  private deviceId?: string;
-  private startTime: number | null = null;
-  private endTime: number | null = null;
-  private values: number[] = [];
-  private errors: DiagnosticError[] = [];
+  private _audioContext: AudioContext;
+  private _cleanupAudio: (() => void) | null = null;
+  private _deviceIdOrTrack: string | undefined;
+  private _endTime: number | null = null;
+  private readonly _errors: DiagnosticError[] = [];
+  private _mediaStreamPromise: Promise<MediaStream>;
+  private _options: InputTest.Options;
+  private _startTime: number;
+  private readonly _values: number[] = [];
+  private _volumeTimeout: NodeJS.Timeout | null = null;
 
+  /**
+   * Creates an `AudioContext` for use in the test if none is passed via
+   * the `options` parameter.
+   * @param deviceIdOrTrack
+   * @param options
+   */
   constructor(
-    deviceId?: string,
-    options?: Partial<InputTestOptions>
+    deviceIdOrTrack?: string,
+    options?: Partial<InputTest.Options>,
   ) {
     super();
-    this.deviceId = deviceId;
-    this.options = { ...defaultInputTestOptions, ...(options || {}) };
-    this.userMediaPromise = this.options.mediaStream
-      ? Promise.resolve(this.options.mediaStream)
-      : navigator.mediaDevices.getUserMedia({ audio: { deviceId } })
-          .catch(reason => {
-            const error = new DiagnosticError(reason);
-            this.onError(error);
 
-            // Because this is a fatal error, we can throw the error here to
-            // prevent the test from being started
-            throw error;
-          });
+    this._options = { ...InputTest.defaultOptions, ...(options || {}) };
+
+    this._audioContext = this._options.audioContext || new AudioContext();
+    this._deviceIdOrTrack = deviceIdOrTrack;
+    this._startTime = Date.now();
+
+    this._mediaStreamPromise = this._options.mediaStream
+      ? Promise.resolve(this._options.mediaStream)
+      : navigator.mediaDevices.getUserMedia({
+          audio: { deviceId: this._deviceIdOrTrack },
+        });
+
+    this._startTest();
   }
 
   /**
-   * Called every `InputTest.options.pollingRate` ms, emits the volume passed
-   * to it as a `InputTestEvents.Volume` event.
-   * @param value the volume
+   * Stop the currently running `InputTest`.
    */
-  onVolume(value: number) {
-    this.values = [...this.values, value];
-    this.emit(InputTestEvents.Volume, value);
+  async stop() {
+    if (this._endTime) {
+      throw AlreadyStoppedError;
+    }
+
+    // Perform cleanup
+    if (this._cleanupAudio !== null) {
+      this._cleanupAudio();
+    }
+    if (!this._options.mediaStream) {
+      // this means we made a call to getUserMedia
+      // we don't want to stop the tracks we get if they were passed in via
+      // parameters
+      try {
+        const mediaStream = await this._mediaStreamPromise;
+        mediaStream.getTracks().forEach(track => track.stop());
+      } catch {
+        // if the media stream promise failed, we didn't successfully perform
+        // getUserMedia, and therefore we don't need to stop any tracks
+      }
+    }
+    if (!this._options.audioContext) {
+      // This means we made our own `AudioContext` so we want to close it
+      this._audioContext.close();
+    }
+    if (this._volumeTimeout !== null) {
+      clearTimeout(this._volumeTimeout);
+    }
+
+    this._endTime = Date.now();
+    const didPass = this._determinePass();
+    const report = {
+      deviceId: this._deviceIdOrTrack,
+      didPass,
+      endTime: this._endTime,
+      errors: this._errors,
+      startTime: this._startTime,
+      testName: InputTest.testName,
+      values: this._values,
+    };
+    this.emit(InputTest.Events.End, didPass, report);
+
+    return report;
+  }
+
+  private _determinePass(): boolean {
+    // TODO Come up with a better algorithm for deciding if the volume values
+    // resulting in a success
+
+    // Loops over every sample, checks to see if it was completely silent by
+    // checking if the average of the amplitudes is 0, and returns whether or
+    // not more than 50% of the samples were silent.
+    return this._errors.length === 0 &&
+      this._values.length > 3 &&
+      (this._values.filter(v => v > 0).length / this._values.length) > 0.5;
   }
 
   /**
@@ -104,20 +129,19 @@ class InputTest extends EventEmitter {
    * or not.
    * @param error
    */
-  onError(error: DiagnosticError) {
-    this.errors = [...this.errors, error];
-    this.emit(InputTestEvents.Error, error);
+  private _onError(error: DiagnosticError): void {
+    this._errors.push(error);
+    this.emit(InputTest.Events.Error, error);
   }
 
-  determinePass(volumeValues: number[]) {
-    // TODO Come up with a better algorithm for deciding if the volume values
-    // resulting in a success
-
-    // Loops over every sample, checks to see if it was completely silent by
-    // checking if the average of the amplitudes is 0, and returns whether or
-    // not more than 50% of the samples were silent.
-    return (volumeValues.filter(v => v > 0).length / volumeValues.length)
-      > 0.5;
+  /**
+   * Called every `InputTest._options.pollingRate` ms, emits the volume passed
+   * to it as a `Events.Volume` event.
+   * @param value the volume
+   */
+  private _onVolume(value: number): void {
+    this._values.push(value);
+    this.emit(InputTest.Events.Volume, value);
   }
 
   /**
@@ -128,84 +152,140 @@ class InputTest extends EventEmitter {
    * this data can then be used as an estimate as the average volume of the
    * entire volume source.
    *
-   * @event InputTestEvents.Volume
+   * @event Events.Volume
    */
-  start(): Promise<InputTestReport> {
-    if (this.startTime !== null) {
-      // Do nothing if this test has already been started once.
-      return Promise.reject(new DiagnosticError(
-        undefined,
-        'This test has already been started.'
-      ));
-    }
+  private async _startTest() {
+    try {
+      const mediaStream: MediaStream = await this._mediaStreamPromise;
 
-    /**
-     * This Promise will resolve with a report object when the test has
-     * successfully run for `this.options.ttl` amount of milliseconds, or will
-     * reject if an internal error occurs.
-     * This report is also emitted at the end of the test with the event
-     * `InputTestEvent.End`.
-     *
-     * This rejection should never occur, as `this.startTime` is set before
-     * it is ever used as a number in the `volumeEvent` handler, but the logic
-     * is still there as a failsafe.
-     */
-    return new Promise(async (resolve, reject) => {
-      const userMedia = await this.userMediaPromise;
-      const audioContext = new AudioContext();
+      const analyser: AnalyserNode = this._audioContext.createAnalyser();
+      analyser.smoothingTimeConstant = 0.4;
+      analyser.fftSize = 64;
 
-      const analyser = audioContext.createAnalyser();
-      analyser.smoothingTimeConstant = this.options.smoothingTimeConstant;
-      analyser.fftSize = this.options.fftSize;
-
-      const microphone = audioContext.createMediaStreamSource(userMedia);
+      const microphone: MediaStreamAudioSourceNode =
+      this._audioContext.createMediaStreamSource(mediaStream);
       microphone.connect(analyser);
 
-      const cleanup = () => {
+      this._cleanupAudio = () => {
         analyser.disconnect();
         microphone.disconnect();
-      }
+      };
 
-      // This function runs every `this.options.reportRate` ms and emits the
+      const frequencyDataBytes: Uint8Array = new Uint8Array(analyser.frequencyBinCount);
+
+      // This function runs every `this._options.reportRate` ms and emits the
       // current volume of the `MediaStream`.
       const volumeEvent = () => {
-        const frequencyDataBytes = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(frequencyDataBytes);
-        const volume = frequencyDataBytes.reduce((sum, val) => sum + val, 0) /
-          frequencyDataBytes.length;
-        this.onVolume(volume);
-
-        if (this.startTime === null) {
-          reject(new DiagnosticError(
-            undefined,
-            'SDK in unknown state, `this.startTime === null`.'
-          ));
-          cleanup();
+        if (this._endTime !== null) {
           return;
         }
 
-        if (Date.now() - this.startTime > this.options.ttl) {
-          cleanup();
-          this.endTime = Date.now();
-          const report: InputTestReport = {
-            startTime: this.startTime,
-            endTime: this.endTime,
-            testName: 'input-volume',
-            deviceId: this.deviceId,
-            errors: this.errors,
-            values: this.values,
-            didPass: this.determinePass(this.values),
-          };
-          this.emit(InputTestEvents.End, report);
-          resolve(report);
-        } else {
-          setTimeout(volumeEvent, this.options.pollingRate);
-        }
-      }
+        analyser.getByteFrequencyData(frequencyDataBytes);
+        const volume: number =
+          frequencyDataBytes.reduce((sum, val) => sum + val, 0) /
+          frequencyDataBytes.length;
+        this._onVolume(volume);
 
-      this.startTime = Date.now();
-      setTimeout(volumeEvent);
-    });
+        if (Date.now() - this._startTime > this._options.duration) {
+          this.stop();
+        } else {
+          this._volumeTimeout = setTimeout(
+            volumeEvent,
+            this._options.pollIntervalMs,
+          );
+        }
+      };
+
+      this._volumeTimeout = setTimeout(
+        volumeEvent,
+        this._options.pollIntervalMs,
+      );
+    } catch (reason) {
+      // This means that the call to `getUserMedia` failed, so we should
+      // just emit a failed `end` event
+      this._onError(new DiagnosticError(reason));
+      this.stop();
+    }
+  }
+}
+
+export namespace InputTest {
+  /**
+   * Possible events that an `InputTest` might emit.
+   */
+  export enum Events {
+    /**
+     * Emitted by the test upon completion with a paramter of type [[Report]].
+     */
+    End = 'end',
+    /**
+     * Emitted by the test when encountering an error with a parameter of type
+     * [[DiagnosticError]]
+     */
+    Error = 'error',
+    /**
+     * Emitted by the test every [[Options.pollIntervalMs]] amount of
+     * milliseconds with a parameter of type `number` that represents the
+     * current volume of the audio stream.
+     */
+    Volume = 'volume',
+  }
+
+  /**
+   * Report that will be emitted by the [[InputTest]] once the test has finished.
+   */
+  export interface Report {
+    /**
+     * The device ID that is passed to the test constructor.
+     */
+    deviceId: string | undefined;
+    /**
+     * Whether or not the test passed as determined by
+     * [[InputTest._determinePass]]
+     */
+    didPass: boolean;
+    /**
+     * Timestamp of test completion.
+     */
+    endTime: number;
+    /**
+     * Any errors that occurred during the run-time of the test.
+     */
+    errors: DiagnosticError[];
+    /**
+     * Timestamp of test start.
+     */
+    startTime: number;
+    /**
+     * The name of the test, should be `input-volume`.
+     */
+    testName: typeof InputTest.testName;
+    /**
+     * The volume values emitted by the test during its run-time.
+     */
+    values: number[];
+  }
+
+  /**
+   * Options that can be passed to the `InputTest`.
+   */
+  export interface Options {
+    /**
+     * AudioContext to be used during the test. If none is passed, then one will
+     * be made upon construction and closed upon completion. If one is passed, it
+     * will _not_ be closed on completion.
+     */
+    audioContext?: AudioContext;
+    /**
+     * Duration of time to run the test in ms
+     */
+    duration: number;
+    /**
+     * MediaStream to use during the test. If none is passed, then a call to
+     * `getUserMedia` will be made to try and get the medi
+     */
+    mediaStream?: MediaStream;
+    pollIntervalMs: number;
   }
 }
 
@@ -216,7 +296,7 @@ class InputTest extends EventEmitter {
  */
 export const testInputDevice = (
   deviceId?: string,
-  options?: Partial<InputTestOptions>
+  options?: Partial<InputTest.Options>,
 ) => (
   new InputTest(deviceId, options)
 );

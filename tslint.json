@@ -1,11 +1,6 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint:recommended"
-  ],
-  "linterOptions": {
-    "exclude": ["**/*.js"]
-  },
+  "extends": ["tslint:recommended"],
   "rules": {
     "arrow-parens": false,
     "ban-types": false,

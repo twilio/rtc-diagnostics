@@ -1,6 +1,14 @@
+/* tslint:disable only-arrow-functions */
+
 import * as assert from 'assert';
 
-import { testInputDevice, InputTestReport } from '../../lib/InputTest';
+import {
+  InputTest,
+  testInputDevice,
+} from '../../lib/InputTest';
+
+const defaultTestDuration = 500;
+const defaultTestPollIntervalMs = 50;
 
 describe('testInputDevice', function() {
   describe('when given a MediaStream', function() {
@@ -21,40 +29,95 @@ describe('testInputDevice', function() {
       mediaStream = streamDestination.stream;
     });
 
-    describe('when the stream is audible', function() {
-      let report: InputTestReport;
+    describe('allowed to run for full duration', function() {
+      describe('when the stream is audible', function() {
+        let didPass: boolean;
+        let report: InputTest.Report;
 
-      before(async function() {
-        vol.gain.value = 1;
-        report = await testInputDevice(undefined, {
-          mediaStream,
-          ttl: 1000,
-        }).start();
+        before(function(done) {
+          vol.gain.value = 1;
+          testInputDevice(undefined, {
+            duration: defaultTestDuration,
+            mediaStream,
+            pollIntervalMs: defaultTestPollIntervalMs,
+          }).on(InputTest.Events.End, (p: boolean, r: InputTest.Report) => {
+            didPass = p;
+            report = r;
+            done();
+          });
+        });
+
+        it('should return a report with `didPass === true`', function() {
+          assert(didPass);
+          assert(report.didPass);
+        });
       });
 
-      it('should return a report with `didPass === true`', function() {
-        assert(report.didPass);
+      describe('when the stream is silent', function() {
+        let didPass: boolean;
+        let report: InputTest.Report;
+
+        before(function(done) {
+          vol.gain.value = 0;
+          testInputDevice(undefined, {
+            duration: defaultTestDuration,
+            mediaStream,
+            pollIntervalMs: defaultTestPollIntervalMs,
+          }).on(InputTest.Events.End, (p: boolean, r: InputTest.Report) => {
+            didPass = p;
+            report = r;
+            done();
+          });
+        });
+
+        it('should have all values set to 0', function() {
+          assert.equal(report.values.filter(v => v !== 0).length, 0);
+        });
+
+        it('should return a report with `didPass === false`', function() {
+          assert.equal(didPass, false);
+          assert.equal(report.didPass, false);
+        });
       });
     });
 
-    describe('when the stream is silent', function() {
-      let report: InputTestReport;
+    describe('stopped manually', function() {
+      let events: InputTest.Events[];
 
       before(async function() {
-        vol.gain.value = 0;
-        report = await testInputDevice(undefined, {
-          mediaStream,
-          ttl: 1000,
-        }).start();
+        const pollIntervalMs = defaultTestPollIntervalMs;
+
+        events = await new Promise(resolve => {
+          const e: InputTest.Events[] = [];
+          const test = testInputDevice(undefined, {
+            duration: Infinity,
+            mediaStream,
+            pollIntervalMs,
+          });
+          test.on(InputTest.Events.End, () => {
+            e.push(InputTest.Events.End);
+            setTimeout(
+              () => resolve(e),
+              pollIntervalMs * 3,
+            );
+          });
+          test.on(InputTest.Events.Volume, () => {
+            e.push(InputTest.Events.Volume);
+          });
+          setTimeout(
+            () => test.stop(),
+            pollIntervalMs * 5,
+          );
+        });
       });
 
-      it('should have all values set to 0', function() {
-        assert.equal(report.values.filter(v => v !== 0).length, 0);
+      it('reports some number of volume events', function() {
+        assert(events.filter(v => v === InputTest.Events.Volume).length);
       });
 
-      it('should return a report with `didPass === false`', function() {
-        assert.equal(report.didPass, false);
+      it('no volume events occur after the end event', async function() {
+        assert.equal(events[events.length - 1], InputTest.Events.End);
       });
-    })
+    });
   });
 });

@@ -1,11 +1,16 @@
 export class DiagnosticError {
-  timestamp: number;
   error: DOMError | undefined;
   message: string;
+  timestamp: number;
 
-  constructor(error: DOMError | undefined = undefined, message: string = '') {
+  constructor(error?: DOMError, message: string = '') {
     this.timestamp = Date.now();
     this.error = error;
     this.message = message;
   }
 }
+
+export const AlreadyStoppedError = new DiagnosticError(
+  undefined,
+  'Test already stopped.',
+);
