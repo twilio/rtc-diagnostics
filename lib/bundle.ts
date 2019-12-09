@@ -1,4 +1,5 @@
 import { testInputDevice } from './InputTest';
+import { testOutputDevice } from './OutputTest';
 
 /**
  * Tell Typescript that we would like to modify the `Twilio` object on the
@@ -20,4 +21,5 @@ window.Twilio = window.Twilio || {};
 window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
   testInputDevice,
+  testOutputDevice,
 };
