@@ -4,8 +4,13 @@
   "description": "Various diagnostics functions to help analyze connections to Twilio",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register test/",
-    "build": "mkdir -p build && browserify src/bundle.ts -p [ tsify ] > build/bundle.js"
+    "bundle": "mkdir -p build && browserify ./lib/bundle.ts -p [ tsify ] > ./build/bundle.js",
+    "build": "tsc && npm run lint && npm run test && npm run bundle",
+    "docs": "typedoc --excludePrivate --excludeProtected --theme ./node_modules/typedoc-twilio-theme/bin/default",
+    "lint": "tslint -c ./tslint.json --project ./tsconfig.json -t stylish",
+    "test": "tsc --noEmit && npm run lint && npm run test:unit && npm run test:integration",
+    "test:unit": "mocha -r ts-node/register ./tests/unit/index.ts",
+    "test:integration": "karma start"
   },
   "contributors": [
     "Michael Huynh",
@@ -13,14 +18,27 @@
     "Charlie Santos"
   ],
   "license": "MIT",
+  "private": true,
   "dependencies": {
-    "@types/events": "^3.0.0",
-    "browserify": "^16.5.0",
-    "events": "^3.0.0",
-    "mocha": "^6.2.2",
-    "ts-node": "^8.5.2",
-    "tsify": "^4.0.1",
-    "typescript": "^3.7.2"
+    "@types/events": "3.0.0",
+    "@types/node": "12.12.11",
+    "events": "3.0.0"
   },
-  "private": true
+  "devDependencies": {
+    "@types/mocha": "5.2.7",
+    "browserify": "16.5.0",
+    "is-docker": "2.0.0",
+    "karma": "4.4.1",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-firefox-launcher": "1.2.0",
+    "karma-mocha": "1.3.0",
+    "karma-typescript": "4.1.1",
+    "mocha": "6.2.2",
+    "ts-node": "8.5.2",
+    "tsify": "4.0.1",
+    "tslint": "5.20.1",
+    "typedoc": "github:ryan-rowland/typedoc#1.0.1",
+    "typedoc-twilio-theme": "1.0.0",
+    "typescript": "3.7.2"
+  }
 }
