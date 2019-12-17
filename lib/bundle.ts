@@ -1,4 +1,5 @@
 import { testInputDevice } from './InputTest';
+import { testNetwork } from './NetworkTest';
 import { testOutputDevice } from './OutputTest';
 
 /**
@@ -21,5 +22,6 @@ window.Twilio = window.Twilio || {};
 window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
   testInputDevice,
+  testNetwork,
   testOutputDevice,
 };
