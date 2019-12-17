@@ -1,5 +1,7 @@
 .DS_STORE
 
-package-lock.json
-node_modules
 build
+coverage
+docs
+node_modules
+package-lock.json
