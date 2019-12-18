@@ -28,7 +28,6 @@ export class InputTest extends EventEmitter {
 
   private _audioContext: AudioContext;
   private _cleanupAudio: (() => void) | null = null;
-  private _deviceIdOrTrack: string | undefined;
   private _endTime: number | null = null;
   private readonly _errors: DiagnosticError[] = [];
   private _mediaStreamPromise: Promise<MediaStream>;
@@ -43,22 +42,18 @@ export class InputTest extends EventEmitter {
    * @param deviceIdOrTrack
    * @param options
    */
-  constructor(
-    deviceIdOrTrack?: string,
-    options?: Partial<InputTest.Options>,
-  ) {
+  constructor(options: Partial<InputTest.Options>) {
     super();
 
-    this._options = { ...InputTest.defaultOptions, ...(options || {}) };
+    this._options = { ...InputTest.defaultOptions, ...options };
 
     this._audioContext = this._options.audioContext || new AudioContext();
-    this._deviceIdOrTrack = deviceIdOrTrack;
     this._startTime = Date.now();
 
     this._mediaStreamPromise = this._options.mediaStream
       ? Promise.resolve(this._options.mediaStream)
       : navigator.mediaDevices.getUserMedia({
-          audio: { deviceId: this._deviceIdOrTrack },
+          audio: { deviceId: this._options.deviceId },
         });
 
     this._startTest();
@@ -99,7 +94,7 @@ export class InputTest extends EventEmitter {
     this._endTime = Date.now();
     const didPass = this._determinePass();
     const report = {
-      deviceId: this._deviceIdOrTrack,
+      deviceId: this._options.deviceId,
       didPass,
       endTime: this._endTime,
       errors: this._errors,
@@ -276,6 +271,7 @@ export namespace InputTest {
      * will _not_ be closed on completion.
      */
     audioContext?: AudioContext;
+    deviceId?: MediaTrackConstraintSet['deviceId'];
     /**
      * Duration of time to run the test in ms
      */
@@ -294,9 +290,16 @@ export namespace InputTest {
  * @param deviceId
  * @param options
  */
-export const testInputDevice = (
-  deviceId?: string,
+export function testInputDevice(): InputTest;
+
+export function testInputDevice(
+  deviceId: MediaTrackConstraintSet['deviceId'],
   options?: Partial<InputTest.Options>,
-) => (
-  new InputTest(deviceId, options)
-);
+): InputTest;
+
+export function testInputDevice(
+  deviceId?: MediaTrackConstraintSet['deviceId'],
+  options: Partial<InputTest.Options> = {},
+) {
+  return new InputTest({ ...options, deviceId });
+}
