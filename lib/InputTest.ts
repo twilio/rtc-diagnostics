@@ -2,17 +2,22 @@ import { EventEmitter } from 'events';
 import {
   AlreadyStoppedError,
   DiagnosticError,
-} from './error';
+} from './errors';
+
+export declare interface InputTest {
+  emit(event: InputTest.Events.End, didPass: boolean, report: InputTest.Report): boolean;
+  emit(event: InputTest.Events.Error, error: DiagnosticError): boolean;
+  emit(event: InputTest.Events.Volume, value: number): boolean;
+
+  on(event: InputTest.Events.End, listener: (didPass: boolean, report: InputTest.Report) => any): this;
+  on(event: InputTest.Events.Error, listener: (error: DiagnosticError) => any): this;
+  on(event: InputTest.Events.Volume, listener: (value: number) => any): this;
+}
 
 /**
  * Supervises an input device test utilizing a `MediaStream` passed to it, or an
- * input `MediaStream` obtained from `getUserMedia` if there is no `MediaStream`
+ * input `MediaStream` obtained from `getUserMedia` if no `MediaStream` was
  * passed via `options`.
- *
- * If the call to `getUserMedia` fails (i.e. when a user denies permission to
- * acquire media), then the constructor will throw the `DOMError` from
- * `getUserMedia`.
- *
  * The events defined in the enum [[Events]] are emitted as the test
  * runs.
  */
@@ -64,7 +69,7 @@ export class InputTest extends EventEmitter {
    */
   async stop() {
     if (this._endTime) {
-      throw AlreadyStoppedError;
+      throw new AlreadyStoppedError();
     }
 
     // Perform cleanup
@@ -195,10 +200,21 @@ export class InputTest extends EventEmitter {
         volumeEvent,
         this._options.pollIntervalMs,
       );
-    } catch (reason) {
-      // This means that the call to `getUserMedia` failed, so we should
-      // just emit a failed `end` event
-      this._onError(new DiagnosticError(reason));
+    } catch (error) {
+      if (error instanceof DOMError) {
+        // This means that the call to `getUserMedia` failed, so we should
+        // just emit a failed `end` event.
+        this._onError(new DiagnosticError(
+          error,
+          'Call to `getUserMedia` failed.',
+        ));
+      } else if (error instanceof DiagnosticError) {
+        // There is some other fatal error.
+        this._onError(error);
+      } else {
+        // There is an unknown fatal error.
+        console.error(error); // tslint:disable-line no-console
+      }
       this.stop();
     }
   }
@@ -207,33 +223,39 @@ export class InputTest extends EventEmitter {
 export namespace InputTest {
   /**
    * Possible events that an `InputTest` might emit.
+   * See [[InputTest.emit]] and [[InputTest.on]].
+   * @event
    */
   export enum Events {
     /**
-     * Emitted by the test upon completion with a paramter of type [[Report]].
+     * Emitted by the test upon completion with a parameter of type [[Report]].
+     * @event
      */
     End = 'end',
     /**
      * Emitted by the test when encountering an error with a parameter of type
-     * [[DiagnosticError]]
+     * [[DiagnosticError]].
+     * @event
      */
     Error = 'error',
     /**
      * Emitted by the test every [[Options.pollIntervalMs]] amount of
      * milliseconds with a parameter of type `number` that represents the
      * current volume of the audio stream.
+     * @event
      */
     Volume = 'volume',
   }
 
   /**
-   * Report that will be emitted by the [[InputTest]] once the test has finished.
+   * Report that will be emitted by the [[InputTest]] once the test has
+   * finished.
    */
   export interface Report {
     /**
      * The device ID that is passed to the test constructor.
      */
-    deviceId: string | undefined;
+    deviceId: MediaTrackConstraintSet['deviceId'];
     /**
      * Whether or not the test passed as determined by
      * [[InputTest._determinePass]]
@@ -267,8 +289,8 @@ export namespace InputTest {
   export interface Options {
     /**
      * AudioContext to be used during the test. If none is passed, then one will
-     * be made upon construction and closed upon completion. If one is passed, it
-     * will _not_ be closed on completion.
+     * be made upon construction and closed upon completion. If one is passed,
+     * it will _not_ be closed on completion.
      */
     audioContext?: AudioContext;
     deviceId?: MediaTrackConstraintSet['deviceId'];
