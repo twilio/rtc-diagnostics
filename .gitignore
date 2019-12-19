@@ -1,4 +1,5 @@
 .DS_STORE
+.nyc_output/
 
 build
 coverage

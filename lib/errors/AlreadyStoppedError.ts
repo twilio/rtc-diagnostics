@@ -1,4 +1,4 @@
-import { InvalidStateError } from './';
+import { InvalidStateError } from './InvalidStateError';
 
 /**
  * Specific instance of a `InvalidStateError` that mostly occurs when a test

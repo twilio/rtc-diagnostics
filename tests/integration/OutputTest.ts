@@ -187,7 +187,7 @@ describe('testOutputDevice', function() {
 
     it('should not have a "no supported source was found" error', function() {
       assert.equal(outputTestReport.errors.length, 1);
-      const error = outputTestReport.errors[0].error;
+      const error = outputTestReport.errors[0];
       assert(error);
       assert.equal(error!.name, 'NotSupportedError');
     });
