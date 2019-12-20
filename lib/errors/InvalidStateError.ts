@@ -1,4 +1,4 @@
-import { DiagnosticError } from './';
+import { DiagnosticError } from './DiagnosticError';
 
 /**
  * Represents when a test in the Diagnostics SDK is an unknown or unexpected
