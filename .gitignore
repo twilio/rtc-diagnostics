@@ -1,7 +1,10 @@
 .DS_STORE
+.vscode
+.nyc_output
 
 build
 coverage
+credentials.json
 docs
 node_modules
 package-lock.json
