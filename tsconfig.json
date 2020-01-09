@@ -1,15 +1,13 @@
 {
+  "include": ["lib/**/*.ts", "tests/**/*.ts"],
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": false,
     "target": "es5",
     "lib": ["es5", "es6", "es2016", "es2017.object", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
-    "rootDir": "src",
-    "outDir": "build",
     "sourceMap": true,
     "inlineSources": true,
-    "strict": true
+    "strict": true,
+    "outDir": "build"
   }
 }
