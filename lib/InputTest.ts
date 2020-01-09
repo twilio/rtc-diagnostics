@@ -61,7 +61,10 @@ export class InputTest extends EventEmitter {
         });
 
     this._startTime = Date.now();
-    this._startTest();
+
+    // We need to use a `setTimeout` here to prevent a race condition.
+    // This allows event listeners to bind before the test starts.
+    setTimeout(() => this._startTest());
   }
 
   /**
@@ -183,6 +186,10 @@ export class InputTest extends EventEmitter {
       // This function runs every `this._options.reportRate` ms and emits the
       // current volume of the `MediaStream`.
       const volumeEvent = () => {
+        if (this._endTime) {
+          return;
+        }
+
         analyser.getByteFrequencyData(frequencyDataBytes);
         const volume: number =
           frequencyDataBytes.reduce((sum, val) => sum + val, 0) /
