@@ -7,13 +7,15 @@ import {
 } from '../../lib/OutputTest';
 import { AudioElement } from '../../lib/types';
 import { MockAudioContext } from '../mocks/MockAudioContext';
-import { MockAudioElement } from '../mocks/MockAudioElement';
+import { mockAudioElementFactory } from '../mocks/MockAudioElement';
 
 const defaultDuration = 5;
 const defaultPollIntervalMs = 1;
 
 describe('testOutputDevice', function() {
-  const audioElementFactory: (new () => AudioElement) = MockAudioElement as any;
+  const audioElementFactory: (new () => AudioElement) = mockAudioElementFactory({
+    supportSetSinkId: true,
+  }) as any;
 
   const volumeValues = 100;
   describe(`with volume values of ${volumeValues}`, function() {
@@ -106,8 +108,8 @@ describe('testOutputDevice', function() {
     }));
   });
 
-  it('should allow `setSinkId`', async function() {
-    const report = new Promise(resolve => {
+  it('should allow `deviceId` if `setSinkId` is supported', async function() {
+    const report = await new Promise(resolve => {
       const test = testOutputDevice('foobar', {
         audioContext: new MockAudioContext() as any,
         audioElementFactory,
@@ -118,5 +120,15 @@ describe('testOutputDevice', function() {
       test.stop(true);
     });
     assert(report);
+  });
+
+  it('should not allow `deviceId` if `setSinkId` is unsupported', async function() {
+    await assert.rejects(() => new Promise((_, reject) => {
+      const test = testOutputDevice('foobar', {
+        audioContext: new MockAudioContext() as any,
+        audioElementFactory: mockAudioElementFactory({ supportSetSinkId: false }) as any,
+      });
+      test.on(OutputTest.Events.Error, err => reject(err));
+    }));
   });
 });

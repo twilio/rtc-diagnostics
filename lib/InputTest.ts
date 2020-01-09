@@ -214,7 +214,12 @@ export class InputTest extends EventEmitter {
       if (error instanceof DiagnosticError) {
         // There is some other fatal error.
         this._onError(error);
-      } else if (error instanceof DOMError) {
+      } else if (DOMException && error instanceof DOMException) {
+        this._onError(new DiagnosticError(
+          error,
+          'A `DOMException` has occurred.',
+        ));
+      } else if (DOMError && error instanceof DOMError) {
         // This means that the call to `getUserMedia` failed, so we should
         // just emit a failed `end` event.
         this._onError(new DiagnosticError(

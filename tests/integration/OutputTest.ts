@@ -24,6 +24,7 @@ describe('testOutputDevice', function() {
         outputTestReport = await new Promise(resolve => {
           const test = testOutputDevice(undefined, {
             duration: defaultTestDuration,
+            passOnTimeout: false,
             pollIntervalMs: defaultTestPollIntervalMs,
           });
           test.on(OutputTest.Events.Volume, () => {

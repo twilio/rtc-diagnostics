@@ -214,7 +214,12 @@ export class OutputTest extends EventEmitter {
     } catch (error) {
       if (error instanceof DiagnosticError) {
         this._onError(error);
-      } else if (error instanceof DOMError) {
+      } else if (DOMException && error instanceof DOMException) {
+        this._onError(new DiagnosticError(
+          error,
+          'A DOMException has occurred.',
+        ));
+      } else if (DOMError && error instanceof DOMError) {
         this._onError(new DiagnosticError(
           error,
           'A DOMError has occurred.',
