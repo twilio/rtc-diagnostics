@@ -59,7 +59,6 @@ export class OutputTest extends EventEmitter {
    * `_startTest` function.
    * An `AudioContext` is created if none is passed in the `options` parameter
    * and the `_startTime` is immediately set.
-   * @param deviceId
    * @param options
    */
   constructor(options: Partial<OutputTest.Options> = {}) {
@@ -75,7 +74,7 @@ export class OutputTest extends EventEmitter {
     this._audioElement.loop = this._options.doLoop;
 
     this._startTime = Date.now();
-    this._startTest();
+    setTimeout(() => this._startTest());
   }
 
   /**
@@ -122,6 +121,11 @@ export class OutputTest extends EventEmitter {
     return report;
   }
 
+  /**
+   * Error event handler. Adds the error to the internal list of errors that is
+   * forwarded in the report.
+   * @param error
+   */
   private _onError(error: DiagnosticError) {
     this._errors.push(error);
     this.emit(OutputTest.Events.Error, error);
@@ -147,11 +151,12 @@ export class OutputTest extends EventEmitter {
       if (this._options.deviceId) {
         if (this._audioElement.setSinkId) {
           await this._audioElement.setSinkId(this._options.deviceId);
+        } else {
+          throw new UnsupportedError(
+            'A `deviceId` was passed to the `OutputTest` but `setSinkId` is not' +
+            ' supported in this browser.',
+          );
         }
-        throw new UnsupportedError(
-          'A `deviceId` was passed to the `OutputTest` but `setSinkId` is not' +
-          'supported in this browser.',
-        );
       }
 
       const source: MediaElementAudioSourceNode =
@@ -204,16 +209,13 @@ export class OutputTest extends EventEmitter {
         this._options.pollIntervalMs,
       );
     } catch (error) {
-      if (error instanceof DOMError) {
+      if (error instanceof DiagnosticError) {
+        this._onError(error);
+      } else if (error instanceof DOMError) {
         this._onError(new DiagnosticError(
           error,
           'A DOMError has occurred.',
         ));
-      } else if (error instanceof DiagnosticError) {
-        this._onError(error);
-      } else {
-        // Some unknown fatal error occurred.
-        console.error(error); // tslint:disable-line no-console
       }
       this.stop(false);
     }

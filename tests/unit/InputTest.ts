@@ -65,16 +65,14 @@ describe('testInputDevice', function() {
       audioContext: new MockAudioContext({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
-      duration: defaultDuration,
       getUserMedia: mockGetUserMedia as any,
-      pollIntervalMs: defaultPollIntervalMs,
     });
     await test.stop();
-    assert.rejects(() => test.stop());
+    await assert.rejects(() => test.stop());
   });
 
   it('should report errors if the audio context throws', async function() {
-    assert.rejects(() => new Promise((_, reject) => {
+    await assert.rejects(() => new Promise((_, reject) => {
       const test = testInputDevice(undefined, {
         audioContext: new MockAudioContext({
           analyserNodeOptions: { volumeValues: 100 },
