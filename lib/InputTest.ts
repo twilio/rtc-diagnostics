@@ -183,10 +183,6 @@ export class InputTest extends EventEmitter {
       // This function runs every `this._options.reportRate` ms and emits the
       // current volume of the `MediaStream`.
       const volumeEvent = () => {
-        if (this._endTime !== null) {
-          return;
-        }
-
         analyser.getByteFrequencyData(frequencyDataBytes);
         const volume: number =
           frequencyDataBytes.reduce((sum, val) => sum + val, 0) /
@@ -208,19 +204,16 @@ export class InputTest extends EventEmitter {
         this._options.pollIntervalMs,
       );
     } catch (error) {
-      if (error instanceof DOMError) {
+      if (error instanceof DiagnosticError) {
+        // There is some other fatal error.
+        this._onError(error);
+      } else if (error instanceof DOMError) {
         // This means that the call to `getUserMedia` failed, so we should
         // just emit a failed `end` event.
         this._onError(new DiagnosticError(
           error,
           'Call to `getUserMedia` failed.',
         ));
-      } else if (error instanceof DiagnosticError) {
-        // There is some other fatal error.
-        this._onError(error);
-      } else {
-        // There is an unknown fatal error.
-        console.error(error); // tslint:disable-line no-console
       }
       this.stop();
     }
