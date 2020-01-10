@@ -1,3 +1,4 @@
+import { testBitrate } from './BitrateTest';
 import { testInputDevice } from './InputTest';
 import { testOutputDevice } from './OutputTest';
 
@@ -20,6 +21,7 @@ declare global {
 window.Twilio = window.Twilio || {};
 window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
+  testBitrate,
   testInputDevice,
   testOutputDevice,
 };
