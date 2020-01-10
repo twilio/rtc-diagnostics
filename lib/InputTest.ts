@@ -35,6 +35,7 @@ export class InputTest extends EventEmitter {
   private _cleanupAudio: (() => void) | null = null;
   private _endTime: number | null = null;
   private readonly _errors: DiagnosticError[] = [];
+  private _maxValue: number = 0;
   private _mediaStreamPromise: Promise<MediaStream>;
   private _options: InputTest.Options;
   private _startTime: number;
@@ -53,15 +54,17 @@ export class InputTest extends EventEmitter {
     this._options = { ...InputTest.defaultOptions, ...options };
 
     this._audioContext = this._options.audioContext || new AudioContext();
-    this._startTime = Date.now();
-
     this._mediaStreamPromise = this._options.mediaStream
       ? Promise.resolve(this._options.mediaStream)
-      : navigator.mediaDevices.getUserMedia({
+      : (this._options.getUserMedia || navigator.mediaDevices.getUserMedia)({
           audio: { deviceId: this._options.deviceId },
         });
 
-    this._startTest();
+    this._startTime = Date.now();
+
+    // We need to use a `setTimeout` here to prevent a race condition.
+    // This allows event listeners to bind before the test starts.
+    setTimeout(() => this._startTest());
   }
 
   /**
@@ -112,6 +115,10 @@ export class InputTest extends EventEmitter {
     return report;
   }
 
+  get maxVolume(): number {
+    return this._maxValue;
+  }
+
   private _determinePass(): boolean {
     // TODO Come up with a better algorithm for deciding if the volume values
     // resulting in a success
@@ -140,6 +147,9 @@ export class InputTest extends EventEmitter {
    * @param value the volume
    */
   private _onVolume(value: number): void {
+    if (value > this._maxValue) {
+      this._maxValue = value;
+    }
     this._values.push(value);
     this.emit(InputTest.Events.Volume, value);
   }
@@ -163,7 +173,7 @@ export class InputTest extends EventEmitter {
       analyser.fftSize = 64;
 
       const microphone: MediaStreamAudioSourceNode =
-      this._audioContext.createMediaStreamSource(mediaStream);
+        this._audioContext.createMediaStreamSource(mediaStream);
       microphone.connect(analyser);
 
       this._cleanupAudio = () => {
@@ -176,7 +186,7 @@ export class InputTest extends EventEmitter {
       // This function runs every `this._options.reportRate` ms and emits the
       // current volume of the `MediaStream`.
       const volumeEvent = () => {
-        if (this._endTime !== null) {
+        if (this._endTime) {
           return;
         }
 
@@ -201,19 +211,21 @@ export class InputTest extends EventEmitter {
         this._options.pollIntervalMs,
       );
     } catch (error) {
-      if (error instanceof DOMError) {
+      if (error instanceof DiagnosticError) {
+        // There is some other fatal error.
+        this._onError(error);
+      } else if (DOMException && error instanceof DOMException) {
+        this._onError(new DiagnosticError(
+          error,
+          'A `DOMException` has occurred.',
+        ));
+      } else if (DOMError && error instanceof DOMError) {
         // This means that the call to `getUserMedia` failed, so we should
         // just emit a failed `end` event.
         this._onError(new DiagnosticError(
           error,
           'Call to `getUserMedia` failed.',
         ));
-      } else if (error instanceof DiagnosticError) {
-        // There is some other fatal error.
-        this._onError(error);
-      } else {
-        // There is an unknown fatal error.
-        console.error(error); // tslint:disable-line no-console
       }
       this.stop();
     }
@@ -293,16 +305,27 @@ export namespace InputTest {
      * it will _not_ be closed on completion.
      */
     audioContext?: AudioContext;
+    /**
+     * The device ID to try to get a MediaStream from using `getUserMedia`.
+     */
     deviceId?: MediaTrackConstraintSet['deviceId'];
     /**
      * Duration of time to run the test in ms
      */
     duration: number;
     /**
+     * Used to mock calls to `getUserMedia`.
+     * @private
+     */
+    getUserMedia?: typeof navigator.mediaDevices.getUserMedia;
+    /**
      * MediaStream to use during the test. If none is passed, then a call to
      * `getUserMedia` will be made to try and get the medi
      */
     mediaStream?: MediaStream;
+    /**
+     * The polling rate to emit volume events.
+     */
     pollIntervalMs: number;
   }
 }
