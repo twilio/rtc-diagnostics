@@ -61,7 +61,10 @@ export class InputTest extends EventEmitter {
         });
 
     this._startTime = Date.now();
-    this._startTest();
+
+    // We need to use a `setTimeout` here to prevent a race condition.
+    // This allows event listeners to bind before the test starts.
+    setTimeout(() => this._startTest());
   }
 
   /**
@@ -183,7 +186,7 @@ export class InputTest extends EventEmitter {
       // This function runs every `this._options.reportRate` ms and emits the
       // current volume of the `MediaStream`.
       const volumeEvent = () => {
-        if (this._endTime !== null) {
+        if (this._endTime) {
           return;
         }
 
@@ -208,19 +211,21 @@ export class InputTest extends EventEmitter {
         this._options.pollIntervalMs,
       );
     } catch (error) {
-      if (error instanceof DOMError) {
+      if (error instanceof DiagnosticError) {
+        // There is some other fatal error.
+        this._onError(error);
+      } else if (DOMException && error instanceof DOMException) {
+        this._onError(new DiagnosticError(
+          error,
+          'A `DOMException` has occurred.',
+        ));
+      } else if (DOMError && error instanceof DOMError) {
         // This means that the call to `getUserMedia` failed, so we should
         // just emit a failed `end` event.
         this._onError(new DiagnosticError(
           error,
           'Call to `getUserMedia` failed.',
         ));
-      } else if (error instanceof DiagnosticError) {
-        // There is some other fatal error.
-        this._onError(error);
-      } else {
-        // There is an unknown fatal error.
-        console.error(error); // tslint:disable-line no-console
       }
       this.stop();
     }

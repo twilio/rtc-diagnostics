@@ -5,7 +5,7 @@ export class DiagnosticError extends Error {
   /**
    * The associated `DOMError` that caused this `DiagnosticError`.
    */
-  domError: DOMError | undefined;
+  domError: DOMError | DOMException | undefined;
   /**
    * The timestamp of the occurrence of this error.
    */
@@ -16,10 +16,12 @@ export class DiagnosticError extends Error {
    * @param domError
    * @param message
    */
-  constructor(domError?: DOMError, message?: string) {
+  constructor(domError?: DOMError | DOMException, message?: string) {
     super(message);
     this.timestamp = Date.now();
     this.domError = domError;
+
+    Object.setPrototypeOf(this, DiagnosticError.prototype);
 
     this.name = 'DiagnosticError';
   }

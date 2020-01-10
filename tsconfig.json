@@ -8,6 +8,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "strict": true,
-    "outDir": "build"
+    "outDir": "build",
+    "resolveJsonModule": true
   }
 }
