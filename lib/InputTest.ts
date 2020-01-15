@@ -2,7 +2,9 @@ import { EventEmitter } from 'events';
 import {
   AlreadyStoppedError,
   DiagnosticError,
+  UnsupportedError,
 } from './errors';
+import { AudioContext } from './polyfills/AudioContext';
 
 export declare interface InputTest {
   emit(event: InputTest.Events.End, didPass: boolean, report: InputTest.Report): boolean;
@@ -53,12 +55,28 @@ export class InputTest extends EventEmitter {
 
     this._options = { ...InputTest.defaultOptions, ...options };
 
-    this._audioContext = this._options.audioContext || new AudioContext();
-    this._mediaStreamPromise = this._options.mediaStream
-      ? Promise.resolve(this._options.mediaStream)
-      : (this._options.getUserMedia || navigator.mediaDevices.getUserMedia)({
+    if (this._options.audioContext) {
+      this._audioContext = this._options.audioContext;
+    } else {
+      if (AudioContext === null) {
+        throw new UnsupportedError(
+          'AudioContext is not supported by this browser.',
+        );
+      }
+      this._audioContext = new AudioContext();
+    }
+
+    if (this._options.mediaStream) {
+      this._mediaStreamPromise = Promise.resolve(this._options.mediaStream);
+    } else {
+      this._mediaStreamPromise = this._options.getUserMedia
+        ? this._options.getUserMedia({
+          audio: { deviceId: this._options.deviceId },
+        })
+        : navigator.mediaDevices.getUserMedia({
           audio: { deviceId: this._options.deviceId },
         });
+    }
 
     this._startTime = Date.now();
 

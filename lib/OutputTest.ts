@@ -5,6 +5,7 @@ import {
   DiagnosticError,
   UnsupportedError,
 } from './errors';
+import { AudioContext } from './polyfills/AudioContext';
 import { AudioElement } from './types';
 
 export declare interface OutputTest {
@@ -66,7 +67,17 @@ export class OutputTest extends EventEmitter {
 
     this._options = { ...OutputTest.defaultOptions, ...options };
 
-    this._audioContext = this._options.audioContext || new AudioContext();
+    if (this._options.audioContext) {
+      this._audioContext = this._options.audioContext;
+    } else {
+      if (AudioContext === null) {
+        throw new UnsupportedError(
+          'AudioContext is not supported by this browser.',
+        );
+      }
+      this._audioContext = new AudioContext();
+    }
+
     this._audioElement = new (this._options.audioElementFactory || Audio)(
       this._options.testURI,
     );
