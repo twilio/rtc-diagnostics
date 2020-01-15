@@ -47,7 +47,6 @@ export const filterIceServerUrls = (
 export class NetworkTest extends EventEmitter {
   static defaultOptions: NetworkTest.Options = {
     iceServers: [],
-    region: 'gll',
     serverType: 'stun' as const,
     timeoutMs: 5000,
   };
@@ -201,10 +200,6 @@ export namespace NetworkTest {
      * this protocol.
      */
     protocol?: 'tcp' | 'udp';
-    /**
-     * The region to use.
-     */
-    region: string;
     /**
      * The ICE server type to use. If we use `turn`, we may also need `stun`.
      * Using `turn` forces `relay`.
