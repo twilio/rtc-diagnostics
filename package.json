@@ -61,7 +61,7 @@
     "tslint": "5.20.1",
     "twilio": "3.39.1",
     "typedoc": "github:ryan-rowland/typedoc#1.0.1",
-    "typedoc-twilio-theme": "git://github.com/charliesantos/typedoc-twilio-theme#32b72f3",
+    "typedoc-twilio-theme": "github:charliesantos/typedoc-twilio-theme#1.0.1",
     "typescript": "3.7.2",
     "vinyl-fs": "3.0.3",
     "vinyl-source-stream": "2.0.0"
