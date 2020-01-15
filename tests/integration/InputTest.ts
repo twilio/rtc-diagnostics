@@ -7,7 +7,8 @@ import {
   testInputDevice,
 } from '../../lib/InputTest';
 
-const defaultTestDuration = 500;
+const testTimeout = 10000;
+const defaultTestDuration = 5000;
 const defaultTestPollIntervalMs = 50;
 
 describe('testInputDevice', function() {
@@ -35,6 +36,7 @@ describe('testInputDevice', function() {
         let report: InputTest.Report;
 
         before(function(done) {
+          this.timeout(testTimeout);
           vol.gain.value = 1;
           testInputDevice(undefined, {
             duration: defaultTestDuration,
@@ -58,6 +60,7 @@ describe('testInputDevice', function() {
         let report: InputTest.Report;
 
         before(function(done) {
+          this.timeout(testTimeout);
           vol.gain.value = 0;
           testInputDevice(undefined, {
             duration: defaultTestDuration,

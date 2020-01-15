@@ -8,7 +8,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "strict": true,
-    "outDir": "build",
+    "outDir": "es5",
     "resolveJsonModule": true
   }
 }

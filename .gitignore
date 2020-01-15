@@ -2,9 +2,10 @@
 .vscode
 .nyc_output
 
-build
 coverage
 credentials.json
+dist
 docs
+es5
 node_modules
 package-lock.json
