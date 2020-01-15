@@ -1,8 +1,6 @@
 // Karma configuration
 // Generated on Thu Nov 21 2019 13:53:15 GMT-0800 (PST)
 
-const isDocker = require('is-docker')();
-
 export default function(config: any) {
   const firefoxFlags = [];
   const chromeFlags = [
@@ -12,14 +10,13 @@ export default function(config: any) {
     '--autoplay-policy=no-user-gesture-required',
   ];
 
-  if (isDocker) {
-    firefoxFlags.push('-headless');
-    chromeFlags.push(
-      '--headless',
-      '--disable-gpu',
-      '--remote-debugging-port=9222',
-    );
-  }
+  firefoxFlags.push('-headless');
+  chromeFlags.push(
+    '--headless',
+    '--disable-gpu',
+    '--remote-debugging-port=9222',
+    '--use-fake-device-for-media-stream',
+  );
 
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -47,7 +44,7 @@ export default function(config: any) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'karma-typescript'],
+    reporters: ['spec', 'karma-typescript'],
 
     // web server port
     port: 9876,
@@ -75,7 +72,7 @@ export default function(config: any) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity,
+    concurrency: 1,
 
     // options passed to the typescript compiler
     karmaTypescriptConfig: {
