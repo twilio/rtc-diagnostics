@@ -12,4 +12,6 @@ declare global {
 }
 
 export const AudioContext: typeof window.AudioContext | null =
-  window.AudioContext || window.webkitAudioContext || null;
+  typeof window !== 'undefined'
+    ? window.AudioContext || window.webkitAudioContext || null
+    : null;
