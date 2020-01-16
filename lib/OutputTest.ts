@@ -110,7 +110,8 @@ export class OutputTest extends EventEmitter {
    */
   stop(pass: boolean) {
     if (this._endTime) {
-      throw new AlreadyStoppedError();
+      console.warn(new AlreadyStoppedError()); // tslint:disable-line no-console
+      return;
     }
 
     // Clean up the test.
@@ -179,10 +180,11 @@ export class OutputTest extends EventEmitter {
         if (this._audioElement.setSinkId) {
           await this._audioElement.setSinkId(this._options.deviceId);
         } else {
-          throw new UnsupportedError(
-            'A `deviceId` was passed to the `OutputTest` but `setSinkId` is not' +
-            ' supported in this browser.',
-          );
+          // Non-fatal error
+          this._onError(new UnsupportedError(
+            'A `deviceId` was passed to the `OutputTest` but `setSinkId` is ' +
+            'not supported in this browser.',
+          ));
         }
       }
 
@@ -238,12 +240,16 @@ export class OutputTest extends EventEmitter {
     } catch (error) {
       if (error instanceof DiagnosticError) {
         this._onError(error);
-      } else if (DOMException && error instanceof DOMException) {
+      } else if (
+        typeof DOMException !== 'undefined' && error instanceof DOMException
+      ) {
         this._onError(new DiagnosticError(
           error,
           'A DOMException has occurred.',
         ));
-      } else if (DOMError && error instanceof DOMError) {
+      } else if (
+        typeof DOMError !== 'undefined' && error instanceof DOMError
+      ) {
         this._onError(new DiagnosticError(
           error,
           'A DOMError has occurred.',

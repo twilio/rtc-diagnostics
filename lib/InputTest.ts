@@ -92,7 +92,8 @@ export class InputTest extends EventEmitter {
    */
   stop() {
     if (this._endTime) {
-      throw new AlreadyStoppedError();
+      console.warn(new AlreadyStoppedError()); // tslint:disable-line no-console
+      return;
     }
 
     // Perform cleanup
@@ -148,8 +149,7 @@ export class InputTest extends EventEmitter {
     // Loops over every sample, checks to see if it was completely silent by
     // checking if the average of the amplitudes is 0, and returns whether or
     // not more than 50% of the samples were silent.
-    return this._errors.length === 0 &&
-      this._values.length > 3 &&
+    return this._values.length > 3 &&
       (this._values.filter(v => v > 0).length / this._values.length) > 0.5;
   }
 
@@ -236,17 +236,19 @@ export class InputTest extends EventEmitter {
       if (error instanceof DiagnosticError) {
         // There is some other fatal error.
         this._onError(error);
-      } else if (DOMException && error instanceof DOMException) {
+      } else if (
+        typeof DOMException !== 'undefined' && error instanceof DOMException
+      ) {
         this._onError(new DiagnosticError(
           error,
           'A `DOMException` has occurred.',
         ));
-      } else if (DOMError && error instanceof DOMError) {
-        // This means that the call to `getUserMedia` failed, so we should
-        // just emit a failed `end` event.
+      } else if (
+        typeof DOMError !== 'undefined' && error instanceof DOMError
+      ) {
         this._onError(new DiagnosticError(
           error,
-          'Call to `getUserMedia` failed.',
+          'A `DOMError` has occurred.',
         ));
       }
       this.stop();
