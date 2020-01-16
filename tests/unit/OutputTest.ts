@@ -1,6 +1,7 @@
 // tslint:disable only-arrow-functions
 
 import * as assert from 'assert';
+import { DiagnosticError } from '../../lib/errors';
 import {
   OutputTest,
   testOutputDevice,
@@ -82,15 +83,58 @@ describe('testOutputDevice', function() {
     });
   });
 
-  it('should throw if stopped twice', async function() {
+  it('should report a failure if allowed to timeout and `passOnTimeout === false`', async function() {
+    const result: { error?: DiagnosticError, report?: OutputTest.Report } = {};
+    await new Promise(resolve => {
+      const test = testOutputDevice(undefined, {
+        audioContext: new MockAudioContext() as any,
+        audioElementFactory,
+        duration: defaultDuration,
+        passOnTimeout: false,
+        pollIntervalMs: defaultPollIntervalMs,
+      });
+      test.on(OutputTest.Events.Error, err => {
+        result['error'] = err;
+        if (result.error && result.report) {
+          resolve(result);
+        }
+      });
+      test.on(OutputTest.Events.End, (_, r) => {
+        result['report'] = r;
+        if (result.error && result.report) {
+          resolve(result);
+        }
+      });
+    });
+    assert(result.report);
+    assert(result.error);
+    assert.equal(result.error!.message, 'Test timed out.');
+    assert.equal(result.report!.didPass, false);
+    assert.equal(result.report!.errors.length, 1);
+    assert.equal(result.error, result.report!.errors[0]);
+  });
+
+  it('should throw if `AudioContext` is not supported', function() {
+    assert.throws(() => testOutputDevice(undefined, {
+      audioElementFactory,
+    }));
+  });
+
+  it('should throw if `Audio` is not supported', function() {
+    assert.throws(() => testOutputDevice(undefined, {
+      audioContext: new MockAudioContext() as any,
+    }));
+  });
+
+  it('should throw if stopped twice', function() {
     const test = testOutputDevice(undefined, {
       audioContext: new MockAudioContext({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
       audioElementFactory,
     });
-    await test.stop(false);
-    await assert.rejects(() => test.stop(false));
+    test.stop(false);
+    assert.throws(() => test.stop(false));
   });
 
   it('should report an error if the audio context throws', async function() {

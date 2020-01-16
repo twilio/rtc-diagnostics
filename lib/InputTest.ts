@@ -4,7 +4,9 @@ import {
   DiagnosticError,
   UnsupportedError,
 } from './errors';
-import { AudioContext } from './polyfills/AudioContext';
+import {
+  PolyfillAudioContext as AudioContext,
+} from './polyfills/AudioContext';
 
 export declare interface InputTest {
   emit(event: InputTest.Events.End, didPass: boolean, report: InputTest.Report): boolean;
@@ -88,33 +90,35 @@ export class InputTest extends EventEmitter {
   /**
    * Stop the currently running `InputTest`.
    */
-  async stop() {
+  stop() {
     if (this._endTime) {
       throw new AlreadyStoppedError();
     }
 
     // Perform cleanup
+    if (this._volumeTimeout !== null) {
+      clearTimeout(this._volumeTimeout);
+    }
+
     if (this._cleanupAudio !== null) {
       this._cleanupAudio();
     }
+
     if (!this._options.mediaStream) {
       // this means we made a call to getUserMedia
       // we don't want to stop the tracks we get if they were passed in via
       // parameters
-      try {
-        const mediaStream = await this._mediaStreamPromise;
+      this._mediaStreamPromise.then(mediaStream => {
         mediaStream.getTracks().forEach(track => track.stop());
-      } catch {
+      }).catch(() => {
         // if the media stream promise failed, we didn't successfully perform
         // getUserMedia, and therefore we don't need to stop any tracks
-      }
+      });
     }
+
     if (!this._options.audioContext) {
       // This means we made our own `AudioContext` so we want to close it
       this._audioContext.close();
-    }
-    if (this._volumeTimeout !== null) {
-      clearTimeout(this._volumeTimeout);
     }
 
     this._endTime = Date.now();

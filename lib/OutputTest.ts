@@ -5,7 +5,9 @@ import {
   DiagnosticError,
   UnsupportedError,
 } from './errors';
-import { AudioContext } from './polyfills/AudioContext';
+import {
+  PolyfillAudioContext as AudioContext,
+} from './polyfills/AudioContext';
 import { AudioElement } from './types';
 
 export declare interface OutputTest {
@@ -78,9 +80,19 @@ export class OutputTest extends EventEmitter {
       this._audioContext = new AudioContext();
     }
 
-    this._audioElement = new (this._options.audioElementFactory || Audio)(
-      this._options.testURI,
-    );
+    if (this._options.audioElementFactory) {
+      this._audioElement = new this._options.audioElementFactory(
+        this._options.testURI,
+      );
+    } else {
+      if (typeof Audio === 'undefined') {
+        throw new UnsupportedError(
+          'The `HTMLAudioElement` constructor `Audio` is not supported.',
+        );
+      }
+      this._audioElement = new Audio(this._options.testURI);
+    }
+
     this._audioElement.setAttribute('crossorigin', 'anonymous');
     this._audioElement.loop = this._options.doLoop;
 
@@ -96,27 +108,28 @@ export class OutputTest extends EventEmitter {
    * user is able to hear and not.
    * @param pass
    */
-  async stop(pass: boolean) {
+  stop(pass: boolean) {
     if (this._endTime) {
       throw new AlreadyStoppedError();
     }
 
     // Clean up the test.
-    if (this._playPromise) {
-      try {
-        // we need to try to wait for the call to play to finish before we can
-        // pause the audio
-        await this._playPromise;
-        this._audioElement.pause();
-      } catch {
-        // this means play errored out so we do nothing
-      }
+    if (this._volumeTimeout) {
+      clearTimeout(this._volumeTimeout);
     }
+
     if (!this._options.audioContext) {
       this._audioContext.close();
     }
-    if (this._volumeTimeout) {
-      clearTimeout(this._volumeTimeout);
+
+    if (this._playPromise) {
+      this._playPromise.then(() => {
+        // we need to try to wait for the call to play to finish before we can
+        // pause the audio
+        this._audioElement.pause();
+      }).catch(() => {
+        // this means play errored out so we do nothing
+      });
     }
 
     this._endTime = Date.now();

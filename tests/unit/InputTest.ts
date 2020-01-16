@@ -7,6 +7,8 @@ import {
 } from '../../lib/InputTest';
 import { MockAudioContext } from '../mocks/MockAudioContext';
 import { mockGetUserMedia } from '../mocks/mockGetUserMedia';
+import { MockMediaStream } from '../mocks/MockMediaStream';
+import { MockTrack } from '../mocks/MockTrack';
 
 const defaultDuration = 100;
 const defaultPollIntervalMs = 10;
@@ -60,15 +62,32 @@ describe('testInputDevice', function() {
     });
   });
 
-  it('should throw an error if stopped multiple times', async function() {
+  it('should work with a MockMediaStream', async function() {
+    const report = new Promise(resolve => {
+      const test = testInputDevice(undefined, {
+        audioContext: new MockAudioContext() as any,
+        mediaStream: new MockMediaStream({
+          tracks: [new MockTrack(), new MockTrack()],
+        }) as any,
+      });
+      test.on(InputTest.Events.End, (_, r) => resolve(r));
+    });
+    assert(report);
+  });
+
+  it('should throw an error if AudioContext is not supported', function() {
+    assert.throws(() => testInputDevice());
+  });
+
+  it('should throw an error if stopped multiple times', function() {
     const test = testInputDevice(undefined, {
       audioContext: new MockAudioContext({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
       getUserMedia: mockGetUserMedia as any,
     });
-    await test.stop();
-    await assert.rejects(() => test.stop());
+    test.stop();
+    assert.throws(() => test.stop());
   });
 
   it('should report errors if the audio context throws', async function() {

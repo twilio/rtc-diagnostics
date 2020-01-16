@@ -1,4 +1,9 @@
-/* tslint:disable */
+/**
+ * The following rule is necessary as having `BitrateTest` imported first causes
+ * unit tests to crash.
+ */
+/* tslint:disable ordered-imports */
+
 import './InputTest';
 import './OutputTest';
 import './BitrateTest';

@@ -1,5 +1,5 @@
 import { MockMediaStream } from './MockMediaStream';
 
-export function mockGetUserMedia() {
+export async function mockGetUserMedia() {
   return new MockMediaStream();
 }
