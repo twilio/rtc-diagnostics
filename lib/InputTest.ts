@@ -30,17 +30,18 @@ export class InputTest extends EventEmitter {
    * Default options for the `InputTest`.
    */
   static defaultOptions: InputTest.Options = {
+    debug: false,
     duration: 5000,
     pollIntervalMs: 100,
   };
   static testName = 'input-volume' as const;
 
-  private _audioContext: AudioContext;
+  private _audioContext: AudioContext | null = null;
   private _cleanupAudio: (() => void) | null = null;
   private _endTime: number | null = null;
   private readonly _errors: DiagnosticError[] = [];
   private _maxValue: number = 0;
-  private _mediaStreamPromise: Promise<MediaStream>;
+  private _mediaStreamPromise: Promise<MediaStream> | null = null;
   private _options: InputTest.Options;
   private _startTime: number;
   private readonly _values: number[] = [];
@@ -57,29 +58,6 @@ export class InputTest extends EventEmitter {
 
     this._options = { ...InputTest.defaultOptions, ...options };
 
-    if (this._options.audioContext) {
-      this._audioContext = this._options.audioContext;
-    } else {
-      if (AudioContext === null) {
-        throw new UnsupportedError(
-          'AudioContext is not supported by this browser.',
-        );
-      }
-      this._audioContext = new AudioContext();
-    }
-
-    if (this._options.mediaStream) {
-      this._mediaStreamPromise = Promise.resolve(this._options.mediaStream);
-    } else {
-      this._mediaStreamPromise = this._options.getUserMedia
-        ? this._options.getUserMedia({
-          audio: { deviceId: this._options.deviceId },
-        })
-        : navigator.mediaDevices.getUserMedia({
-          audio: { deviceId: this._options.deviceId },
-        });
-    }
-
     this._startTime = Date.now();
 
     // We need to use a `setTimeout` here to prevent a race condition.
@@ -89,10 +67,12 @@ export class InputTest extends EventEmitter {
 
   /**
    * Stop the currently running `InputTest`.
+   * @param pass whether or not the test should pass. If set to false, will
+   * override the result from `determinePass`.
    */
-  stop() {
+  stop(pass: boolean = true) {
     if (this._endTime) {
-      console.warn(new AlreadyStoppedError()); // tslint:disable-line no-console
+      this._onWarning(new AlreadyStoppedError());
       return;
     }
 
@@ -105,7 +85,7 @@ export class InputTest extends EventEmitter {
       this._cleanupAudio();
     }
 
-    if (!this._options.mediaStream) {
+    if (!this._options.mediaStream && this._mediaStreamPromise) {
       // this means we made a call to getUserMedia
       // we don't want to stop the tracks we get if they were passed in via
       // parameters
@@ -117,13 +97,13 @@ export class InputTest extends EventEmitter {
       });
     }
 
-    if (!this._options.audioContext) {
+    if (!this._options.audioContext && this._audioContext) {
       // This means we made our own `AudioContext` so we want to close it
       this._audioContext.close();
     }
 
     this._endTime = Date.now();
-    const didPass = this._determinePass();
+    const didPass = pass && this._determinePass();
     const report = {
       deviceId: this._options.deviceId,
       didPass,
@@ -177,6 +157,17 @@ export class InputTest extends EventEmitter {
   }
 
   /**
+   * Warning event handler.
+   * @param warning
+   */
+  private _onWarning(error: DiagnosticError) {
+    if (this._options.debug) {
+      // tslint:disable-next-line no-console
+      console.warn(error);
+    }
+  }
+
+  /**
    * Entry point into the input device test. Uses the `MediaStream` that the
    * object was set up with, and performs a fourier transform on the audio data
    * using an `AnalyserNode`. The output of the fourier transform are the
@@ -188,6 +179,41 @@ export class InputTest extends EventEmitter {
    */
   private async _startTest() {
     try {
+      if (this._options.mediaStream) {
+        this._mediaStreamPromise = Promise.resolve(this._options.mediaStream);
+      } else {
+        if (this._options.getUserMedia) {
+          this._mediaStreamPromise = this._options.getUserMedia({
+            audio: { deviceId: this._options.deviceId },
+          });
+        } else {
+          if (
+            typeof navigator === 'undefined' ||
+            navigator.mediaDevices === undefined ||
+            navigator.mediaDevices.getUserMedia === undefined
+          ) {
+            throw new UnsupportedError(
+              'The function `getUserMedia` is not supported.',
+            );
+          }
+          this._mediaStreamPromise = navigator.mediaDevices.getUserMedia({
+            audio: { deviceId: this._options.deviceId },
+          });
+        }
+      }
+
+      if (this._options.audioContext) {
+        this._audioContext = this._options.audioContext;
+      } else {
+        if (AudioContext === null) {
+          // Fatal error
+          throw new UnsupportedError(
+            'AudioContext is not supported by this browser.',
+          );
+        }
+        this._audioContext = new AudioContext();
+      }
+
       const mediaStream: MediaStream = await this._mediaStreamPromise;
 
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
@@ -251,7 +277,7 @@ export class InputTest extends EventEmitter {
           'A `DOMError` has occurred.',
         ));
       }
-      this.stop();
+      this.stop(false);
     }
   }
 }
@@ -329,6 +355,10 @@ export namespace InputTest {
      * it will _not_ be closed on completion.
      */
     audioContext?: AudioContext;
+    /**
+     * Whether or not to log debug statements to the console.
+     */
+    debug: boolean;
     /**
      * The device ID to try to get a MediaStream from using `getUserMedia`.
      */

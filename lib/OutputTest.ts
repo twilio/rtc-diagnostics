@@ -39,6 +39,7 @@ export declare interface OutputTest {
  */
 export class OutputTest extends EventEmitter {
   static defaultOptions: OutputTest.Options = {
+    debug: false,
     doLoop: true,
     duration: Infinity,
     passOnTimeout: true,
@@ -47,8 +48,8 @@ export class OutputTest extends EventEmitter {
   };
   static testName = 'output-volume' as const;
 
-  private _audioContext: AudioContext;
-  private _audioElement: AudioElement;
+  private _audioContext: AudioContext | null = null;
+  private _audioElement: AudioElement | null = null;
   private _endTime: number | null = null;
   private readonly _errors: DiagnosticError[] = [];
   private _options: OutputTest.Options;
@@ -69,33 +70,6 @@ export class OutputTest extends EventEmitter {
 
     this._options = { ...OutputTest.defaultOptions, ...options };
 
-    if (this._options.audioContext) {
-      this._audioContext = this._options.audioContext;
-    } else {
-      if (AudioContext === null) {
-        throw new UnsupportedError(
-          'AudioContext is not supported by this browser.',
-        );
-      }
-      this._audioContext = new AudioContext();
-    }
-
-    if (this._options.audioElementFactory) {
-      this._audioElement = new this._options.audioElementFactory(
-        this._options.testURI,
-      );
-    } else {
-      if (typeof Audio === 'undefined') {
-        throw new UnsupportedError(
-          'The `HTMLAudioElement` constructor `Audio` is not supported.',
-        );
-      }
-      this._audioElement = new Audio(this._options.testURI);
-    }
-
-    this._audioElement.setAttribute('crossorigin', 'anonymous');
-    this._audioElement.loop = this._options.doLoop;
-
     this._startTime = Date.now();
 
     // We need to use a `setTimeout` here to prevent a race condition.
@@ -110,7 +84,7 @@ export class OutputTest extends EventEmitter {
    */
   stop(pass: boolean) {
     if (this._endTime) {
-      console.warn(new AlreadyStoppedError()); // tslint:disable-line no-console
+      this._onWarning(new AlreadyStoppedError());
       return;
     }
 
@@ -119,7 +93,7 @@ export class OutputTest extends EventEmitter {
       clearTimeout(this._volumeTimeout);
     }
 
-    if (!this._options.audioContext) {
+    if (!this._options.audioContext && this._audioContext) {
       this._audioContext.close();
     }
 
@@ -127,7 +101,9 @@ export class OutputTest extends EventEmitter {
       this._playPromise.then(() => {
         // we need to try to wait for the call to play to finish before we can
         // pause the audio
-        this._audioElement.pause();
+        if (this._audioElement) {
+          this._audioElement.pause();
+        }
       }).catch(() => {
         // this means play errored out so we do nothing
       });
@@ -170,12 +146,52 @@ export class OutputTest extends EventEmitter {
   }
 
   /**
+   * Warning event handler.
+   * @param warning
+   */
+  private _onWarning(error: DiagnosticError) {
+    if (this._options.debug) {
+      // tslint:disable-next-line no-console
+      console.warn(error);
+    }
+  }
+
+  /**
    * Entry point of the test, called after setup in the constructor.
    * Emits the volume levels of the audio.
    * @event `OutputTest.Events.Volume`
    */
   private async _startTest() {
     try {
+      if (this._options.audioContext) {
+        this._audioContext = this._options.audioContext;
+      } else {
+        if (AudioContext === null) {
+          // Fatal error
+          throw new UnsupportedError(
+            'AudioContext is not supported by this browser.',
+          );
+        }
+        this._audioContext = new AudioContext();
+      }
+
+      if (this._options.audioElementFactory) {
+        this._audioElement = new this._options.audioElementFactory(
+          this._options.testURI,
+        );
+      } else {
+        if (typeof Audio === 'undefined') {
+          // Fatal error
+          throw new UnsupportedError(
+            'The `HTMLAudioElement` constructor `Audio` is not supported.',
+          );
+        }
+        this._audioElement = new Audio(this._options.testURI);
+      }
+
+      this._audioElement.setAttribute('crossorigin', 'anonymous');
+      this._audioElement.loop = this._options.doLoop;
+
       if (this._options.deviceId) {
         if (this._audioElement.setSinkId) {
           await this._audioElement.setSinkId(this._options.deviceId);
@@ -213,7 +229,7 @@ export class OutputTest extends EventEmitter {
         const isTimedOut = Date.now() - this._startTime > this._options.duration;
         const stop = this._options.doLoop
           ? isTimedOut
-          : this._audioElement.ended || isTimedOut;
+          : (this._audioElement && this._audioElement.ended) || isTimedOut;
 
         if (stop) {
           if (this._options.passOnTimeout === false) {
@@ -305,6 +321,10 @@ export namespace OutputTest {
      * @private
      */
     audioElementFactory?: new (...args: any[]) => AudioElement;
+    /**
+     * Whether or not to log debug statements to the console.
+     */
+    debug: boolean;
     /**
      * The `deviceId` of the audio device to attempt to play audio out of.
      * This option is directly passed to [[AudioElement.setSinkId]].

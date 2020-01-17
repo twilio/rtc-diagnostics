@@ -114,16 +114,61 @@ describe('testOutputDevice', function() {
     assert.equal(result.error, result.report!.errors[0]);
   });
 
-  it('should throw if `AudioContext` is not supported', function() {
-    assert.throws(() => testOutputDevice(undefined, {
-      audioElementFactory,
-    }));
-  });
+  describe('should immediately end and report an error', function() {
+    // not providing the mock object here results in the test resorting to the
+    // global
+    // because these are unit tests, and node does not have these globals,
+    // they are null and are essentially "not supported"
 
-  it('should throw if `Audio` is not supported', function() {
-    assert.throws(() => testOutputDevice(undefined, {
-      audioContext: new MockAudioContext() as any,
-    }));
+    it('when AudioContext is not supported', async function() {
+      const report: OutputTest.Report = await new Promise(resolve => {
+        const test = testOutputDevice(undefined, {
+          audioElementFactory,
+        });
+        test.on(OutputTest.Events.Error, () => {
+          // do nothing, prevent rejection
+        });
+        test.on(OutputTest.Events.End, (_, r) => resolve(r));
+      });
+      assert(report);
+      assert.equal(report.didPass, false);
+      assert.equal(report.errors.length, 1);
+      const [error] = report.errors;
+      assert(error instanceof DiagnosticError);
+      assert.equal(error.name, 'UnsupportedError');
+    });
+    it('when Audio is not supported', async function() {
+      const report: OutputTest.Report = await new Promise(resolve => {
+        const test = testOutputDevice(undefined, {
+          audioContext: new MockAudioContext() as any,
+        });
+        test.on(OutputTest.Events.Error, () => {
+          // do nothing, prevent rejection
+        });
+        test.on(OutputTest.Events.End, (_, r) => resolve(r));
+      });
+      assert(report);
+      assert.equal(report.didPass, false);
+      assert.equal(report.errors.length, 1);
+      const [error] = report.errors;
+      assert(error instanceof DiagnosticError);
+      assert.equal(error.name, 'UnsupportedError');
+    });
+    it('when neither AudioContext or Audio is supported', async function() {
+      const report: OutputTest.Report = await new Promise(resolve => {
+        const test = testOutputDevice();
+        test.on(OutputTest.Events.Error, () => {
+          // do nothing, prevent rejection
+        });
+        test.on(OutputTest.Events.End, (_, r) => resolve(r));
+      });
+      assert(report);
+      assert.equal(report.didPass, false);
+      assert.equal(report.errors.length, 1);
+      const [error] = report.errors;
+      assert(error instanceof DiagnosticError);
+      assert.equal(error.name, 'UnsupportedError');
+    });
   });
 
   it('should throw if stopped twice', function() {
@@ -132,9 +177,12 @@ describe('testOutputDevice', function() {
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
       audioElementFactory,
+      debug: false, // prevent console warnings
     });
-    test.stop(false);
-    assert.throws(() => test.stop(false));
+    const report = test.stop(false);
+    assert(report);
+    const shouldBeUndefined = test.stop(false);
+    assert.equal(shouldBeUndefined, undefined);
   });
 
   it('should report an error if the audio context throws', async function() {
