@@ -31,7 +31,7 @@ export class InputTest extends EventEmitter {
    */
   static defaultOptions: InputTest.Options = {
     debug: false,
-    duration: 5000,
+    duration: Infinity,
     pollIntervalMs: 100,
   };
   static testName = 'input-volume' as const;
