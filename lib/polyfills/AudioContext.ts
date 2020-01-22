@@ -1,3 +1,5 @@
+import { UnsupportedError } from '../errors';
+
 /**
  * This file provides a cross-browser polyfill for AudioContext.
  *
@@ -15,7 +17,24 @@ declare global {
   }
 }
 
-export const PolyfillAudioContext: typeof AudioContext | null =
-  typeof window !== 'undefined'
-    ? window.AudioContext || window.webkitAudioContext || null
-    : null;
+const UnsupportedAudioContextError = new UnsupportedError(
+  'AudioContext is not supported by this browser.',
+);
+
+/**
+ * Attempts to polyfill `AudioContext`. Will throw an `UnsupportedError` if
+ * unable to.
+ */
+export const polyfillAudioContext: () => typeof AudioContext = () => {
+  if (typeof window === 'undefined') {
+    // Fatal error
+    throw UnsupportedAudioContextError;
+  }
+
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (AudioContext === undefined) {
+    throw UnsupportedAudioContextError;
+  }
+
+  return AudioContext;
+};

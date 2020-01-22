@@ -1,126 +1,162 @@
 /* tslint:disable only-arrow-functions */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 
 import {
   InputTest,
   testInputDevice,
 } from '../../lib/InputTest';
 
-const testTimeout = 10000;
-const defaultTestDuration = 5000;
-const defaultTestPollIntervalMs = 50;
+const defaultTestDuration = 250;
+const defaultTestPollIntervalMs = 5;
 
 describe('testInputDevice', function() {
-  describe('when given a MediaStream', function() {
-    let mediaStream: MediaStream;
-    let vol: GainNode;
+  describe('with a deviceId', function() {
+    let volumeHandler: sinon.SinonSpy;
+    let errorHandler: sinon.SinonSpy;
+    let endHandler: sinon.SinonSpy;
 
-    before(function() {
-      const context = new AudioContext();
+    beforeEach(async function() {
+      volumeHandler = sinon.spy();
+      errorHandler = sinon.spy();
+      endHandler = sinon.spy();
 
-      const streamDestination = context.createMediaStreamDestination();
-      const oscillator = context.createOscillator();
-      vol = context.createGain();
-
-      oscillator.connect(vol);
-      vol.connect(streamDestination);
-
-      oscillator.start();
-      mediaStream = streamDestination.stream;
-    });
-
-    describe('allowed to run for full duration', function() {
-      describe('when the stream is audible', function() {
-        let didPass: boolean;
-        let report: InputTest.Report;
-
-        before(function(done) {
-          this.timeout(testTimeout);
-          vol.gain.value = 1;
-          testInputDevice(undefined, {
-            duration: defaultTestDuration,
-            mediaStream,
-            pollIntervalMs: defaultTestPollIntervalMs,
-          }).on(InputTest.Events.End, (p: boolean, r: InputTest.Report) => {
-            didPass = p;
-            report = r;
-            done();
-          });
+      await new Promise(resolve => {
+        const test = testInputDevice('default', {
+          debug: false,
+          duration: defaultTestDuration,
+          pollIntervalMs: defaultTestPollIntervalMs,
         });
-
-        it('should return a report with `didPass === true`', function() {
-          assert(didPass);
-          assert(report.didPass);
-        });
-      });
-
-      describe('when the stream is silent', function() {
-        let didPass: boolean;
-        let report: InputTest.Report;
-
-        before(function(done) {
-          this.timeout(testTimeout);
-          vol.gain.value = 0;
-          testInputDevice(undefined, {
-            duration: defaultTestDuration,
-            mediaStream,
-            pollIntervalMs: defaultTestPollIntervalMs,
-          }).on(InputTest.Events.End, (p: boolean, r: InputTest.Report) => {
-            didPass = p;
-            report = r;
-            done();
-          });
-        });
-
-        it('should have all values set to 0', function() {
-          assert.equal(report.values.filter(v => v !== 0).length, 0);
-        });
-
-        it('should return a report with `didPass === false`', function() {
-          assert.equal(didPass, false);
-          assert.equal(report.didPass, false);
+        test.on(InputTest.Events.Error, errorHandler);
+        test.on(InputTest.Events.Volume, volumeHandler);
+        test.on(InputTest.Events.End, (_, r) => {
+          endHandler(r);
+          // we want to wait before resolving so we can detect if the end handler
+          // has been called multiple times
+          setTimeout(() => resolve(), defaultTestDuration);
         });
       });
     });
 
-    describe('stopped manually', function() {
-      let events: InputTest.Events[];
+    it('should have called the volume handler more than once', function() {
+      assert(volumeHandler.callCount > 1);
+    });
 
-      before(async function() {
-        const pollIntervalMs = defaultTestPollIntervalMs;
+    it('should have not called the error handler', function() {
+      assert(!errorHandler.called);
+    });
 
-        events = await new Promise(resolve => {
-          const e: InputTest.Events[] = [];
-          const test = testInputDevice(undefined, {
-            duration: Infinity,
-            mediaStream,
-            pollIntervalMs,
-          });
-          test.on(InputTest.Events.End, () => {
-            e.push(InputTest.Events.End);
-            setTimeout(
-              () => resolve(e),
-              pollIntervalMs * 3,
-            );
-          });
-          test.on(InputTest.Events.Volume, () => {
-            e.push(InputTest.Events.Volume);
-          });
-          setTimeout(
-            () => test.stop(),
-            pollIntervalMs * 5,
-          );
+    it('should have called the end handler once', function() {
+      assert(endHandler.callCount === 1);
+    });
+
+    it('should have generated a valid report', function() {
+      const report: InputTest.Report = endHandler.args[0][0];
+      assert(report);
+
+      assert('deviceId' in report);
+      assert('errors' in report);
+      assert.equal(report.errors.length, 0);
+      assert('startTime' in report);
+      assert('endTime' in report);
+      assert('didPass' in report);
+      assert('testName' in report);
+      assert(report.testName === InputTest.testName);
+      assert('values' in report);
+    });
+
+    it('should contain the same amount of volume values as there were volume events', function() {
+      const report: InputTest.Report = endHandler.args[0][0];
+      assert(report);
+
+      assert.equal(report.values.length, volumeHandler.callCount);
+    });
+
+    it('should not contain any errors', function() {
+      const report: InputTest.Report = endHandler.args[0][0];
+      assert(report);
+
+      assert('errors' in report);
+      assert.equal(report.errors.length, 0);
+    });
+
+    afterEach(function() {
+      sinon.restore();
+    });
+  });
+
+  describe('without a deviceId', function() {
+    let volumeHandler: sinon.SinonSpy;
+    let errorHandler: sinon.SinonSpy;
+    let endHandler: sinon.SinonSpy;
+
+    beforeEach(async function() {
+      volumeHandler = sinon.spy();
+      errorHandler = sinon.spy();
+      endHandler = sinon.spy();
+
+      await new Promise(resolve => {
+        const test = testInputDevice(undefined, {
+          debug: false,
+          duration: defaultTestDuration,
+          pollIntervalMs: defaultTestPollIntervalMs,
+        });
+        test.on(InputTest.Events.Error, errorHandler);
+        test.on(InputTest.Events.Volume, volumeHandler);
+        test.on(InputTest.Events.End, (_, r) => {
+          endHandler(r);
+          // we want to wait before resolving so we can detect if the end handler
+          // has been called multiple times
+          setTimeout(() => resolve(), defaultTestDuration);
         });
       });
+    });
 
-      it('reports some number of volume events', function() {
-        assert(events.filter(v => v === InputTest.Events.Volume).length);
-      });
+    it('should have called the volume handler more than once', function() {
+      assert(volumeHandler.callCount > 1);
+    });
 
-      it('no volume events occur after the end event', async function() {
-        assert.equal(events[events.length - 1], InputTest.Events.End);
-      });
+    it('should have not called the error handler', function() {
+      assert(!errorHandler.called);
+    });
+
+    it('should have called the end handler once', function() {
+      assert(endHandler.callCount === 1);
+    });
+
+    it('should have generated a valid report', function() {
+      const report: InputTest.Report = endHandler.args[0][0];
+      assert(report);
+
+      assert('deviceId' in report);
+      assert('errors' in report);
+      assert.equal(report.errors.length, 0);
+      assert('startTime' in report);
+      assert('endTime' in report);
+      assert('didPass' in report);
+      assert('testName' in report);
+      assert(report.testName === InputTest.testName);
+      assert('values' in report);
+    });
+
+    it('should contain the same amount of volume values as there were volume events', function() {
+      const report: InputTest.Report = endHandler.args[0][0];
+      assert(report);
+
+      assert.equal(report.values.length, volumeHandler.callCount);
+    });
+
+    it('should not contain any errors', function() {
+      const report: InputTest.Report = endHandler.args[0][0];
+      assert(report);
+
+      assert('errors' in report);
+      assert.equal(report.errors.length, 0);
+    });
+
+    afterEach(function() {
+      sinon.restore();
     });
   });
 });

@@ -2,11 +2,11 @@ import { EventEmitter } from 'events';
 import {
   AlreadyStoppedError,
   DiagnosticError,
-  UnsupportedError,
 } from './errors';
 import {
-  PolyfillAudioContext as AudioContext,
-} from './polyfills/AudioContext';
+  polyfillAudioContext,
+  polyfillGetUserMedia,
+} from './polyfills';
 
 export declare interface InputTest {
   emit(event: InputTest.Events.End, didPass: boolean, report: InputTest.Report): boolean;
@@ -41,15 +41,14 @@ export class InputTest extends EventEmitter {
   private _endTime: number | null = null;
   private readonly _errors: DiagnosticError[] = [];
   private _maxValue: number = 0;
-  private _mediaStreamPromise: Promise<MediaStream> | null = null;
+  private _mediaStream: MediaStream | null = null;
   private _options: InputTest.Options;
   private _startTime: number;
   private readonly _values: number[] = [];
   private _volumeTimeout: NodeJS.Timeout | null = null;
 
   /**
-   * Creates an `AudioContext` for use in the test if none is passed via
-   * the `options` parameter.
+   * Initializes the `startTime` and `options`.
    * @param deviceIdOrTrack
    * @param options
    */
@@ -77,30 +76,7 @@ export class InputTest extends EventEmitter {
     }
 
     // Perform cleanup
-    if (this._volumeTimeout !== null) {
-      clearTimeout(this._volumeTimeout);
-    }
-
-    if (this._cleanupAudio !== null) {
-      this._cleanupAudio();
-    }
-
-    if (!this._options.mediaStream && this._mediaStreamPromise) {
-      // this means we made a call to getUserMedia
-      // we don't want to stop the tracks we get if they were passed in via
-      // parameters
-      this._mediaStreamPromise.then(mediaStream => {
-        mediaStream.getTracks().forEach(track => track.stop());
-      }).catch(() => {
-        // if the media stream promise failed, we didn't successfully perform
-        // getUserMedia, and therefore we don't need to stop any tracks
-      });
-    }
-
-    if (!this._options.audioContext && this._audioContext) {
-      // This means we made our own `AudioContext` so we want to close it
-      this._audioContext.close();
-    }
+    this._cleanup();
 
     this._endTime = Date.now();
     const didPass = pass && this._determinePass();
@@ -120,6 +96,26 @@ export class InputTest extends EventEmitter {
 
   get maxVolume(): number {
     return this._maxValue;
+  }
+
+  /**
+   * Clean up any instanciated objects (i.e. `AudioContext`, `MediaStreams`,
+   * etc.).
+   * Called by `.stop`.
+   */
+  private _cleanup() {
+    if (this._volumeTimeout) {
+      clearTimeout(this._volumeTimeout);
+    }
+    if (this._cleanupAudio) {
+      this._cleanupAudio();
+    }
+    if (this._mediaStream) {
+      this._mediaStream.getTracks().forEach(track => track.stop());
+    }
+    if (this._audioContext) {
+      this._audioContext.close();
+    }
   }
 
   private _determinePass(): boolean {
@@ -179,49 +175,22 @@ export class InputTest extends EventEmitter {
    */
   private async _startTest() {
     try {
-      if (this._options.mediaStream) {
-        this._mediaStreamPromise = Promise.resolve(this._options.mediaStream);
-      } else {
-        if (this._options.getUserMedia) {
-          this._mediaStreamPromise = this._options.getUserMedia({
-            audio: { deviceId: this._options.deviceId },
-          });
-        } else {
-          if (
-            typeof navigator === 'undefined' ||
-            navigator.mediaDevices === undefined ||
-            navigator.mediaDevices.getUserMedia === undefined
-          ) {
-            throw new UnsupportedError(
-              'The function `getUserMedia` is not supported.',
-            );
-          }
-          this._mediaStreamPromise = navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: this._options.deviceId },
-          });
-        }
-      }
+      this._mediaStream = await (
+        this._options.getUserMedia || polyfillGetUserMedia()
+      )({
+        audio: { deviceId: this._options.deviceId },
+      });
 
-      if (this._options.audioContext) {
-        this._audioContext = this._options.audioContext;
-      } else {
-        if (AudioContext === null) {
-          // Fatal error
-          throw new UnsupportedError(
-            'AudioContext is not supported by this browser.',
-          );
-        }
-        this._audioContext = new AudioContext();
-      }
-
-      const mediaStream: MediaStream = await this._mediaStreamPromise;
+      this._audioContext = new (
+        this._options.audioContextFactory || polyfillAudioContext()
+      )();
 
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
       analyser.fftSize = 64;
 
       const microphone: MediaStreamAudioSourceNode =
-        this._audioContext.createMediaStreamSource(mediaStream);
+        this._audioContext.createMediaStreamSource(this._mediaStream);
       microphone.connect(analyser);
 
       this._cleanupAudio = () => {
@@ -350,11 +319,10 @@ export namespace InputTest {
    */
   export interface Options {
     /**
-     * AudioContext to be used during the test. If none is passed, then one will
-     * be made upon construction and closed upon completion. If one is passed,
-     * it will _not_ be closed on completion.
+     * AudioContext mock to be used during the test.
+     * @private
      */
-    audioContext?: AudioContext;
+    audioContextFactory?: typeof window.AudioContext;
     /**
      * Whether or not to log debug statements to the console.
      */
@@ -371,12 +339,7 @@ export namespace InputTest {
      * Used to mock calls to `getUserMedia`.
      * @private
      */
-    getUserMedia?: typeof navigator.mediaDevices.getUserMedia;
-    /**
-     * MediaStream to use during the test. If none is passed, then a call to
-     * `getUserMedia` will be made to try and get the medi
-     */
-    mediaStream?: MediaStream;
+    getUserMedia?: typeof window.navigator.mediaDevices.getUserMedia;
     /**
      * The polling rate to emit volume events.
      */

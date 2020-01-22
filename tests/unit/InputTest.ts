@@ -6,10 +6,8 @@ import {
   InputTest,
   testInputDevice,
 } from '../../lib/InputTest';
-import { MockAudioContext } from '../mocks/MockAudioContext';
+import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockGetUserMedia } from '../mocks/mockGetUserMedia';
-import { MockMediaStream } from '../mocks/MockMediaStream';
-import { MockTrack } from '../mocks/MockTrack';
 
 const defaultDuration = 100;
 const defaultPollIntervalMs = 10;
@@ -22,7 +20,7 @@ describe('testInputDevice', function() {
     before(async function() {
       report = await new Promise(resolve => {
         test = testInputDevice(undefined, {
-          audioContext: new MockAudioContext({
+          audioContextFactory: mockAudioContextFactory({
             analyserNodeOptions: { volumeValues: 100 },
           }) as any,
           duration: defaultDuration,
@@ -48,7 +46,7 @@ describe('testInputDevice', function() {
     before(async function() {
       report = await new Promise(resolve => {
         testInputDevice(undefined, {
-          audioContext: new MockAudioContext({
+          audioContextFactory: mockAudioContextFactory({
             analyserNodeOptions: { volumeValues: 0 },
           }) as any,
           duration: defaultDuration,
@@ -61,19 +59,6 @@ describe('testInputDevice', function() {
     it('should have not passed', function() {
       assert.equal(report.didPass, false);
     });
-  });
-
-  it('should work with a MockMediaStream', async function() {
-    const report = new Promise(resolve => {
-      const test = testInputDevice(undefined, {
-        audioContext: new MockAudioContext() as any,
-        mediaStream: new MockMediaStream({
-          tracks: [new MockTrack(), new MockTrack()],
-        }) as any,
-      });
-      test.on(InputTest.Events.End, (_, r) => resolve(r));
-    });
-    assert(report);
   });
 
   describe('should immediately end and report an error', function() {
@@ -102,7 +87,7 @@ describe('testInputDevice', function() {
     it('when getUserMedia is not supported', async function() {
       const report: InputTest.Report = await new Promise(resolve => {
         const test = testInputDevice(undefined, {
-          audioContext: new MockAudioContext() as any,
+          audioContextFactory: mockAudioContextFactory() as any,
         });
         test.on(InputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -135,7 +120,7 @@ describe('testInputDevice', function() {
 
   it('should do nothing if stopped multiple times', function() {
     const test = testInputDevice(undefined, {
-      audioContext: new MockAudioContext({
+      audioContextFactory: mockAudioContextFactory({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
       debug: false, // prevent console warnings
@@ -150,7 +135,7 @@ describe('testInputDevice', function() {
   it('should report errors if the audio context throws', async function() {
     await assert.rejects(() => new Promise((_, reject) => {
       const test = testInputDevice(undefined, {
-        audioContext: new MockAudioContext({
+        audioContextFactory: mockAudioContextFactory({
           analyserNodeOptions: { volumeValues: 100 },
           doThrow: { createAnalyser: true },
         }) as any,

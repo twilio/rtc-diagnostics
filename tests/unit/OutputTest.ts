@@ -7,7 +7,7 @@ import {
   testOutputDevice,
 } from '../../lib/OutputTest';
 import { AudioElement } from '../../lib/types';
-import { MockAudioContext } from '../mocks/MockAudioContext';
+import { MockAudioContext, mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockAudioElementFactory } from '../mocks/MockAudioElement';
 
 const defaultDuration = 5;
@@ -23,13 +23,13 @@ describe('testOutputDevice', function() {
     let report: OutputTest.Report;
 
     before(async function() {
-      const audioContext: AudioContext = new MockAudioContext({
+      const audioContextFactory: typeof AudioContext = mockAudioContextFactory({
         analyserNodeOptions: { volumeValues },
       }) as any;
 
       report = await new Promise(resolve => {
         testOutputDevice(undefined, {
-          audioContext,
+          audioContextFactory,
           audioElementFactory,
           duration: defaultDuration,
           pollIntervalMs: defaultPollIntervalMs,
@@ -55,13 +55,13 @@ describe('testOutputDevice', function() {
     let report: OutputTest.Report;
 
     before(async function() {
-      const audioContext: AudioContext = new MockAudioContext({
+      const audioContextFactory: typeof AudioContext = mockAudioContextFactory({
         analyserNodeOptions: { volumeValues: 0 },
       }) as any;
 
       report = await new Promise(resolve => {
         testOutputDevice(undefined, {
-          audioContext,
+          audioContextFactory,
           audioElementFactory,
           duration: defaultDuration,
           pollIntervalMs: defaultPollIntervalMs,
@@ -87,7 +87,7 @@ describe('testOutputDevice', function() {
     const result: { error?: DiagnosticError, report?: OutputTest.Report } = {};
     await new Promise(resolve => {
       const test = testOutputDevice(undefined, {
-        audioContext: new MockAudioContext() as any,
+        audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory,
         duration: defaultDuration,
         passOnTimeout: false,
@@ -140,7 +140,7 @@ describe('testOutputDevice', function() {
     it('when Audio is not supported', async function() {
       const report: OutputTest.Report = await new Promise(resolve => {
         const test = testOutputDevice(undefined, {
-          audioContext: new MockAudioContext() as any,
+          audioContextFactory: mockAudioContextFactory() as any,
         });
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -173,7 +173,7 @@ describe('testOutputDevice', function() {
 
   it('should throw if stopped twice', function() {
     const test = testOutputDevice(undefined, {
-      audioContext: new MockAudioContext({
+      audioContextFactory: mockAudioContextFactory({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
       audioElementFactory,
@@ -188,7 +188,7 @@ describe('testOutputDevice', function() {
   it('should report an error if the audio context throws', async function() {
     await assert.rejects(() => new Promise((_, reject) => {
       const test = testOutputDevice(undefined, {
-        audioContext: new MockAudioContext({
+        audioContextFactory: mockAudioContextFactory({
           analyserNodeOptions: { volumeValues: 100 },
           doThrow: { createAnalyser: true },
         }) as any,
@@ -203,7 +203,7 @@ describe('testOutputDevice', function() {
   it('should allow `deviceId` if `setSinkId` is supported', async function() {
     const report = await new Promise(resolve => {
       const test = testOutputDevice('foobar', {
-        audioContext: new MockAudioContext() as any,
+        audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory,
         duration: defaultDuration,
         pollIntervalMs: defaultPollIntervalMs,
@@ -217,7 +217,7 @@ describe('testOutputDevice', function() {
   it('should not allow `deviceId` if `setSinkId` is unsupported', async function() {
     await assert.rejects(() => new Promise((_, reject) => {
       const test = testOutputDevice('foobar', {
-        audioContext: new MockAudioContext() as any,
+        audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory: mockAudioElementFactory({ supportSetSinkId: false }) as any,
       });
       test.on(OutputTest.Events.Error, err => reject(err));

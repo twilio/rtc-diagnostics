@@ -6,8 +6,9 @@ import {
   UnsupportedError,
 } from './errors';
 import {
-  PolyfillAudioContext as AudioContext,
-} from './polyfills/AudioContext';
+  polyfillAudio,
+  polyfillAudioContext,
+} from './polyfills';
 import { AudioElement } from './types';
 
 export declare interface OutputTest {
@@ -82,32 +83,14 @@ export class OutputTest extends EventEmitter {
    * user is able to hear and not.
    * @param pass
    */
-  stop(pass: boolean) {
+  stop(pass: boolean = false) {
     if (this._endTime) {
       this._onWarning(new AlreadyStoppedError());
       return;
     }
 
     // Clean up the test.
-    if (this._volumeTimeout) {
-      clearTimeout(this._volumeTimeout);
-    }
-
-    if (!this._options.audioContext && this._audioContext) {
-      this._audioContext.close();
-    }
-
-    if (this._playPromise) {
-      this._playPromise.then(() => {
-        // we need to try to wait for the call to play to finish before we can
-        // pause the audio
-        if (this._audioElement) {
-          this._audioElement.pause();
-        }
-      }).catch(() => {
-        // this means play errored out so we do nothing
-      });
-    }
+    this._cleanup();
 
     this._endTime = Date.now();
     const report: OutputTest.Report = {
@@ -123,6 +106,29 @@ export class OutputTest extends EventEmitter {
     this.emit(OutputTest.Events.End, report.didPass, report);
 
     return report;
+  }
+
+  /**
+   * Cleanup the test.
+   */
+  private _cleanup() {
+    if (this._volumeTimeout) {
+      clearTimeout(this._volumeTimeout);
+    }
+    if (this._audioContext) {
+      this._audioContext.close();
+    }
+    if (this._playPromise) {
+      this._playPromise.then(() => {
+        // we need to try to wait for the call to play to finish before we can
+        // pause the audio
+        if (this._audioElement) {
+          this._audioElement.pause();
+        }
+      }).catch(() => {
+        // this means play errored out so we do nothing
+      });
+    }
   }
 
   /**
@@ -163,32 +169,13 @@ export class OutputTest extends EventEmitter {
    */
   private async _startTest() {
     try {
-      if (this._options.audioContext) {
-        this._audioContext = this._options.audioContext;
-      } else {
-        if (AudioContext === null) {
-          // Fatal error
-          throw new UnsupportedError(
-            'AudioContext is not supported by this browser.',
-          );
-        }
-        this._audioContext = new AudioContext();
-      }
+      this._audioContext = new (
+        this._options.audioContextFactory || polyfillAudioContext()
+      )();
 
-      if (this._options.audioElementFactory) {
-        this._audioElement = new this._options.audioElementFactory(
-          this._options.testURI,
-        );
-      } else {
-        if (typeof Audio === 'undefined') {
-          // Fatal error
-          throw new UnsupportedError(
-            'The `HTMLAudioElement` constructor `Audio` is not supported.',
-          );
-        }
-        this._audioElement = new Audio(this._options.testURI);
-      }
-
+      this._audioElement = new (
+        this._options.audioElementFactory || polyfillAudio()
+      )(this._options.testURI);
       this._audioElement.setAttribute('crossorigin', 'anonymous');
       this._audioElement.loop = this._options.doLoop;
 
@@ -314,7 +301,7 @@ export namespace OutputTest {
      * by the test if passed in. If it is not passed in, an `AudioContext` will
      * be made that will be closed.
      */
-    audioContext?: AudioContext;
+    audioContextFactory?: typeof window.AudioContext;
     /**
      * A constuctor that is used to create an [[AudioElement]], useful for
      * mocks.
