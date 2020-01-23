@@ -87,7 +87,7 @@ export class OutputTest extends EventEmitter {
    * user is able to hear and not.
    * @param pass
    */
-  stop(pass: boolean = false) {
+  stop(pass: boolean = true) {
     if (this._endTime) {
       this._onWarning(new AlreadyStoppedError());
       return;
