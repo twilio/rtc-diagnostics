@@ -9,7 +9,6 @@ import { UnsupportedError } from '../errors';
  * It is necessary to declare `AudioContext` in the `Window` global as it does
  * not exist in older typings.
  */
-
 declare global {
   interface Window {
     AudioContext: typeof AudioContext;
@@ -17,24 +16,17 @@ declare global {
   }
 }
 
-const UnsupportedAudioContextError = new UnsupportedError(
+/**
+ * Common error that can be thrown when the polyfill is unable to work.
+ */
+export const AudioContextUnsupportedError = new UnsupportedError(
   'AudioContext is not supported by this browser.',
 );
 
 /**
- * Attempts to polyfill `AudioContext`. Will throw an `UnsupportedError` if
- * unable to.
+ * Attempts to polyfill `AudioContext`.
  */
-export const polyfillAudioContext: () => typeof AudioContext = () => {
-  if (typeof window === 'undefined') {
-    // Fatal error
-    throw UnsupportedAudioContextError;
-  }
-
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (AudioContext === undefined) {
-    throw UnsupportedAudioContextError;
-  }
-
-  return AudioContext;
-};
+export const AudioContextPolyfill: typeof window.AudioContext | undefined =
+  typeof window !== 'undefined'
+    ? window.AudioContext || window.webkitAudioContext
+    : undefined;

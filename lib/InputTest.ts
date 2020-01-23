@@ -4,8 +4,10 @@ import {
   DiagnosticError,
 } from './errors';
 import {
-  polyfillAudioContext,
-  polyfillGetUserMedia,
+  AudioContext,
+  AudioContextUnsupportedError,
+  getUserMedia,
+  GetUserMediaUnsupportedError,
 } from './polyfills';
 
 export declare interface InputTest {
@@ -30,8 +32,10 @@ export class InputTest extends EventEmitter {
    * Default options for the `InputTest`.
    */
   static defaultOptions: InputTest.Options = {
+    audioContextFactory: AudioContext,
     debug: false,
     duration: Infinity,
+    getUserMedia,
     pollIntervalMs: 100,
   };
   static testName = 'input-volume' as const;
@@ -175,15 +179,17 @@ export class InputTest extends EventEmitter {
    */
   private async _startTest() {
     try {
-      this._mediaStream = await (
-        this._options.getUserMedia || polyfillGetUserMedia()
-      )({
+      if (!this._options.getUserMedia) {
+        throw GetUserMediaUnsupportedError;
+      }
+      this._mediaStream = await this._options.getUserMedia({
         audio: { deviceId: this._options.deviceId },
       });
 
-      this._audioContext = new (
-        this._options.audioContextFactory || polyfillAudioContext()
-      )();
+      if (!this._options.audioContextFactory) {
+        throw AudioContextUnsupportedError;
+      }
+      this._audioContext = new this._options.audioContextFactory();
 
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
@@ -245,6 +251,12 @@ export class InputTest extends EventEmitter {
           error,
           'A `DOMError` has occurred.',
         ));
+      } else {
+        this._onError(new DiagnosticError(
+          undefined,
+          'Unknown error occurred.',
+        ));
+        this._onWarning(error);
       }
       this.stop(false);
     }

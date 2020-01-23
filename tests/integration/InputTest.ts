@@ -34,7 +34,7 @@ describe('testInputDevice', function() {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
-          setTimeout(() => resolve(), defaultTestDuration);
+          setTimeout(() => resolve(), defaultTestPollIntervalMs * 3);
         });
       });
     });
@@ -108,7 +108,7 @@ describe('testInputDevice', function() {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
-          setTimeout(() => resolve(), defaultTestDuration);
+          setTimeout(() => resolve(), defaultTestPollIntervalMs * 3);
         });
       });
     });

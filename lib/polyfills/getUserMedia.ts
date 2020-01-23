@@ -10,25 +10,22 @@ declare global {
 }
 
 /**
- * This polyfill only serves to rebind `getUserMedia` to the
- * `navigator.mediaDevices` scope and throws an `UnsupportedError` if it does
- * not exist.
+ * Common error that can be thrown when the polyfill is unable to work.
  */
-export const polyfillGetUserMedia: () => typeof window.navigator.mediaDevices.getUserMedia = () => {
-  if (
-    typeof window === 'undefined' ||
-    window.navigator === undefined ||
-    window.navigator.mediaDevices === undefined ||
-    window.navigator.mediaDevices.getUserMedia === undefined
-  ) {
-    throw new UnsupportedError(
-      'The function `getUserMedia` is not supported.',
-    );
-  }
+export const GetUserMediaUnsupportedError = new UnsupportedError(
+  'The function `getUserMedia` is not supported.',
+);
 
-  // We need to bind `getUserMedia` here because of a browser bug that loses
-  // the scope.
-  return window.navigator.mediaDevices.getUserMedia.bind(
-    window.navigator.mediaDevices,
-  );
-};
+/**
+ * This polyfill serves to rebind `getUserMedia` to the `navigator.mediaDevices`
+ * scope.
+ */
+export const getUserMediaPolyfill: typeof window.navigator.mediaDevices.getUserMedia | undefined =
+  typeof window !== 'undefined' &&
+  window.navigator !== undefined &&
+  window.navigator.mediaDevices !== undefined &&
+  window.navigator.mediaDevices.getUserMedia !== undefined
+    ? window.navigator.mediaDevices.getUserMedia.bind(
+      window.navigator.mediaDevices,
+    )
+    : undefined;

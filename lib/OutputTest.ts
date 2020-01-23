@@ -6,8 +6,10 @@ import {
   UnsupportedError,
 } from './errors';
 import {
-  polyfillAudio,
-  polyfillAudioContext,
+  Audio,
+  AudioContext,
+  AudioContextUnsupportedError,
+  AudioUnsupportedError,
 } from './polyfills';
 import { AudioElement } from './types';
 
@@ -40,6 +42,8 @@ export declare interface OutputTest {
  */
 export class OutputTest extends EventEmitter {
   static defaultOptions: OutputTest.Options = {
+    audioContextFactory: AudioContext,
+    audioElementFactory: Audio,
     debug: false,
     doLoop: true,
     duration: Infinity,
@@ -169,13 +173,15 @@ export class OutputTest extends EventEmitter {
    */
   private async _startTest() {
     try {
-      this._audioContext = new (
-        this._options.audioContextFactory || polyfillAudioContext()
-      )();
+      if (!this._options.audioContextFactory) {
+        throw AudioContextUnsupportedError;
+      }
+      this._audioContext = new this._options.audioContextFactory();
 
-      this._audioElement = new (
-        this._options.audioElementFactory || polyfillAudio()
-      )(this._options.testURI);
+      if (!this._options.audioElementFactory) {
+        throw AudioUnsupportedError;
+      }
+      this._audioElement = new this._options.audioElementFactory(this._options.testURI);
       this._audioElement.setAttribute('crossorigin', 'anonymous');
       this._audioElement.loop = this._options.doLoop;
 
@@ -257,6 +263,12 @@ export class OutputTest extends EventEmitter {
           error,
           'A DOMError has occurred.',
         ));
+      } else {
+        this._onError(new DiagnosticError(
+          undefined,
+          'Unknown error occurred.',
+        ));
+        this._onWarning(error);
       }
       this.stop(false);
     }
