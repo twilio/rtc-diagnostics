@@ -1,5 +1,9 @@
 import { EventEmitter } from 'events';
 import { DiagnosticError } from '../errors';
+import {
+  connectionPolyfill as connection,
+  NetworkInformation,
+} from '../polyfills/connection';
 import { RTCCall } from './RTCCall';
 
 export declare interface NetworkTest {
@@ -46,6 +50,7 @@ export const filterIceServerUrls = (
  */
 export class NetworkTest extends EventEmitter {
   static defaultOptions: NetworkTest.Options = {
+    connection,
     iceServers: [],
     serverType: 'stun' as const,
     timeoutMs: 5000,
@@ -92,14 +97,26 @@ export class NetworkTest extends EventEmitter {
   stop(didPass: boolean) {
     this._rtcCall.close();
 
+    const networkInformation = this._options.connection || {};
+
     this._endTime = Date.now();
+
+    // We are unable to use the spread operator here on `networkInformation`,
+    // the values will always be `undefined`.
     const report: NetworkTest.Report = {
       didPass,
+      downlink: networkInformation.downlink,
+      downlinkMax: networkInformation.downlinkMax,
+      effectiveType: networkInformation.effectiveType,
       endTime: this._endTime,
       errors: this._errors,
+      rtt: networkInformation.rtt,
+      saveData: networkInformation.saveData,
       startTime: this._startTime,
       testName: NetworkTest.testName,
+      type: networkInformation.type,
     };
+
     this.emit(NetworkTest.Events.End, report);
   }
 
@@ -185,6 +202,11 @@ export namespace NetworkTest {
    */
   export interface Options {
     /**
+     * A `NetworkInformation` connection. Used for mocking.
+     * @private
+     */
+    connection?: NetworkInformation;
+    /**
      * A list of `RTCIceServer` credentials for the two `RTCPeerConnection`s to
      * use.
      */
@@ -238,6 +260,18 @@ export namespace NetworkTest {
      */
     didPass: boolean;
     /**
+     * NetworkInformation downlink
+     */
+    downlink?: number;
+    /**
+     * NetworkInformation downlinkMax
+     */
+    downlinkMax?: number;
+    /**
+     * NetworkInformation effectiveType
+     */
+    effectiveType?: string;
+    /**
      * The timestamp when the [[NetworkTest]] ended.
      */
     endTime: number;
@@ -246,6 +280,14 @@ export namespace NetworkTest {
      */
     errors: DiagnosticError[];
     /**
+     * NetworkInformation rtt
+     */
+    rtt?: number;
+    /**
+     * NetworkInformation saveData
+     */
+    saveData?: boolean;
+    /**
      * When the [[NetworkTest]] starts, set on construction.
      */
     startTime: number;
@@ -253,6 +295,10 @@ export namespace NetworkTest {
      * The name of the [[NetworkTest]].
      */
     testName: typeof NetworkTest.testName;
+    /**
+     * NetworkInformation type
+     */
+    type?: string;
   }
 }
 
