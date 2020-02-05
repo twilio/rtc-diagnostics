@@ -62,7 +62,7 @@ export class NetworkTest extends EventEmitter {
   private _errors: DiagnosticError[] = [];
   private _options: NetworkTest.Options;
   private _peerConnectionConfig: RTCConfiguration;
-  private _rtcCall: RTCCall;
+  private _rtcCall: RTCCall | null = null;
   private _startTime: number;
 
   constructor(options: Partial<NetworkTest.Options> = {}) {
@@ -81,10 +81,6 @@ export class NetworkTest extends EventEmitter {
         ? 'relay'
         : 'all',
     };
-    this._rtcCall = new RTCCall({
-      peerConnectionConfig: this._peerConnectionConfig,
-      peerConnectionFactory: this._options.peerConnectionFactory,
-    });
 
     this._startTest();
   }
@@ -95,7 +91,9 @@ export class NetworkTest extends EventEmitter {
    * @param didPass
    */
   stop(didPass: boolean) {
-    this._rtcCall.close();
+    if (this._rtcCall) {
+      this._rtcCall.close();
+    }
 
     const networkInformation = this._options.connection || {};
 
@@ -136,28 +134,37 @@ export class NetworkTest extends EventEmitter {
    * other. If this process takes
    */
   private async _startTest() {
-    // Set up a promise that resolves when we receive the correct message
-    // on the receiving PeerConnection
-    const receivedMessage = new Promise(resolve => {
-      this._rtcCall.on(RTCCall.Events.Message, message => {
-        if (message.data === NetworkTest.testMessage) {
-          resolve();
-        }
-      });
-    });
-
-    // Set up a promise that rejects after the timeout period.
-    const timeout = new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new DiagnosticError(
-          undefined,
-          'NetworkTest timeout, the PeerConnection did not receive the ' +
-          'message.',
-        ));
-      }, this._options.timeoutMs);
-    });
-
     try {
+      this._rtcCall = new RTCCall({
+        peerConnectionConfig: this._peerConnectionConfig,
+        peerConnectionFactory: this._options.peerConnectionFactory,
+      });
+
+      // Set up a promise that resolves when we receive the correct message
+      // on the receiving PeerConnection
+      const receivedMessage = new Promise((resolve, reject) => {
+        if (!this._rtcCall) {
+          reject(new DiagnosticError(undefined, 'RTCCall is `null`.'));
+          return;
+        }
+        this._rtcCall.on(RTCCall.Events.Message, message => {
+          if (message.data === NetworkTest.testMessage) {
+            resolve();
+          }
+        });
+      });
+
+      // Set up a promise that rejects after the timeout period.
+      const timeout = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new DiagnosticError(
+            undefined,
+            'NetworkTest timeout, the PeerConnection did not receive the ' +
+            'message.',
+          ));
+        }, this._options.timeoutMs);
+      });
+
       // We race between two promises:
       // an async function that will resolve once we connect and we send and
       // receive a message,
@@ -170,6 +177,9 @@ export class NetworkTest extends EventEmitter {
       // [[_onError]] handler of the NetworkTest.
       await Promise.race([
         (async () => {
+          if (!this._rtcCall) {
+            throw new DiagnosticError(undefined, 'RTCCall is `null`.');
+          }
           await this._rtcCall.establishConnection();
           this._rtcCall.send(NetworkTest.testMessage);
           await receivedMessage;
@@ -183,7 +193,9 @@ export class NetworkTest extends EventEmitter {
     } catch (error) {
       if (error instanceof DiagnosticError) {
         this._onError(error);
-      } else if (error instanceof DOMException) {
+      } else if (
+        typeof DOMException !== 'undefined' && error instanceof DOMException
+      ) {
         // Could be thrown by the PeerConnections during the call
         // `rtcCall.establishConnection`.
         this._onError(new DiagnosticError(
