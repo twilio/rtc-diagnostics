@@ -82,7 +82,7 @@ export class NetworkTest extends EventEmitter {
         : 'all',
     };
 
-    this._startTest();
+    setTimeout(() => this._startTest());
   }
 
   /**
