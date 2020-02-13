@@ -1,20 +1,12 @@
 import { UnsupportedError } from '../errors';
 
 /**
- * We need to redeclare `Audio` on `Window` for old Typescript versions.
- */
-declare global {
-  interface Window {
-    Audio: typeof Audio;
-  }
-}
-
-/**
  * Common error that can be thrown when the polyfill is unable to work.
  */
-export const GetUserMediaUnsupportedError = new UnsupportedError(
-  'The function `getUserMedia` is not supported.',
-);
+export const GetUserMediaUnsupportedError: UnsupportedError =
+  new UnsupportedError(
+    'The function `getUserMedia` is not supported.',
+  );
 
 /**
  * This polyfill serves to rebind `getUserMedia` to the `navigator.mediaDevices`

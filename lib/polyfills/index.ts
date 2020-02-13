@@ -7,6 +7,11 @@ export {
   AudioContextUnsupportedError,
 } from './AudioContext';
 export {
+  enumerateDevicesPolyfill as enumerateDevices,
+  enumerateDevicesUnsupportedMessage,
+  EnumerateDevicesUnsupportedError,
+} from './enumerateDevices';
+export {
   getUserMediaPolyfill as getUserMedia,
   GetUserMediaUnsupportedError,
 } from './getUserMedia';

@@ -19,9 +19,10 @@ declare global {
 /**
  * Common error that can be thrown when the polyfill is unable to work.
  */
-export const AudioContextUnsupportedError = new UnsupportedError(
-  'AudioContext is not supported by this browser.',
-);
+export const AudioContextUnsupportedError: UnsupportedError =
+  new UnsupportedError(
+    'AudioContext is not supported by this browser.',
+  );
 
 /**
  * Attempts to polyfill `AudioContext`.

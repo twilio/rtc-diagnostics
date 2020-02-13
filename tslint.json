@@ -18,7 +18,18 @@
     "no-var-requires": false,
     "quotemark": [true, "single"],
     "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
-    "unified-signatures": false
+    "unified-signatures": false,
+    "typedef": [true,
+      "call-signature",
+      "arrow-call-signature",
+      "parameter",
+      "arrow-parameter",
+      "property-declaration",
+      "variable-declaration",
+      "member-variable-declaration",
+      "object-destructuring",
+      "array-destructuring"
+    ]
   },
   "rulesDirectory": []
 }

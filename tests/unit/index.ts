@@ -7,3 +7,4 @@
 import './InputTest';
 import './OutputTest';
 import './BitrateTest';
+import './OptionValidation';
