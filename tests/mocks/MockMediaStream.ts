@@ -6,7 +6,7 @@ export class MockMediaStream {
   };
   options: MockMediaStream.Options;
   constructor(options: Partial<MockMediaStream.Options> = {}) {
-    this.options = { ...MockMediaStream.defaultOptions, ...options.tracks };
+    this.options = { ...MockMediaStream.defaultOptions, ...options };
   }
   getTracks() {
     return this.options.tracks as any[];

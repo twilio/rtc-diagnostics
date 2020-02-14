@@ -10,7 +10,7 @@
     "build:es5": "rimraf ./es5 && tsc",
     "build:release": "npm-run-all lint build status",
     "clean": "rimraf ./dist ./coverage ./es5 ./docs",
-    "docs": "rimraf ./docs && typedoc --excludePrivate --excludeProtected --excludeInternal --theme ./node_modules/typedoc-twilio-theme/bin/default",
+    "docs": "rimraf ./docs && typedoc --excludePrivate --excludeProtected --theme ./node_modules/typedoc-twilio-theme/bin/default",
     "lint": "tslint -c ./tslint.json --project ./tsconfig.json -t stylish",
     "release": "release",
     "status": "git status",

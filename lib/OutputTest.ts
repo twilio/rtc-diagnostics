@@ -26,7 +26,7 @@ export declare interface OutputTest {
    * @param event [[OutputTest.Events.End]]
    * @param didPass A boolean representing the passing state of the test.
    * @param report A summary of the test.
-   * @internal
+   * @private
    */
   emit(
     event: OutputTest.Events.End,
@@ -37,7 +37,7 @@ export declare interface OutputTest {
    * This event is emitted when the test encounters an error, fatal or not.
    * @param event [[OutputTest.Events.Error]]
    * @param error An error that was encountered during the run time of the test.
-   * @internal
+   * @private
    */
   emit(
     event: OutputTest.Events.Error,
@@ -49,7 +49,7 @@ export declare interface OutputTest {
    * milliseconds.
    * @param event [[OutputTest.Events.Volume]]
    * @param value The volume of the audio source.
-   * @internal
+   * @private
    */
   emit(
     event: OutputTest.Events.Volume,
@@ -292,11 +292,13 @@ export class OutputTest extends EventEmitter {
       const invalidReasons: ValidityRecord<OutputTest.Options> | undefined =
         await validateOptions<OutputTest.Options>(this._options, {
           deviceId: createAudioDeviceValidator({
+            enumerateDevices: this._options.enumerateDevices,
             kind: 'audiooutput',
           }),
           duration: validateTime,
           pollIntervalMs: validateTime,
         });
+
       if (invalidReasons) {
         throw new InvalidOptionsError(invalidReasons);
       }
@@ -426,9 +428,8 @@ export namespace OutputTest {
    */
   export interface Options {
     /**
-     * An `AudioContext` to be used by the test. This will _not_ be closed
-     * by the test if passed in. If it is not passed in, an `AudioContext` will
-     * be made that will be closed.
+     * An `AudioContext` to be used by the test.
+     * @private
      */
     audioContextFactory?: typeof window.AudioContext;
     /**
@@ -457,6 +458,11 @@ export namespace OutputTest {
      * See [[OutputTest]] for details on the behavior of "timing out".
      */
     duration: number;
+    /**
+     * Used to mock the call to `enumerateDevices`.
+     * @private
+     */
+    enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
     /**
      * Set [[OutputTest.Report.didPass]] to true or not upon test timeout.
      * See [[OutputTest]] for details on the behavior of "timing out".

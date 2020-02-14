@@ -26,7 +26,7 @@ export declare interface InputTest {
    * @param event [[InputTest.Events.End]]
    * @param didPass Whether or not the test passed.
    * @param report Summary of the test.
-   * @internal
+   * @private
    */
   emit(
     event: InputTest.Events.End,
@@ -38,7 +38,7 @@ export declare interface InputTest {
    * an error, fatal or not.
    * @param event [[InputTest.Events.Error]]
    * @param error The [[DiagnosticError]] that was encountered.
-   * @internal
+   * @private
    */
   emit(
     event: InputTest.Events.Error,
@@ -49,7 +49,7 @@ export declare interface InputTest {
    * [[InputTest.Options.pollIntervalMs]] after the test starts succesfully.
    * @param event [[InputTest.Events.Volume]]
    * @param value The current volume of the audio source.
-   * @internal
+   * @private
    */
   emit(
     event: InputTest.Events.Volume,
@@ -62,6 +62,8 @@ export declare interface InputTest {
    * @param listener A callback that expects the following parameters:
    *  A `boolean` which represents if the test passed.
    *  An [[InputTest.Report]] that summarizes the test.
+   * @returns This [[InputTest]] instance.
+   * @event
    */
   on(
     event: InputTest.Events.End,
@@ -73,6 +75,8 @@ export declare interface InputTest {
    * @param event [[InputTest.Events.Error]]
    * @param listener A callback that expects the following parameters:
    *  A [[DiagnosticError]] that the test encountered.
+   * @returns This [[InputTest]] instance.
+   * @event
    */
   on(
     event: InputTest.Events.Error,
@@ -85,6 +89,8 @@ export declare interface InputTest {
    * @param event [[InputTest.Events.Volume]]
    * @param listener A callback that expects the following parameters:
    *  A `number` that represents the audio source's current volume.
+   * @returns This [[InputTest]] instance.
+   * @event
    */
   on(
     event: InputTest.Events.Volume,
@@ -299,6 +305,7 @@ export class InputTest extends EventEmitter {
       const invalidReasons: ValidityRecord<InputTest.Options> | undefined =
         await validateOptions<InputTest.Options>(this._options, {
           deviceId: createAudioDeviceValidator({
+            enumerateDevices: this._options.enumerateDevices,
             kind: 'audioinput',
           }),
           duration: validateTime,
@@ -397,9 +404,8 @@ export class InputTest extends EventEmitter {
 
 export namespace InputTest {
   /**
-   * Possible events that an `InputTest` might emit.
-   * See [[InputTest.emit]] and [[InputTest.on]].
-   * @event
+   * Possible events that an `InputTest` might emit. See [[InputTest.emit]] and
+   * [[InputTest.on]].
    */
   export enum Events {
     End = 'end',
@@ -460,6 +466,11 @@ export namespace InputTest {
      * Duration of time to run the test in ms
      */
     duration: number;
+    /**
+     * Used to mock the call to `enumerateDevices`.
+     * @private
+     */
+    enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
     /**
      * Used to mock calls to `getUserMedia`.
      * @private

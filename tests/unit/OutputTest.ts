@@ -7,8 +7,9 @@ import {
   testOutputDevice,
 } from '../../lib/OutputTest';
 import { AudioElement } from '../../lib/types';
-import { MockAudioContext, mockAudioContextFactory } from '../mocks/MockAudioContext';
+import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockAudioElementFactory } from '../mocks/MockAudioElement';
+import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
 
 const defaultDuration = 5;
 const defaultPollIntervalMs = 1;
@@ -32,6 +33,9 @@ describe('testOutputDevice', function() {
           audioContextFactory,
           audioElementFactory,
           duration: defaultDuration,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+          }),
           pollIntervalMs: defaultPollIntervalMs,
         }).on(OutputTest.Events.End, (_p, r) => resolve(r));
       });
@@ -64,6 +68,9 @@ describe('testOutputDevice', function() {
           audioContextFactory,
           audioElementFactory,
           duration: defaultDuration,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+          }),
           pollIntervalMs: defaultPollIntervalMs,
         }).on(OutputTest.Events.End, (_p, r) => resolve(r));
       });
@@ -90,6 +97,9 @@ describe('testOutputDevice', function() {
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory,
         duration: defaultDuration,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+        }),
         passOnTimeout: false,
         pollIntervalMs: defaultPollIntervalMs,
       });
@@ -124,6 +134,9 @@ describe('testOutputDevice', function() {
       const report: OutputTest.Report = await new Promise(resolve => {
         const test = testOutputDevice(undefined, {
           audioElementFactory,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+          }),
         });
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -141,6 +154,9 @@ describe('testOutputDevice', function() {
       const report: OutputTest.Report = await new Promise(resolve => {
         const test = testOutputDevice(undefined, {
           audioContextFactory: mockAudioContextFactory() as any,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+          }),
         });
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -156,7 +172,11 @@ describe('testOutputDevice', function() {
     });
     it('when neither AudioContext or Audio is supported', async function() {
       const report: OutputTest.Report = await new Promise(resolve => {
-        const test = testOutputDevice();
+        const test = testOutputDevice(undefined, {
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+          }),
+        });
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
@@ -178,6 +198,9 @@ describe('testOutputDevice', function() {
       }) as any,
       audioElementFactory,
       debug: false, // prevent console warnings
+      enumerateDevices: mockEnumerateDevicesFactory({
+        devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+      }),
     });
     const report = test.stop(false);
     assert(report);
@@ -194,6 +217,9 @@ describe('testOutputDevice', function() {
         }) as any,
         audioElementFactory,
         duration: defaultDuration,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+        }),
         pollIntervalMs: defaultPollIntervalMs,
       });
       test.on(OutputTest.Events.Error, err => reject(err));
@@ -206,6 +232,9 @@ describe('testOutputDevice', function() {
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory,
         duration: defaultDuration,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
+        }),
         pollIntervalMs: defaultPollIntervalMs,
       });
       test.on(OutputTest.Events.End, r => resolve(r));
@@ -219,6 +248,9 @@ describe('testOutputDevice', function() {
       const test = testOutputDevice('foobar', {
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory: mockAudioElementFactory({ supportSetSinkId: false }) as any,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
+        }),
       });
       test.on(OutputTest.Events.Error, err => reject(err));
     }));

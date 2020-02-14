@@ -8,6 +8,14 @@ import {
 } from '../polyfills';
 
 /**
+ * Helper type for audio device validation.
+ */
+interface AudioDeviceValidatorOptions {
+  enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
+  kind?: MediaDeviceKind;
+}
+
+/**
  * Return a function that validates an audio device by ID. It will returns a
  * `string` representing why the ID is invalid, or nothing if it is valid. Will
  * throw if `enumerateDevices` is not supported by the system.
@@ -19,11 +27,10 @@ import {
  * invalid message or `undefined` if the audio device is valid.
  */
 export function createAudioDeviceValidator(
-  options: {
-    enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
-    kind?: MediaDeviceKind;
-  } = { enumerateDevices },
+  options: AudioDeviceValidatorOptions = {},
 ): Validator {
+  const opts: AudioDeviceValidatorOptions = { enumerateDevices, ...options };
+
   /**
    * The audio device validator that will be returned.
    * @param deviceId The device ID to be validated.
@@ -32,7 +39,7 @@ export function createAudioDeviceValidator(
    */
   return async (deviceId: string | undefined): Promise<string | undefined> => {
     const devices: MediaDeviceInfo[] | undefined =
-      options.enumerateDevices && await options.enumerateDevices();
+      opts.enumerateDevices && await opts.enumerateDevices();
 
     if (!devices) {
       throw EnumerateDevicesUnsupportedError;
@@ -45,7 +52,7 @@ export function createAudioDeviceValidator(
     // `deviceId` as `undefined` is a valid value as this will cause
     // `getUserMedia` to just get the default device
     if (deviceId === undefined) {
-      return;
+      deviceId = 'default';
     }
 
     let device: MediaDeviceInfo | undefined;
@@ -59,9 +66,9 @@ export function createAudioDeviceValidator(
       return `Device ID "${deviceId}" not found within list of available devices.`;
     }
 
-    if (options.kind && device.kind !== options.kind) {
+    if (opts.kind && device.kind !== opts.kind) {
       return `Device ID "${device.deviceId}" is not the correct "kind",`
-        + ` is "${device.kind}" but expected "${options.kind}".`;
+        + ` is "${device.kind}" but expected "${opts.kind}".`;
     }
   };
 }
@@ -102,7 +109,7 @@ export async function validateOptions<T extends Record<string, any>>(
   // As they finish, fill the validity record.
   await Promise.all(Object.entries(validators).map(
     ([option, validator]: [keyof T, Validator | undefined]): Promise<void> =>
-      new Promise(async (): Promise<void> => {
+      (async (): Promise<void> => {
         if (validator) {
           try {
             const invalidReason: string | undefined =
@@ -141,7 +148,7 @@ export async function validateOptions<T extends Record<string, any>>(
             }
           }
         }
-      }),
+      })(),
     ),
   );
 

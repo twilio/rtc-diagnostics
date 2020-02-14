@@ -1,3 +1,5 @@
-export class MockTrack {
+// tslint:disable no-empty
 
+export class MockTrack {
+  stop() {}
 }

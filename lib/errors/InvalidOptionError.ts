@@ -18,7 +18,7 @@ export class InvalidOptionError extends DiagnosticError {
 
     super(
       domError,
-      `Option "${option}" invalid with reason: ${reason}.`,
+      `Option "${option}" invalid with reason: "${reason}".`,
     );
 
     this.option = option;

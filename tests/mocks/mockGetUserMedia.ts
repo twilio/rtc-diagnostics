@@ -1,7 +1,9 @@
 import { MockMediaStream } from './MockMediaStream';
 
-export async function mockGetUserMedia(options: MockGetUserMediaOptions = {}) {
-  return options.mediaStream || new MockMediaStream();
+export function mockGetUserMediaFactory(options: MockGetUserMediaOptions = {}) {
+  return async function mockGetUserMedia() {
+    return options.mediaStream || new MockMediaStream();
+  }
 }
 
 export interface MockGetUserMediaOptions {

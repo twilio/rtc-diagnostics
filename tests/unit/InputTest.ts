@@ -7,10 +7,19 @@ import {
   testInputDevice,
 } from '../../lib/InputTest';
 import { mockAudioContextFactory } from '../mocks/MockAudioContext';
-import { mockGetUserMedia } from '../mocks/mockGetUserMedia';
+import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
+import { mockGetUserMediaFactory } from '../mocks/mockGetUserMedia';
+import { MockMediaStream } from '../mocks/MockMediaStream';
+import { MockTrack } from '../mocks/MockTrack';
 
 const defaultDuration = 100;
 const defaultPollIntervalMs = 10;
+
+const getUserMedia = mockGetUserMediaFactory({
+  mediaStream: new MockMediaStream({
+    tracks: [new MockTrack()],
+  }),
+}) as any;
 
 describe('testInputDevice', function() {
   describe('when the volume values are all 100', function() {
@@ -24,7 +33,10 @@ describe('testInputDevice', function() {
             analyserNodeOptions: { volumeValues: 100 },
           }) as any,
           duration: defaultDuration,
-          getUserMedia: mockGetUserMedia as any,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
+          }),
+          getUserMedia,
           pollIntervalMs: defaultPollIntervalMs,
         });
         test.on(InputTest.Events.End, (_, r) => resolve(r));
@@ -50,7 +62,10 @@ describe('testInputDevice', function() {
             analyserNodeOptions: { volumeValues: 0 },
           }) as any,
           duration: defaultDuration,
-          getUserMedia: mockGetUserMedia as any,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
+          }),
+          getUserMedia,
           pollIntervalMs: defaultPollIntervalMs,
         }).on(InputTest.Events.End, (_, r) => resolve(r));
       });
@@ -70,7 +85,10 @@ describe('testInputDevice', function() {
     it('when AudioContext is not supported', async function() {
       const report: InputTest.Report = await new Promise(resolve => {
         const test = testInputDevice(undefined, {
-          getUserMedia: mockGetUserMedia as any,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
+          }),
+          getUserMedia,
         });
         test.on(InputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -88,6 +106,9 @@ describe('testInputDevice', function() {
       const report: InputTest.Report = await new Promise(resolve => {
         const test = testInputDevice(undefined, {
           audioContextFactory: mockAudioContextFactory() as any,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
+          }),
         });
         test.on(InputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -103,7 +124,11 @@ describe('testInputDevice', function() {
     });
     it('when neither AudioContext or getUserMedia is supported', async function() {
       const report: InputTest.Report = await new Promise(resolve => {
-        const test = testInputDevice();
+        const test = testInputDevice(undefined, {
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
+          }),
+        });
         test.on(InputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
@@ -124,7 +149,10 @@ describe('testInputDevice', function() {
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
       debug: false, // prevent console warnings
-      getUserMedia: mockGetUserMedia as any,
+      enumerateDevices: mockEnumerateDevicesFactory({
+        devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
+      }),
+      getUserMedia,
     });
     const report = test.stop();
     assert(report);
@@ -140,7 +168,10 @@ describe('testInputDevice', function() {
           doThrow: { createAnalyser: true },
         }) as any,
         duration: defaultDuration,
-        getUserMedia: mockGetUserMedia as any,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
+        }),
+        getUserMedia,
         pollIntervalMs: defaultPollIntervalMs,
       });
       test.on(InputTest.Events.Error, e => reject(e));

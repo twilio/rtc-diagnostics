@@ -11,7 +11,10 @@ export class InvalidOptionsError<
   reasons: Partial<Record<keyof T, DiagnosticError>> = {};
 
   constructor(reasons: Partial<Record<keyof T, DiagnosticError>>) {
-    super(undefined, 'Some of the options passed to this test were invalid.');
+    super(
+      undefined,
+      'Some of the options passed to this test were unable to be validated.',
+    );
 
     this.reasons = reasons;
     this.name = 'InvalidOptionsError';
