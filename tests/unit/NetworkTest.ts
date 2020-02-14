@@ -3,7 +3,6 @@
 import * as assert from 'assert';
 
 import {
-  filterIceServerUrls,
   testNetwork,
 } from '../../lib/NetworkTest';
 import { mockRTCPeerConnectionFactory } from '../mocks/MockRTCPeerConnection';
@@ -51,37 +50,5 @@ describe('testNetwork', function() {
         timeoutMs: 10,
       }),
     );
-  });
-});
-
-const iceServers: RTCIceServer[] = [{
-  credential: 'foo',
-  credentialType: 'password',
-  urls: ['stun:test.example:9999?transport=udp'],
-  username: 'bar',
-}, {
-  credential: 'foo',
-  credentialType: 'password',
-  urls: ['turn:test.example:9999?transport=udp'],
-  username: 'bar',
-}, {
-  credential: 'foo',
-  credentialType: 'password',
-  urls: ['turn:test.example:9999?transport=tcp'],
-  username: 'bar',
-}];
-
-describe('filterIceServerUrls', function() {
-  it('should filter servers based on protocol', function() {
-    const filter = filterIceServerUrls(iceServers, 'udp', 'stun');
-    assert.equal(iceServers[0], filter[0]);
-  });
-  it('should filter servers based on protocol', function() {
-    const filter = filterIceServerUrls(iceServers, 'udp', 'turn');
-    assert.equal(iceServers[1], filter[0]);
-  });
-  it('should filter servers based on protocol', function() {
-    const filter = filterIceServerUrls(iceServers, 'tcp', 'turn');
-    assert.equal(iceServers[2], filter[0]);
   });
 });

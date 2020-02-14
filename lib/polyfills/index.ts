@@ -1,1 +1,3 @@
-export { connectionPolyfill as connection } from './connection';
+export {
+  networkInformationPolyfill as networkInformation,
+} from './NetworkInformation';

@@ -1,5 +1,3 @@
-import { UnsupportedError } from '../errors/UnsupportedError';
-
 /**
  * These datatypes are defined by the spec found on this site:
  * https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation
@@ -25,10 +23,7 @@ const polyfillWindow: PolyfillWindow | undefined =
     ? window as unknown as PolyfillWindow
     : undefined;
 
-export const NetworkInformationUnsupportedError =
-  new UnsupportedError('NetworkInformation API not supported by this browser.');
-
-export const connectionPolyfill =
+export const networkInformationPolyfill: NetworkInformation | undefined =
   typeof polyfillWindow !== 'undefined' && polyfillWindow.navigator &&
   polyfillWindow.navigator.connection
     ? polyfillWindow.navigator.connection
