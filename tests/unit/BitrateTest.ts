@@ -57,7 +57,7 @@ describe('BitrateTest', () => {
     originalRTCPeerConnection = root.RTCPeerConnection;
     root.RTCPeerConnection = getPeerConnectionFactory();
 
-    bitrateTest = new BitrateTest();
+    bitrateTest = new BitrateTest({ iceServers });
   });
 
   afterEach(() => {
@@ -78,11 +78,6 @@ describe('BitrateTest', () => {
       bitrateTest = new BitrateTest({ iceServers });
       assert.deepEqual(pcReceiverContext.rtcConfiguration.iceServers, iceServers);
       assert.deepEqual(pcSenderContext.rtcConfiguration.iceServers, iceServers);
-    });
-
-    it('should not set iceServers if not passed in', () => {
-      assert(!pcReceiverContext.rtcConfiguration.iceServers);
-      assert(!pcSenderContext.rtcConfiguration.iceServers);
     });
   });
 
@@ -169,7 +164,7 @@ describe('BitrateTest', () => {
     const wait = () => new Promise(r => setTimeout(r, 1));
 
     beforeEach(() => {
-      bitrateTest = new BitrateTest();
+      bitrateTest = new BitrateTest({ iceServers });
       bitrateTest.stop = sinon.stub();
     });
 
@@ -251,7 +246,7 @@ describe('BitrateTest', () => {
 
     beforeEach(() => {
       clock = sinon.useFakeTimers(0);
-      bitrateTest = new BitrateTest();
+      bitrateTest = new BitrateTest({ iceServers });
       bitrateTest.stop = sinon.stub();
     });
 
@@ -317,7 +312,7 @@ describe('BitrateTest', () => {
 
         beforeEach(() => {
           clock = sinon.useFakeTimers(0);
-          bitrateTest = new BitrateTest();
+          bitrateTest = new BitrateTest({ iceServers });
           clock.tick(1);
           dataChannelEvent = {
             channel: {
@@ -397,7 +392,15 @@ describe('BitrateTest', () => {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
               didPass: true,
               errors: [],
+              networkTiming: {
+                firstPacket: 1,
+              },
               testName: 'bitrate-test',
+              testTiming: {
+                duration: 3601,
+                end: 3601,
+                start: 0,
+              },
               values,
             });
             done();
@@ -453,6 +456,48 @@ describe('BitrateTest', () => {
           clock.tick(1200);
 
           bitrateTest.stop();
+        });
+
+        describe('connection timing', () => {
+          it('should include PeerConnection timing', (done) => {
+            bitrateTest.on('end', (report: BitrateTest.Report) => {
+              const { start, end, duration } = report.networkTiming.peerConnection!;
+              assert.equal(start, 1001);
+              assert.equal(end, 2001);
+              assert.equal(duration, 1000);
+              done();
+            });
+
+            ['new', 'connecting', 'connected', 'disconnected', 'closed'].forEach(state => {
+              pcSenderContext.connectionState = state;
+              pcSenderContext.onconnectionstatechange();
+              clock.tick(1000);
+            });
+
+            sendMessage(message);
+            clock.tick(1200);
+            bitrateTest.stop();
+          });
+
+          it('should include IceConnection timing', (done) => {
+            bitrateTest.on('end', (report: BitrateTest.Report) => {
+              const { start, end, duration } = report.networkTiming.ice!;
+              assert.equal(start, 1001);
+              assert.equal(end, 2001);
+              assert.equal(duration, 1000);
+              done();
+            });
+
+            ['new', 'checking', 'connected', 'completed', 'disconnected', 'closed'].forEach(state => {
+              pcSenderContext.iceConnectionState = state;
+              pcSenderContext.oniceconnectionstatechange();
+              clock.tick(1000);
+            });
+
+            sendMessage(message);
+            clock.tick(1200);
+            bitrateTest.stop();
+          });
         });
       });
     });
