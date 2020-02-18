@@ -11,6 +11,7 @@ import {
   AudioContext,
   AudioContextUnsupportedError,
   AudioUnsupportedError,
+  enumerateDevices,
 } from './polyfills';
 import { AudioElement, TimeMeasurement } from './types';
 import {
@@ -124,6 +125,7 @@ export class OutputTest extends EventEmitter {
     debug: false,
     doLoop: true,
     duration: Infinity,
+    enumerateDevices,
     passOnTimeout: true,
     pollIntervalMs: 100,
     testURI: INCOMING_SOUND_URL,
@@ -212,12 +214,12 @@ export class OutputTest extends EventEmitter {
       didPass: pass,
       errors: this._errors,
       testName: OutputTest.testName,
-      testURI: this._options.testURI,
-      timestamps: {
+      testTiming: {
         duration: this._endTime - this._startTime,
         end: this._endTime,
         start: this._startTime,
       },
+      testURI: this._options.testURI,
       values: this._values,
     };
     this.emit(OutputTest.Events.End, report.didPass, report);
@@ -502,13 +504,13 @@ export namespace OutputTest {
      */
     testName: typeof OutputTest.testName;
     /**
+     * Time measurements of test run time.
+     */
+    testTiming: TimeMeasurement;
+    /**
      * The URI of the audio file.
      */
     testURI: string;
-    /**
-     * Time measurements of test run time.
-     */
-    timestamps: TimeMeasurement;
     /**
      * The volume values emitted by the test during its run-time.
      */

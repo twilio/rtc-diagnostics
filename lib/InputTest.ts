@@ -8,6 +8,7 @@ import {
 import {
   AudioContext,
   AudioContextUnsupportedError,
+  enumerateDevices,
   getUserMedia,
   GetUserMediaUnsupportedError,
 } from './polyfills';
@@ -113,6 +114,7 @@ export class InputTest extends EventEmitter {
     audioContextFactory: AudioContext,
     debug: false,
     duration: Infinity,
+    enumerateDevices,
     getUserMedia,
     pollIntervalMs: 100,
   };
@@ -204,7 +206,7 @@ export class InputTest extends EventEmitter {
       didPass,
       errors: this._errors,
       testName: InputTest.testName,
-      timestamps: {
+      testTiming: {
         duration: this._endTime - this._startTime,
         end: this._endTime,
         start: this._startTime,
@@ -438,7 +440,7 @@ export namespace InputTest {
     /**
      * Time measurements of test run time.
      */
-    timestamps: TimeMeasurement;
+    testTiming: TimeMeasurement;
     /**
      * The volume values emitted by the test during its run-time.
      */
