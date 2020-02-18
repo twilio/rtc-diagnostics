@@ -9,7 +9,7 @@ import {
 } from '../../lib/utils/OptionValidation';
 import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
 
-describe.only('OptionValidation', function() {
+describe('OptionValidation', function() {
   describe('validateTime', function() {
     it('should return an invalidity string if the time is negative', function() {
       const shouldBeString = validateTime(-1);
