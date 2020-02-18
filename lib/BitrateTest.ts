@@ -171,7 +171,7 @@ class BitrateTest extends EventEmitter {
    * @param error - The error object
    * @param isFatal - Whether this is a fatal error
    */
-  private _onError(message: string, error: DOMError | undefined, isFatal?: boolean): void {
+  private _onError(message: string, error?: DOMError, isFatal?: boolean): void {
     const diagnosticError = new DiagnosticError(error, message);
     this._errors.push(diagnosticError);
     this.emit('error', diagnosticError);
