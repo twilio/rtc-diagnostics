@@ -1,9 +1,14 @@
 import { EventEmitter } from 'events';
-import { DiagnosticError, InvalidStateError } from '../errors';
+import {
+  DiagnosticError,
+  InvalidStateError,
+  PromiseTimedOutError,
+} from '../errors';
 import {
   NetworkInformation,
   networkInformationPolyfill as networkInformation,
 } from '../polyfills/NetworkInformation';
+import { waitForPromise } from '../utils/TimeoutPromise';
 import { TestCall } from './TestCall';
 
 export declare interface NetworkTest {
@@ -72,7 +77,6 @@ export class NetworkTest extends EventEmitter {
    */
   static defaultOptions: NetworkTest.Options = {
     networkInformation,
-    serverType: 'stun' as const,
     timeoutMs: 5000,
   };
 
@@ -154,9 +158,9 @@ export class NetworkTest extends EventEmitter {
       // Set up a promise that resolves when we receive the correct message
       // on the receiving PeerConnection
       const waitReceivedMessage: Promise<void> = new Promise(
-        (resolve: () => void, reject: (error: DiagnosticError) => void): void => {
+        (resolve: () => void, reject: (error: InvalidStateError) => void): void => {
           if (!this._testCall) {
-            reject(new DiagnosticError(undefined, 'TestCall is `null`.'));
+            reject(new InvalidStateError('TestCall is `null`.'));
             return;
           }
           this._testCall.on(TestCall.Event.Message, (message: MessageEvent) => {
@@ -164,19 +168,6 @@ export class NetworkTest extends EventEmitter {
               resolve();
             }
           });
-        },
-      );
-
-      // Set up a promise that rejects after the timeout period.
-      const timeout: Promise<void> = new Promise(
-        (_: () => void, reject: (error: DiagnosticError) => void): void => {
-          setTimeout(() => {
-            reject(new DiagnosticError(
-              undefined,
-              'NetworkTest timeout, the PeerConnection did not receive the ' +
-              'message.',
-            ));
-          }, this._options.timeoutMs);
         },
       );
 
@@ -190,17 +181,28 @@ export class NetworkTest extends EventEmitter {
       // while we are establishing a connection, sending a message, or waiting
       // for the message to be recieved, this rejection is forwarded to the
       // [[_onError]] handler of the NetworkTest.
-      await Promise.race([
-        (async (): Promise<void> => {
+      try {
+        await waitForPromise((async (): Promise<void> => {
           if (!this._testCall) {
             throw new InvalidStateError('TestCall is `null`.');
           }
           await this._testCall.establishConnection();
           this._testCall.send(NetworkTest.testMessage);
           await waitReceivedMessage;
-        })(),
-        timeout,
-      ]);
+        })(), this._options.timeoutMs);
+      } catch (error) {
+        if (error instanceof PromiseTimedOutError) {
+          throw new DiagnosticError(
+            undefined,
+            'NetworkTest timeout, the PeerConnection did not receive the ' +
+            'message.',
+          );
+        } else {
+          // Re-throw the error so the handler at the end of `_startTest`
+          // can handle it properly.
+          throw error;
+        }
+      }
 
       // If none of the Promises reject, then we successfully received the
       // `testMessage`.
@@ -216,6 +218,13 @@ export class NetworkTest extends EventEmitter {
         this._onError(new DiagnosticError(
           error,
           'A `DOMException` occurred.',
+        ));
+      } else if (
+        typeof DOMError !== 'undefined' && error instanceof DOMError
+      ) {
+        this._onError(new DiagnosticError(
+          error,
+          'A `DOMError` occurred.',
         ));
       } else {
         // An unknown error occurred.
@@ -281,17 +290,6 @@ export namespace NetworkTest {
      * @private
      */
     peerConnectionFactory?: typeof RTCPeerConnection;
-    /**
-     * The protocol to use when connecting the `RTCPeerConnection`s.
-     * Effectively, we just filter the `iceServers` parameter for URLs that fit
-     * this protocol.
-     */
-    protocol?: 'tcp' | 'udp';
-    /**
-     * The ICE server type to use. If we use `turn`, we may also need `stun`.
-     * Using `turn` forces `relay`.
-     */
-    serverType?: 'stun' | 'turn';
     /**
      * Timeout in milliseconds. This causes a [[DiagnosticError]] if the test is
      * unable to connect and send and receive a message within this timeout.

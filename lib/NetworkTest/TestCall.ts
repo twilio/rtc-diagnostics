@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { timeoutPromise } from '../utils/TimeoutPromise';
+import { waitForPromise } from '../utils/TimeoutPromise';
 
 export declare interface TestCall {
   /**
@@ -20,12 +20,14 @@ export declare interface TestCall {
    * This event is emitted when the `RTCPeerConnection` receives an ICE
    * candidate.
    * @param event [[TestCall.Event.IceCandidate]]
+   * @param peerConnection The `RTCPeerConnection` that received the ICE event.
    * @param iceEvent The ICE candidate event.
    * @returns `true` if the event had listeners, `false` otherwise.
    * @private
    */
   emit(
     event: TestCall.Event.IceCandidate,
+    peerConnection: RTCPeerConnection,
     iceEvent: RTCPeerConnectionIceEvent,
   ): boolean;
   /**
@@ -73,12 +75,16 @@ export declare interface TestCall {
    * Fired when one of the two `RTCPeerConnection`s receives an ICE candidate.
    * @param event [[TestCall.Event.IceCandidate]]
    * @param listener A callback that expects the following parameters:
+   * - The `RTCPeerConnection` that received the event.
    * - An `RTCPeerConnectionIceEvent` that the `RTCPeerConnection` received.
    * @returns This [[TestCall]] instance.
    */
   on(
     event: TestCall.Event.IceCandidate,
-    listener: (rtcEvent: RTCPeerConnectionIceEvent) => any,
+    listener: (
+      peerConnection: RTCPeerConnection,
+      iceEvent: RTCPeerConnectionIceEvent,
+    ) => any,
   ): this;
   /**
    * Fired when the recipient-designated `RTCPeerConnection` receives a message
@@ -177,26 +183,35 @@ export class TestCall extends EventEmitter {
     };
 
     // Forward ICE candidates
-    this._sender.onicecandidate = (iceEvent: RTCPeerConnectionIceEvent): void => {
+    const createIceCandidateHandler: (
+      peerConnectionFrom: RTCPeerConnection,
+      peerConnectionTo: RTCPeerConnection,
+    ) => (
+      iceEvent: RTCPeerConnectionIceEvent,
+    ) => void = (
+      peerConnectionFrom: RTCPeerConnection,
+      peerConnectionTo: RTCPeerConnection,
+    ) => (
+      iceEvent: RTCPeerConnectionIceEvent,
+    ): void => {
       if (
         iceEvent.candidate &&
         iceEvent.candidate.candidate &&
         iceEvent.candidate.candidate.indexOf('relay') !== -1
       ) {
-        this.emit(TestCall.Event.IceCandidate, iceEvent);
-        this._recipient.addIceCandidate(iceEvent.candidate);
+        this.emit(TestCall.Event.IceCandidate, peerConnectionFrom, iceEvent);
+        peerConnectionTo.addIceCandidate(iceEvent.candidate);
       }
     };
-    this._recipient.onicecandidate = (iceEvent: RTCPeerConnectionIceEvent): void => {
-      if (
-        iceEvent.candidate &&
-        iceEvent.candidate.candidate &&
-        iceEvent.candidate.candidate.indexOf('relay') !== -1
-      ) {
-        this.emit(TestCall.Event.IceCandidate, iceEvent);
-        this._sender.addIceCandidate(iceEvent.candidate);
-      }
-    };
+
+    this._sender.onicecandidate = createIceCandidateHandler(
+      this._sender,
+      this._recipient,
+    );
+    this._recipient.onicecandidate = createIceCandidateHandler(
+      this._recipient,
+      this._sender,
+    );
   }
 
   /**
@@ -249,8 +264,8 @@ export class TestCall extends EventEmitter {
     // Set up a promise that resolves when the data channel of both
     // PCs is open.
     const waitBothDataChannelOpen: Promise<[void, void]> = Promise.all([
-      timeoutPromise(waitForRecipientDataChannelOpen, this._timeoutDuration),
-      timeoutPromise(waitForSenderDataChannelOpen, this._timeoutDuration),
+      waitForPromise(waitForRecipientDataChannelOpen, this._timeoutDuration),
+      waitForPromise(waitForSenderDataChannelOpen, this._timeoutDuration),
     ]);
 
     // Create the offer on the sender
