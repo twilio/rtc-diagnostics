@@ -20,5 +20,5 @@ export const enumerateDevicesPolyfill: typeof navigator.mediaDevices.enumerateDe
   typeof navigator !== 'undefined' &&
   navigator.mediaDevices &&
   navigator.mediaDevices.enumerateDevices
-    ? navigator.mediaDevices.enumerateDevices
+    ? navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices)
     : undefined;

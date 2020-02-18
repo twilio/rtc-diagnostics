@@ -15,10 +15,10 @@ import {
 } from './polyfills';
 import { AudioElement, TimeMeasurement } from './types';
 import {
-  createAudioDeviceValidator,
+  InvalidityRecord,
+  validateDeviceId,
   validateOptions,
   validateTime,
-  ValidityRecord,
 } from './utils/OptionValidation';
 
 export declare interface OutputTest {
@@ -63,8 +63,11 @@ export declare interface OutputTest {
    * when the audio file is finished playing, or when a time has elapsed
    * greater than [[OutputTest.Options.duration]].
    * @event
-   * @param event TODO
-   * @param listener TODO
+   * @param event [[OutputTest.Events.End]]
+   * @param listener A listener function that expects the following parameters
+   * when the event fires:
+   * - A boolean representing whether or not the test passed.
+   * - A [[OutputTest.Report]] that summarizes the run time of the test.
    * @returns This [[OutputTest]] instance.
    */
   on(
@@ -74,8 +77,10 @@ export declare interface OutputTest {
   /**
    * Fires when the test has run into an error, fatal or not.
    * @event
-   * @param event TODO
-   * @param listener TODO
+   * @param event [[OutputTest.Events.Error]]
+   * @param listener A listener function that expects the following parameters
+   * when the event fires:
+   * - The [[DiagnosticError]].
    * @returns This [[OutputTest]] instance.
    */
   on(
@@ -87,8 +92,10 @@ export declare interface OutputTest {
    * starts successfully. Will have a `number` parameter representing the
    * current volume of the audio file.
    * @event
-   * @param event TODO
-   * @param listener TODO
+   * @param event [[OutputTest.Events.Volume]]
+   * @param listener A listener function that expects the following parameters
+   * when the event fires:
+   * - A number representing the volume of the audio source.
    * @returns This [[OutputTest]] instance.
    */
   on(
@@ -210,7 +217,7 @@ export class OutputTest extends EventEmitter {
 
     this._endTime = Date.now();
     const report: OutputTest.Report = {
-      deviceId: this._options.deviceId,
+      deviceId: this._options.deviceId || 'default',
       didPass: pass,
       errors: this._errors,
       testName: OutputTest.testName,
@@ -291,12 +298,9 @@ export class OutputTest extends EventEmitter {
       // Try to validate all of the inputs before starting the test.
       // We perform this check here so if the validation throws, it gets handled
       // properly as a fatal-error and we still emit a report with that error.
-      const invalidReasons: ValidityRecord<OutputTest.Options> | undefined =
+      const invalidReasons: InvalidityRecord<OutputTest.Options> | undefined =
         await validateOptions<OutputTest.Options>(this._options, {
-          deviceId: createAudioDeviceValidator({
-            enumerateDevices: this._options.enumerateDevices,
-            kind: 'audiooutput',
-          }),
+          deviceId: validateDeviceId,
           duration: validateTime,
           pollIntervalMs: validateTime,
         });

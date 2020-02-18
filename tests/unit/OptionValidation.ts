@@ -62,8 +62,7 @@ describe('OptionValidation', function() {
         }, {
           deviceId: undefined,
           devices: [{ deviceId: 'default', kind: 'audiooutput' }],
-          expected: 'Device ID "default" is not the correct "kind",'
-            + ` is "audiooutput" but expected "audioinput".`,
+          expected: `No devices found with the correct kind "audioinput".`,
           kind: 'audioinput',
           title: 'when looking for a specific kind that is not available',
         }, {
@@ -71,6 +70,16 @@ describe('OptionValidation', function() {
           devices: [{ deviceId: 'default' }],
           expected: `Device ID "foobar" not found within list of available devices.`,
           title: 'when looking for a id that is not available',
+        }, {
+          deviceId: 'foobar',
+          devices: [
+            { deviceId: 'foobar', kind: 'audiooutput' },
+            { deviceId: 'barfoo', kind: 'audioinput' },
+          ],
+          expected: `Device ID "foobar" is not the correct "kind",`
+            + ` expected "audioinput".`,
+          kind: 'audioinput',
+          title: 'when looking for a id that is available but not the correct kind',
         }];
 
         mockOptions.forEach(options => {
@@ -131,15 +140,6 @@ describe('OptionValidation', function() {
           someOption: -10,
         }, {
           someOption: () => 'foobar',
-        });
-        assert.equal(typeof reasons, 'object');
-      });
-
-      it('should handle when a validator throws', async function() {
-        const reasons = await validateOptions({
-          someOption: -10,
-        }, {
-          someOption: () => { throw new DiagnosticError(); },
         });
         assert.equal(typeof reasons, 'object');
       });

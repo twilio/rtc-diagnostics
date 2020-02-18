@@ -6,11 +6,9 @@ import { DiagnosticError } from './DiagnosticError';
 export class InvalidOptionsError<
   T extends Record<string, any>
 > extends DiagnosticError {
-  // Because each option could have had a DOMError or DOMException, we look at
-  // that here.
-  reasons: Partial<Record<keyof T, DiagnosticError>> = {};
+  reasons: Partial<Record<keyof T, string[]>> = {};
 
-  constructor(reasons: Partial<Record<keyof T, DiagnosticError>>) {
+  constructor(reasons: Partial<Record<keyof T, string[]>>) {
     super(
       undefined,
       'Some of the options passed to this test were unable to be validated.',

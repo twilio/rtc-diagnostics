@@ -1,11 +1,42 @@
 import {
-  DiagnosticError,
-  InvalidOptionError,
-} from '../errors';
-import {
   enumerateDevices,
   EnumerateDevicesUnsupportedError,
 } from '../polyfills';
+
+/**
+ * Helper type that defines the type of the options we expect.
+ */
+export type InputOptions = Record<string, any>;
+
+/**
+ * Helper type for what a [[ValidatorFunction]] should return;
+ */
+export type Validity = string | undefined;
+
+/**
+ * Helper type for validation. All validators should have this typing.
+ * If the option is invalid, then the validator should return a string
+ * describing why, otherwise return nothing or `undefined`.
+ */
+export type ValidatorFunction = (option: any) => Validity | Promise<Validity>;
+
+/**
+ * Helper type for validation. Defines the configuration that `validateOptions`
+ * expects.
+ */
+export type ValidatorConfig<T extends InputOptions> = Partial<Record<
+  keyof T,
+  ValidatorFunction | ValidatorFunction[] | undefined
+>>;
+
+/**
+ * Helper type for validation. Defines the record that describes the invalidity
+ * of options if they are found invalid.
+ */
+export type InvalidityRecord<T extends InputOptions> = Partial<Record<
+  keyof T,
+  string[]
+>>;
 
 /**
  * Helper type for audio device validation.
@@ -28,7 +59,7 @@ interface AudioDeviceValidatorOptions {
  */
 export function createAudioDeviceValidator(
   options: AudioDeviceValidatorOptions = {},
-): Validator {
+): ValidatorFunction {
   const opts: AudioDeviceValidatorOptions = { enumerateDevices, ...options };
 
   /**
@@ -37,7 +68,7 @@ export function createAudioDeviceValidator(
    * @returns A Promise that resolves with a `string` representing why the
    * device ID is invalid, or `undefined` if it is valid.
    */
-  return async (deviceId: string | undefined): Promise<string | undefined> => {
+  return async (deviceId: string | undefined): Promise<Validity> => {
     const devices: MediaDeviceInfo[] | undefined =
       opts.enumerateDevices && await opts.enumerateDevices();
 
@@ -51,106 +82,144 @@ export function createAudioDeviceValidator(
 
     // `deviceId` as `undefined` is a valid value as this will cause
     // `getUserMedia` to just get the default device
-    if (deviceId === undefined) {
-      deviceId = 'default';
-    }
+    if (deviceId === undefined || deviceId === 'default') {
+      if (opts.kind) {
+        // If we get here, we just want to make sure there is at least one
+        // media device with the correct kind.
+        const matchingDevicesKind = devices.filter((device: MediaDeviceInfo) =>
+          device.kind === opts.kind);
 
-    let device: MediaDeviceInfo | undefined;
-    for (const currentDevice of devices) {
-      if (currentDevice.deviceId === deviceId) {
-        device = currentDevice;
+        if (!matchingDevicesKind.length) {
+          return `No devices found with the correct kind "${opts.kind}".`;
+        }
       }
+      return;
     }
 
-    if (!device) {
+    const matchingDevicesId = devices.filter((device: MediaDeviceInfo) =>
+      device.deviceId === deviceId);
+
+    if (!matchingDevicesId.length) {
       return `Device ID "${deviceId}" not found within list of available devices.`;
     }
 
-    if (opts.kind && device.kind !== opts.kind) {
-      return `Device ID "${device.deviceId}" is not the correct "kind",`
-        + ` is "${device.kind}" but expected "${opts.kind}".`;
+    if (opts.kind) {
+      const matchingDevicesIdAndKind = matchingDevicesId.filter(
+        (device: MediaDeviceInfo) => device.kind === opts.kind);
+      if (!matchingDevicesIdAndKind.length) {
+        return `Device ID "${deviceId}" is not the correct "kind",`
+          + ` expected "${opts.kind}".`;
+      }
     }
   };
 }
 
 /**
+ * Validate that an option is a valid device ID to pass to `getUserMedia` or
+ * `setSinkId`.
+ * @param option The option to check is a valid device ID to pass to
+ * `getUserMedia` or `setSinkId`.
+ * @returns If the option is not valid, return a string that describes why,
+ * otherwise `undefined`.
+ */
+export function validateDeviceId(option: any): Validity {
+  if (option  && typeof option !== 'string') {
+    return 'If "deviceId" is defined, it must be a "string".';
+  }
+}
+
+/**
+ * Validate that an option is a valid string.
+ * @param option The option to check is a valid string.
+ * @returns If the option is not valid, return a string that describes why it is
+ * invalid, otherwise return `undefined`.
+ */
+export function validateString(option: any): Validity {
+  const type = typeof option;
+  if (type !== 'string') {
+    return `Option cannot have type "${type}", must be "string".`;
+  }
+}
+
+/**
  * Validate a time-based parameter, i.e. duration or poll interval.
- * @param time the duration of time to validate
- * @returns a possibly undefined string, if the time is valid it will return
+ * @param option The duration of time to validate
+ * @returns A possibly undefined string, if the time is valid it will return
  * undefined, otherwise an error message
  */
-export function validateTime(time: number): string | undefined {
-  if (time < 0) {
+export function validateTime(option: any): Validity {
+  const doesNotExistMessage = validateExists(option);
+  if (doesNotExistMessage) {
+    return doesNotExistMessage;
+  }
+
+  if (typeof option !== 'number') {
+    return 'Time must be a number.';
+  }
+
+  if (option < 0) {
     return 'Time must always be non-negative.';
   }
 }
 
 /**
- * Helper types for the validation process.
+ * Validate that an option is neither `undefined` nor `null`.
+ * @param option The option to check exists.
+ * @returns A possibly undefined string, if the option exists it will return
+ * `undefined`, otherwise a string representing why the option is invalid
  */
-type Validator = (option: any) =>
-  (string | undefined) | // A non-async validator
-  Promise<string | undefined>; // A async validator
-export type ValidityRecord<T> = Partial<Record<keyof T, InvalidOptionError>>;
+export function validateExists(option: any): Validity {
+  if (option === undefined || option === null) {
+    return `Option cannot be "${String(option)}".`;
+  }
+}
 
 /**
- * Validate input options to the [[InputTest]]. TODO
- * @param validators TODO
- * @returns A Promise that resolves TODO
+ * Validate input options to the [[InputTest]].
+ * @param inputOptions The options to validate.
+ * @param config A record of option names to either a single
+ * [[ValidatorFunction]] or an array of [[ValidatorFunctions]].
+ * @returns A Promise that resolves either with a [[InvalidityRecord]] describing
+ * which options are invalid and why, or `undefined` if all options are vaild.
  */
-export async function validateOptions<T extends Record<string, any>>(
+export async function validateOptions<T extends InputOptions>(
   inputOptions: T,
-  validators: Partial<Record<keyof T, Validator>>,
-): Promise<ValidityRecord<T> | undefined> {
+  config: ValidatorConfig<T>,
+): Promise<InvalidityRecord<T> | undefined> {
   // Create a validity record to return once all the validators finish running.
-  const validity: ValidityRecord<T> = {};
+  const validity: InvalidityRecord<T> = {};
 
-  // Each validator could be an async function, but they can be run in parallel.
-  // As they finish, fill the validity record.
-  await Promise.all(Object.entries(validators).map(
-    ([option, validator]: [keyof T, Validator | undefined]): Promise<void> =>
-      (async (): Promise<void> => {
-        if (validator) {
-          try {
-            const invalidReason: string | undefined =
-              await validator(inputOptions[option]);
-            if (invalidReason) {
-              validity[option] = new InvalidOptionError(
-                option.toString(),
-                invalidReason,
-              );
-            }
-          } catch (error) {
-            // Each validator might throw a DOMError or DOMException, or even
-            // possibly a DiagnosticError.
-            if (error instanceof DiagnosticError) {
-              validity[option] = new InvalidOptionError(
-                option.toString(),
-                `A "DiagnosticError" occurred when trying to validate the option "${option}".`,
-                error,
-              );
-            } else if (
-              typeof DOMError !== 'undefined' && error instanceof DOMError
-            ) {
-              validity[option] = new InvalidOptionError(
-                option.toString(),
-                `A "DOMError" occurred when trying to validate the option "${option}".`,
-                error,
-              );
-            } else if (
-              typeof DOMException !== 'undefined' && error instanceof DOMException
-            ) {
-              validity[option] = new InvalidOptionError(
-                option.toString(),
-                `A "DOMException" occurred when trying to validate the option "${option}".`,
-                error,
-              );
-            }
+  await Promise.all(Object.entries(config).map(async ([
+    optionKey,
+    validatorFunctions,
+  ]: [
+    keyof T,
+    ValidatorFunction | ValidatorFunction[] | undefined,
+  ]): Promise<void> => {
+    if (!validatorFunctions) {
+      return;
+    }
+
+    const optionValue = inputOptions[optionKey];
+
+    const validators = Array.isArray(validatorFunctions)
+      ? validatorFunctions
+      : [validatorFunctions];
+
+    await Promise.all(validators.map(
+      async (validator: ValidatorFunction): Promise<void> => {
+        const invalidReason = await validator(optionValue);
+        if (invalidReason) {
+          const invalidReasons: string[] | undefined = validity[optionKey];
+          if (invalidReasons) {
+            invalidReasons.push(invalidReason);
+          } else {
+            validity[optionKey] = [invalidReason];
           }
         }
-      })(),
-    ),
-  );
+      },
+    ));
+  }));
 
   if (Object.keys(validity).length) {
     return validity;

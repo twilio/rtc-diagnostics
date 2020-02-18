@@ -14,10 +14,10 @@ import {
 } from './polyfills';
 import { TimeMeasurement } from './types';
 import {
-  createAudioDeviceValidator,
+  InvalidityRecord,
+  validateDeviceId,
   validateOptions,
   validateTime,
-  ValidityRecord,
 } from './utils/OptionValidation';
 
 export declare interface InputTest {
@@ -173,7 +173,7 @@ export class InputTest extends EventEmitter {
    * @param deviceIdOrTrack
    * @param options
    */
-  constructor(options: Partial<InputTest.Options>) {
+  constructor(options: Partial<InputTest.Options> = {}) {
     super();
 
     this._options = { ...InputTest.defaultOptions, ...options };
@@ -202,7 +202,7 @@ export class InputTest extends EventEmitter {
     this._endTime = Date.now();
     const didPass: boolean = pass && this._determinePass();
     const report: InputTest.Report = {
-      deviceId: this._options.deviceId,
+      deviceId: this._options.deviceId || 'default',
       didPass,
       errors: this._errors,
       testName: InputTest.testName,
@@ -304,12 +304,9 @@ export class InputTest extends EventEmitter {
       // Try to validate all of the inputs before starting the test.
       // We perform this check here so if the validation throws, it gets handled
       // properly as a fatal-error and we still emit a report with that error.
-      const invalidReasons: ValidityRecord<InputTest.Options> | undefined =
+      const invalidReasons: InvalidityRecord<InputTest.Options> | undefined =
         await validateOptions<InputTest.Options>(this._options, {
-          deviceId: createAudioDeviceValidator({
-            enumerateDevices: this._options.enumerateDevices,
-            kind: 'audioinput',
-          }),
+          deviceId: validateDeviceId,
           duration: validateTime,
           pollIntervalMs: validateTime,
         });
