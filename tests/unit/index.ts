@@ -5,6 +5,7 @@
 /* tslint:disable ordered-imports */
 
 import './InputTest';
+import './NetworkTest';
 import './OutputTest';
 import './BitrateTest';
 import './OptionValidation';

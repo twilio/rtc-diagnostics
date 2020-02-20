@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { DiagnosticError } from './errors/DiagnosticError';
+import { NetworkTiming, TimeMeasurement } from './timing';
 
 const MAX_NUMBER_OF_PACKETS_TO_SEND = 100;
 const BYTES_KEEP_BUFFERED = 1024 * MAX_NUMBER_OF_PACKETS_TO_SEND;
@@ -39,6 +40,11 @@ class BitrateTest extends EventEmitter {
   private _lastCheckedTimestamp: number = 0;
 
   /**
+   * Network related timing for this test
+   */
+  private _networkTiming: NetworkTiming = {};
+
+  /**
    * The RTCPeerConnection that will receive data
    */
   private _pcReceiver: RTCPeerConnection;
@@ -64,6 +70,11 @@ class BitrateTest extends EventEmitter {
   private _sendDataIntervalId: NodeJS.Timer | undefined;
 
   /**
+   * Timing measurements for this test
+   */
+  private _testTiming: TimeMeasurement = { start: 0 };
+
+  /**
    * Total number of bytes received by the receiver RTCPeerConnection
    */
   private _totalBytesReceived: number = 0;
@@ -78,18 +89,19 @@ class BitrateTest extends EventEmitter {
    * @constructor
    * @param options
    */
-  constructor(options?: BitrateTest.Options) {
+  constructor(options: BitrateTest.Options) {
     super();
 
-    if (options && options.iceServers) {
-      this._rtcConfiguration.iceServers = options.iceServers;
-    }
+    options = options || {};
+    this._rtcConfiguration.iceServers = options.iceServers;
 
     this._pcReceiver = new RTCPeerConnection(this._rtcConfiguration);
     this._pcSender = new RTCPeerConnection(this._rtcConfiguration);
 
     this._pcReceiver.onicecandidate = (event: RTCPeerConnectionIceEvent) => this._onIceCandidate(this._pcSender, event);
     this._pcSender.onicecandidate = (event: RTCPeerConnectionIceEvent) => this._onIceCandidate(this._pcReceiver, event);
+
+    this._setupNetworkListeners(this._pcSender);
 
     // Return before starting the test to allow consumer
     // to listen and capture errors
@@ -108,6 +120,9 @@ class BitrateTest extends EventEmitter {
 
     this._pcSender.close();
     this._pcReceiver.close();
+
+    this._testTiming.end = Date.now();
+    this._testTiming.duration = this._testTiming.end - this._testTiming.start;
 
     this.emit('end', this._getReport());
   }
@@ -143,7 +158,9 @@ class BitrateTest extends EventEmitter {
       averageBitrate: isNaN(averageBitrate) ? 0 : averageBitrate,
       didPass: !this._errors.length && !!this._values.length,
       errors: this._errors,
+      networkTiming: this._networkTiming,
       testName: BitrateTest.testName,
+      testTiming: this._testTiming,
       values: this._values,
     };
   }
@@ -154,7 +171,7 @@ class BitrateTest extends EventEmitter {
    * @param error - The error object
    * @param isFatal - Whether this is a fatal error
    */
-  private _onError(message: string, error: DOMError, isFatal?: boolean): void {
+  private _onError(message: string, error?: DOMError, isFatal?: boolean): void {
     const diagnosticError = new DiagnosticError(error, message);
     this._errors.push(diagnosticError);
     this.emit('error', diagnosticError);
@@ -184,6 +201,10 @@ class BitrateTest extends EventEmitter {
    */
   private _onMessageReceived(event: MessageEvent) {
     this._totalBytesReceived += event.data.length;
+
+    if (!this._networkTiming.firstPacket) {
+      this._networkTiming.firstPacket = Date.now();
+    }
   }
 
   /**
@@ -247,9 +268,49 @@ class BitrateTest extends EventEmitter {
   }
 
   /**
+   * Setup network related event listeners on a PeerConnection
+   * @param pc
+   */
+  private _setupNetworkListeners(pc: RTCPeerConnection) {
+    // PeerConnection state
+    pc.onconnectionstatechange = () => {
+      this._networkTiming.peerConnection = this._networkTiming.peerConnection || { start: 0 };
+
+      if (pc.connectionState === 'connecting') {
+        this._networkTiming.peerConnection.start = Date.now();
+      } else if (pc.connectionState === 'connected') {
+        this._networkTiming.peerConnection.end = Date.now();
+
+        const { start, end } = this._networkTiming.peerConnection;
+        this._networkTiming.peerConnection.duration = end - start;
+      }
+    };
+
+    // ICE Connection state
+    pc.oniceconnectionstatechange = () => {
+      this._networkTiming.ice = this._networkTiming.ice || { start: 0 };
+
+      if (pc.iceConnectionState === 'checking') {
+        this._networkTiming.ice.start = Date.now();
+      } else if (pc.iceConnectionState === 'connected') {
+        this._networkTiming.ice.end = Date.now();
+
+        const { start, end } = this._networkTiming.ice;
+        this._networkTiming.ice.duration = end - start;
+      }
+    };
+  }
+
+  /**
    * Starts the test
    */
   private _startTest(): void {
+    this._testTiming.start = Date.now();
+
+    if (!this._rtcConfiguration.iceServers) {
+      return this._onError('No iceServers found', undefined, true);
+    }
+
     this._pcSender.createOffer()
       .then((offer: RTCSessionDescriptionInit) => this._onSenderOfferCreated(offer))
       .then(() => {
@@ -268,7 +329,7 @@ namespace BitrateTest {
     /**
      * The array of ICE server configurations to use
      */
-    iceServers?: RTCIceServer[];
+    iceServers: RTCIceServer[];
   }
 
   /**
@@ -291,9 +352,19 @@ namespace BitrateTest {
     errors: DiagnosticError[];
 
     /**
+     * Network related timing measurements
+     */
+    networkTiming: NetworkTiming;
+
+    /**
      * The name of the test
      */
     testName: string;
+
+    /**
+     * Timing measurements of the test
+     */
+    testTiming: TimeMeasurement;
 
     /**
      * Bitrate values collected during the test
