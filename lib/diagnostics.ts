@@ -1,5 +1,6 @@
 import { testBitrate } from './BitrateTest';
 import { testInputDevice } from './InputTest';
+import { testNetwork } from './NetworkTest';
 import { testOutputDevice } from './OutputTest';
 
 /**
@@ -23,5 +24,6 @@ window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
   testBitrate,
   testInputDevice,
+  testNetwork,
   testOutputDevice,
 };
