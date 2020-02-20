@@ -82,7 +82,7 @@ export function createAudioDeviceValidator(
 
     // `deviceId` as `undefined` is a valid value as this will cause
     // `getUserMedia` to just get the default device
-    if (deviceId === undefined || deviceId === 'default') {
+    if (deviceId === undefined) {
       if (opts.kind) {
         // If we get here, we just want to make sure there is at least one
         // media device with the correct kind.

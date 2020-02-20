@@ -23,7 +23,7 @@ describe('testInputDevice', function() {
       endHandler = sinon.spy();
 
       await new Promise(resolve => {
-        const test = testInputDevice('default', {
+        const test = testInputDevice(undefined, {
           debug: false,
           duration: defaultTestDuration,
           pollIntervalMs: defaultTestPollIntervalMs,

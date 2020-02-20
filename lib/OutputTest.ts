@@ -13,6 +13,7 @@ import {
   AudioUnsupportedError,
   enumerateDevices,
 } from './polyfills';
+import { getDefaultDevices } from './polyfills/enumerateDevices';
 import { AudioElement, TimeMeasurement } from './types';
 import {
   InvalidityRecord,
@@ -151,6 +152,13 @@ export class OutputTest extends EventEmitter {
    */
   private _audioElement: AudioElement | null = null;
   /**
+   * The default media devices when starting the test.
+   */
+  private _defaultDevices: Partial<Record<
+    MediaDeviceKind,
+    MediaDeviceInfo
+  >> = {};
+  /**
    * A timestamp of when the test ends.
    */
   private _endTime: number | null = null;
@@ -217,7 +225,10 @@ export class OutputTest extends EventEmitter {
 
     this._endTime = Date.now();
     const report: OutputTest.Report = {
-      deviceId: this._options.deviceId || 'default',
+      deviceId: this._options.deviceId || (
+        this._defaultDevices.audiooutput &&
+        this._defaultDevices.audiooutput.deviceId
+      ),
       didPass: pass,
       errors: this._errors,
       testName: OutputTest.testName,
@@ -333,6 +344,8 @@ export class OutputTest extends EventEmitter {
           ));
         }
       }
+
+      this._defaultDevices = await getDefaultDevices();
 
       const source: MediaElementAudioSourceNode =
         this._audioContext.createMediaElementSource(this._audioElement);

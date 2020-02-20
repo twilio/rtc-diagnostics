@@ -12,6 +12,7 @@ import {
   getUserMedia,
   GetUserMediaUnsupportedError,
 } from './polyfills';
+import { getDefaultDevices } from './polyfills/enumerateDevices';
 import { TimeMeasurement } from './types';
 import {
   InvalidityRecord,
@@ -133,6 +134,13 @@ export class InputTest extends EventEmitter {
    */
   private _cleanupAudio: (() => void) | null = null;
   /**
+   * The default media devices when starting the test.
+   */
+  private _defaultDevices: Partial<Record<
+    MediaDeviceKind,
+    MediaDeviceInfo
+  >> = {};
+  /**
    * A timestamp that is set when the test ends.
    */
   private _endTime: number | null = null;
@@ -202,7 +210,10 @@ export class InputTest extends EventEmitter {
     this._endTime = Date.now();
     const didPass: boolean = pass && this._determinePass();
     const report: InputTest.Report = {
-      deviceId: this._options.deviceId || 'default',
+      deviceId: this._options.deviceId || (
+        this._defaultDevices.audioinput &&
+        this._defaultDevices.audioinput.deviceId
+      ),
       didPass,
       errors: this._errors,
       testName: InputTest.testName,
@@ -320,6 +331,8 @@ export class InputTest extends EventEmitter {
       this._mediaStream = await this._options.getUserMedia({
         audio: { deviceId: this._options.deviceId },
       });
+
+      this._defaultDevices = await getDefaultDevices();
 
       if (!this._options.audioContextFactory) {
         throw AudioContextUnsupportedError;
