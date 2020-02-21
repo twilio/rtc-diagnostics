@@ -8,6 +8,8 @@ import {
   NetworkInformation,
   networkInformationPolyfill as networkInformation,
 } from '../polyfills/NetworkInformation';
+import { NetworkTiming, TimeMeasurement } from '../timing';
+import { validateOptions, validateTime } from '../utils/OptionValidation';
 import { waitForPromise } from '../utils/TimeoutPromise';
 import { TestCall } from './TestCall';
 
@@ -79,13 +81,11 @@ export class NetworkTest extends EventEmitter {
     networkInformation,
     timeoutMs: 5000,
   };
-
   /**
    * The test message that is sent from one end of the [[TestCall]] to the
    * other to determine connectivity through WebRTC.
    */
   static testMessage: string = 'Ahoy, world!';
-
   /**
    * The name of the [[NetworkTest]], included in the report that the test emits
    * at the end of its run time.
@@ -97,21 +97,35 @@ export class NetworkTest extends EventEmitter {
    * [[NetworkTest._stop]] is called internally.
    */
   private _endTime: number | null = null;
-
   /**
    * Any errors that the [[NetworkTest]] encounters during its run time.
    */
   private _errors: DiagnosticError[] = [];
-
+  /**
+   * Timestamp when [[TestCall._recipient]] receives a message.
+   */
+  private _firstPacketTime: number | undefined;
   /**
    * Options that have been passed to the [[NetworkTest]].
    */
   private _options: NetworkTest.Options;
-
+  /**
+   * The configuration to pass to [[TestCall]].
+   */
   private _peerConnectionConfig: RTCConfiguration;
+  /**
+   * When the test starts, set on construction.
+   */
   private _startTime: number;
+  /**
+   * The [[TestCall]] used internally.
+   */
   private _testCall: TestCall | null = null;
 
+  /**
+   * Initializes the test and starts it.
+   * @param options Options to pass to the constructor.
+   */
   constructor(options: Partial<NetworkTest.Options> = {}) {
     super();
 
@@ -149,6 +163,8 @@ export class NetworkTest extends EventEmitter {
    */
   private async _startTest(): Promise<void> {
     try {
+      await validateOptions(this._options, { timeoutMs: validateTime });
+
       this._testCall = new TestCall({
         peerConnectionConfig: this._peerConnectionConfig,
         peerConnectionFactory: this._options.peerConnectionFactory,
@@ -165,6 +181,7 @@ export class NetworkTest extends EventEmitter {
           }
           this._testCall.on(TestCall.Event.Message, (message: MessageEvent) => {
             if (message.data === NetworkTest.testMessage) {
+              this._firstPacketTime = Date.now();
               resolve();
             }
           });
@@ -250,6 +267,13 @@ export class NetworkTest extends EventEmitter {
 
     this._endTime = Date.now();
 
+    const networkTiming: NetworkTiming = this._testCall
+      ? this._testCall.networkTiming
+      : {};
+    if (this._firstPacketTime) {
+      networkTiming.firstPacket = this._firstPacketTime;
+    }
+
     // We are unable to use the spread operator here on `networkInformation`,
     // the values will always be `undefined`.
     const report: NetworkTest.Report = {
@@ -257,12 +281,16 @@ export class NetworkTest extends EventEmitter {
       downlink: info.downlink,
       downlinkMax: info.downlinkMax,
       effectiveType: info.effectiveType,
-      endTime: this._endTime,
       errors: this._errors,
+      networkTiming,
       rtt: info.rtt,
       saveData: info.saveData,
-      startTime: this._startTime,
       testName: NetworkTest.testName,
+      testTiming: {
+        duration: this._endTime - this._startTime,
+        end: this._endTime,
+        start: this._startTime,
+      },
       type: info.type,
     };
 
@@ -324,13 +352,13 @@ export namespace NetworkTest {
      */
     effectiveType?: string;
     /**
-     * The timestamp when the [[NetworkTest]] ended.
-     */
-    endTime: number;
-    /**
      * Any error that occured during the run-time of the test.
      */
     errors: DiagnosticError[];
+    /**
+     * Timestamps of various network events as the [[TestCall]] runs.
+     */
+    networkTiming: NetworkTiming;
     /**
      * NetworkInformation rtt
      */
@@ -340,13 +368,14 @@ export namespace NetworkTest {
      */
     saveData?: boolean;
     /**
-     * When the [[NetworkTest]] starts, set on construction.
-     */
-    startTime: number;
-    /**
      * The name of the [[NetworkTest]].
      */
     testName: typeof NetworkTest.testName;
+    /**
+     * When the [[NetworkTest]] starts and ends, and the duration.
+     * Set on construction and when the end event fires.
+     */
+    testTiming: TimeMeasurement;
     /**
      * NetworkInformation type
      */
@@ -361,16 +390,6 @@ export namespace NetworkTest {
  */
 export function testNetwork(
   options?: Partial<NetworkTest.Options>,
-): Promise<NetworkTest.Report> {
-  return new Promise((
-      resolve: (report: NetworkTest.Report) => void,
-      reject: (error: DiagnosticError) => void,
-    ): void => {
-      const networkTest: NetworkTest = new NetworkTest(options);
-      networkTest.on(NetworkTest.Events.Error,
-        (error: DiagnosticError) => reject(error));
-      networkTest.on(NetworkTest.Events.End,
-        (report: NetworkTest.Report) => resolve(report));
-    },
-  );
+): NetworkTest {
+  return new NetworkTest(options);
 }

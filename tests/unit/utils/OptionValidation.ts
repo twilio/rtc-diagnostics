@@ -1,13 +1,13 @@
 // tslint:disable only-arrow-functions
 
 import * as assert from 'assert';
-import { DiagnosticError } from '../../lib/errors';
+import { DiagnosticError } from '../../../lib/errors';
 import {
   createAudioDeviceValidator,
   validateOptions,
   validateTime,
-} from '../../lib/utils/OptionValidation';
-import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
+} from '../../../lib/utils/OptionValidation';
+import { mockEnumerateDevicesFactory } from '../../mocks/mockEnumerateDevices';
 
 describe('OptionValidation', function() {
   describe('validateTime', function() {

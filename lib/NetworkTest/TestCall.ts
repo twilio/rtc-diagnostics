@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { NetworkTiming } from '../timing';
 import { waitForPromise } from '../utils/TimeoutPromise';
 
 export declare interface TestCall {
@@ -123,6 +124,11 @@ export declare interface TestCall {
  */
 export class TestCall extends EventEmitter {
   /**
+   * Timestamps of various network events.
+   */
+  networkTiming: NetworkTiming = {};
+
+  /**
    * The recipient-designated `RTCPeerConnection`, will receive a message
    * from the [[_sender]].
    */
@@ -231,6 +237,53 @@ export class TestCall extends EventEmitter {
    * ICE connection process between the two.
    */
   async establishConnection(): Promise<void> {
+    const createIceConnectionStateChangeHandler: (
+      peerConnection: RTCPeerConnection,
+    ) => () => void = (
+      peerConnection: RTCPeerConnection,
+    ) => (): void => {
+      this.networkTiming.ice = this.networkTiming.ice || { start: 0 };
+      switch (peerConnection.iceConnectionState) {
+        case 'checking':
+          this.networkTiming.ice.start = Date.now();
+          break;
+        case 'connected':
+          this.networkTiming.ice.end = Date.now();
+          this.networkTiming.ice.duration =
+            this.networkTiming.ice.end - this.networkTiming.ice.start;
+          break;
+      }
+    };
+
+    const createConnectionStateChangeHandler: (
+      peerConnection: RTCPeerConnection,
+    ) => () => void = (
+      peerConnection: RTCPeerConnection,
+    ) => (): void => {
+      this.networkTiming.peerConnection =
+      this.networkTiming.peerConnection || { start: 0 };
+      switch (peerConnection.connectionState) {
+        case 'connecting':
+          this.networkTiming.peerConnection.start = Date.now();
+          break;
+        case 'connected':
+          this.networkTiming.peerConnection.end = Date.now();
+          this.networkTiming.peerConnection.duration =
+            this.networkTiming.peerConnection.end -
+            this.networkTiming.peerConnection.start;
+          break;
+      }
+    };
+
+    [this._sender, this._recipient].forEach(
+      (peerConnection: RTCPeerConnection): void => {
+        peerConnection.oniceconnectionstatechange =
+          createIceConnectionStateChangeHandler(peerConnection);
+        peerConnection.onconnectionstatechange =
+          createConnectionStateChangeHandler(peerConnection);
+      },
+    );
+
     // Set up a promise that resolves when the data channel of the recipient
     // is open
     const waitForRecipientDataChannelOpen: Promise<void> = new Promise(
@@ -261,13 +314,6 @@ export class TestCall extends EventEmitter {
       },
     );
 
-    // Set up a promise that resolves when the data channel of both
-    // PCs is open.
-    const waitBothDataChannelOpen: Promise<[void, void]> = Promise.all([
-      waitForPromise(waitForRecipientDataChannelOpen, this._timeoutDuration),
-      waitForPromise(waitForSenderDataChannelOpen, this._timeoutDuration),
-    ]);
-
     // Create the offer on the sender
     const senderDesc: RTCSessionDescriptionInit =
       await this._sender.createOffer();
@@ -289,7 +335,10 @@ export class TestCall extends EventEmitter {
     // Once the offer and answer are set, the connection should start and
     // eventually be established between the two PCs
     // We can wait for the data channel to open on both sides to be sure
-    await waitBothDataChannelOpen;
+    await Promise.all([
+      waitForPromise(waitForRecipientDataChannelOpen, this._timeoutDuration),
+      waitForPromise(waitForSenderDataChannelOpen, this._timeoutDuration),
+    ]);
   }
 
   /**

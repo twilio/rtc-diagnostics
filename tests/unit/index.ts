@@ -7,5 +7,6 @@
 import './InputTest';
 import './NetworkTest';
 import './OutputTest';
+import './utils';
+
 import './BitrateTest';
-import './OptionValidation';
