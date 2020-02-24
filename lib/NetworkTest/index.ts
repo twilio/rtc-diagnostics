@@ -102,9 +102,9 @@ export class NetworkTest extends EventEmitter {
    */
   private _errors: DiagnosticError[] = [];
   /**
-   * Timestamp when [[TestCall._recipient]] receives a message.
+   * Network event time measurements.
    */
-  private _firstPacketTime: number | undefined;
+  private _networkTiming: NetworkTiming = {};
   /**
    * Options that have been passed to the [[NetworkTest]].
    */
@@ -181,7 +181,7 @@ export class NetworkTest extends EventEmitter {
           }
           this._testCall.on(TestCall.Event.Message, (message: MessageEvent) => {
             if (message.data === NetworkTest.testMessage) {
-              this._firstPacketTime = Date.now();
+              this._networkTiming.firstPacket = Date.now();
               resolve();
             }
           });
@@ -267,12 +267,9 @@ export class NetworkTest extends EventEmitter {
 
     this._endTime = Date.now();
 
-    const networkTiming: NetworkTiming = this._testCall
-      ? this._testCall.networkTiming
+    const testCallNetworkTiming: NetworkTiming = this._testCall
+      ? this._testCall.getNetworkTiming()
       : {};
-    if (this._firstPacketTime) {
-      networkTiming.firstPacket = this._firstPacketTime;
-    }
 
     // We are unable to use the spread operator here on `networkInformation`,
     // the values will always be `undefined`.
@@ -282,7 +279,7 @@ export class NetworkTest extends EventEmitter {
       downlinkMax: info.downlinkMax,
       effectiveType: info.effectiveType,
       errors: this._errors,
-      networkTiming,
+      networkTiming: { ...this._networkTiming, ...testCallNetworkTiming },
       rtt: info.rtt,
       saveData: info.saveData,
       testName: NetworkTest.testName,
