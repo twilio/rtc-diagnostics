@@ -302,7 +302,7 @@ export class TestCall extends EventEmitter {
    * event handlers to.
    */
   private _bindPeerConnectionTimeHandlers(peerConnection: RTCPeerConnection): void {
-    peerConnection.oniceconnectionstatechange = (): void => {
+    peerConnection.onconnectionstatechange = (): void => {
       this._networkTiming.peerConnection =
         this._networkTiming.peerConnection || { start: 0 };
       switch (peerConnection.connectionState) {
@@ -318,7 +318,7 @@ export class TestCall extends EventEmitter {
       }
     };
 
-    peerConnection.onconnectionstatechange = (): void => {
+    peerConnection.oniceconnectionstatechange = (): void => {
       this._networkTiming.ice = this._networkTiming.ice || { start: 0 };
       switch (peerConnection.iceConnectionState) {
         case 'checking':
