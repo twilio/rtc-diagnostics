@@ -8,7 +8,7 @@ import {
   testInputDevice,
 } from '../../lib/InputTest';
 
-const defaultTestDuration = 250;
+const defaultTestDuration = 500;
 const defaultTestPollIntervalMs = 5;
 
 describe('testInputDevice', function() {
