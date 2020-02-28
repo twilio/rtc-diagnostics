@@ -321,11 +321,6 @@ export class InputTest extends EventEmitter {
           duration: validateTime,
           pollIntervalMs: validateTime,
         });
-
-      // tslint:disable
-
-      console.log('validated options', invalidReasons);
-
       if (invalidReasons) {
         throw new InvalidOptionsError(invalidReasons);
       }
@@ -337,37 +332,25 @@ export class InputTest extends EventEmitter {
         audio: { deviceId: this._options.deviceId },
       });
 
-      console.log('got user media');
-
       this._defaultDevices = await getDefaultDevices();
-
-      console.log('got default devices');
 
       if (!this._options.audioContextFactory) {
         throw AudioContextUnsupportedError;
       }
       this._audioContext = new this._options.audioContextFactory();
 
-      console.log('made audio context');
-
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
       analyser.fftSize = 64;
-
-      console.log('created analyser node');
 
       const microphone: MediaStreamAudioSourceNode =
         this._audioContext.createMediaStreamSource(this._mediaStream);
       microphone.connect(analyser);
 
-      console.log('made media stream source');
-
       this._cleanupAudio = (): void => {
         analyser.disconnect();
         microphone.disconnect();
       };
-
-      console.log('bound cleanup audio');
 
       const frequencyDataBytes: Uint8Array =
         new Uint8Array(analyser.frequencyBinCount);
@@ -375,28 +358,21 @@ export class InputTest extends EventEmitter {
       // This function runs every `this._options.reportRate` ms and emits the
       // current volume of the `MediaStream`.
       const volumeEvent: () => void = (): void => {
-        console.log('volume event');
         if (this._endTime) {
-          console.log('was an end time');
           return;
         }
 
         analyser.getByteFrequencyData(frequencyDataBytes);
-        console.log('getting byte frequency data');
         const volume: number =
           frequencyDataBytes.reduce(
             (sum: number, val: number) => sum + val,
             0,
           ) / frequencyDataBytes.length;
-        console.log('volume', volume);
         this._onVolume(volume);
-        console.log('volume emit');
 
         if (Date.now() - this._startTime > this._options.duration) {
-          console.log('past duration, stopping');
           this.stop();
         } else {
-          console.log('not past duration, continuing');
           this._volumeTimeout = setTimeout(
             volumeEvent,
             this._options.pollIntervalMs,
@@ -404,16 +380,11 @@ export class InputTest extends EventEmitter {
         }
       };
 
-      console.log('starting volume events');
-
       this._volumeTimeout = setTimeout(
         volumeEvent,
         this._options.pollIntervalMs,
       );
     } catch (error) {
-
-      console.log(error);
-
       if (error instanceof DiagnosticError) {
         // There is some other fatal error.
         this._onError(error);
