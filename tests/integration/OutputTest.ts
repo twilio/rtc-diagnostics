@@ -169,7 +169,7 @@ describe('testOutputDevice', function() {
         const test = testOutputDevice(undefined, {
           duration: Infinity,
           pollIntervalMs: defaultTestPollIntervalMs,
-          testURI: 'https://media.twiliocdn.com/sdk/js/client/sounds/releases/1.0.0/doesnotactuallyexist.ogg',
+          testURI: '',
         });
         test.on(OutputTest.Events.Volume, () => {
           outputTestEvents.push(OutputTest.Events.Volume);
@@ -181,7 +181,6 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Error, () => {
           outputTestEvents.push(OutputTest.Events.Error);
         });
-        setTimeout(() => test.stop(false), defaultTestDuration);
       });
     });
 
