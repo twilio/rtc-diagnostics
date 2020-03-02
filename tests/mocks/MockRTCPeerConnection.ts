@@ -17,7 +17,11 @@ export const mockRTCPeerConnectionFactory = (
     createDataChannel() {
       return new mockRTCDataChannel();
     }
-    async createOffer() {}
+    async createOffer() {
+      if (options.doThrow && options.doThrow.createOffer) {
+        throw new Error();
+      }
+    }
     ondatachannel: (...args: any[]) => void = () => {};
     onicecandidate: (...args: any[]) => void = () => {};
     async setLocalDescription() {}
@@ -31,6 +35,9 @@ export const mockRTCPeerConnectionFactory = (
 export namespace MockRTCPeerConnection {
   export interface Options {
     candidate?: any;
+    doThrow?: {
+      createOffer?: boolean;
+    };
     mockRTCDataChannelFactoryOptions: MockRTCDataChannel.Options;
   }
 }

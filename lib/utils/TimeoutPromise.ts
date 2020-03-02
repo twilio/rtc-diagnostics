@@ -6,15 +6,10 @@ import { PromiseTimedOutError } from '../errors';
  * @param timeoutMs The amount of time after which to reject the promise.
  */
 export function waitForPromise<T>(
-  promiseOrArray: Promise<T>,
+  promise: Promise<T>,
   timeoutMs: number,
-): Promise<T> {
+): Promise<T | void> {
   let timer: NodeJS.Timeout;
-
-  const promise: Promise<any> =
-    Array.isArray(promiseOrArray)
-      ? Promise.all(promiseOrArray)
-      : promiseOrArray;
 
   const timeoutPromise: Promise<void> = new Promise(
     (_: () => void, reject: (error: PromiseTimedOutError) => void) => {
@@ -25,8 +20,7 @@ export function waitForPromise<T>(
   return Promise.race([
     promise,
     timeoutPromise,
-  ]).then((result: T) => {
+  ]).finally(() => {
     clearTimeout(timer);
-    return result;
   });
 }

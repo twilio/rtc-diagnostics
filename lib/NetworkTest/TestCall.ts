@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { NetworkTiming } from '../timing';
 import { waitForPromise } from '../utils/TimeoutPromise';
 
 export declare interface TestCall {
@@ -123,6 +124,10 @@ export declare interface TestCall {
  */
 export class TestCall extends EventEmitter {
   /**
+   * Network event time measurements.
+   */
+  private _networkTiming: NetworkTiming = {};
+  /**
    * The recipient-designated `RTCPeerConnection`, will receive a message
    * from the [[_sender]].
    */
@@ -183,35 +188,16 @@ export class TestCall extends EventEmitter {
     };
 
     // Forward ICE candidates
-    const createIceCandidateHandler: (
-      peerConnectionFrom: RTCPeerConnection,
-      peerConnectionTo: RTCPeerConnection,
-    ) => (
-      iceEvent: RTCPeerConnectionIceEvent,
-    ) => void = (
-      peerConnectionFrom: RTCPeerConnection,
-      peerConnectionTo: RTCPeerConnection,
-    ) => (
-      iceEvent: RTCPeerConnectionIceEvent,
-    ): void => {
-      if (
-        iceEvent.candidate &&
-        iceEvent.candidate.candidate &&
-        iceEvent.candidate.candidate.indexOf('relay') !== -1
-      ) {
-        this.emit(TestCall.Event.IceCandidate, peerConnectionFrom, iceEvent);
-        peerConnectionTo.addIceCandidate(iceEvent.candidate);
-      }
-    };
+    this._bindPeerConnectionIceCandidateHandler(
+      this._sender,
+      this._recipient,
+    );
+    this._bindPeerConnectionIceCandidateHandler(
+      this._recipient,
+      this._sender,
+    );
 
-    this._sender.onicecandidate = createIceCandidateHandler(
-      this._sender,
-      this._recipient,
-    );
-    this._recipient.onicecandidate = createIceCandidateHandler(
-      this._recipient,
-      this._sender,
-    );
+    this._bindPeerConnectionTimeHandlers(this._sender);
   }
 
   /**
@@ -231,42 +217,19 @@ export class TestCall extends EventEmitter {
    * ICE connection process between the two.
    */
   async establishConnection(): Promise<void> {
-    // Set up a promise that resolves when the data channel of the recipient
-    // is open
-    const waitForRecipientDataChannelOpen: Promise<void> = new Promise(
+    // Set up a promise that resolves when the data channel is open
+    const waitForDataChannelOpen: Array<Promise<void>> = [
+      this._sender,
+      this._recipient,
+    ].map((peerConnection: RTCPeerConnection) => new Promise(
       (resolve: () => void): void => {
-        this.on(
-          TestCall.Event.Open,
-          (peerConnection: RTCPeerConnection): void => {
-            if (peerConnection === this._recipient) {
-              resolve();
-            }
-          },
-        );
+        this.on(TestCall.Event.Open, (connectedPeerConnection: RTCPeerConnection): void => {
+          if (peerConnection === connectedPeerConnection) {
+            resolve();
+          }
+        });
       },
-    );
-
-    // Set up a promise that resolves when the data channel of the sender
-    // is open
-    const waitForSenderDataChannelOpen: Promise<void> = new Promise(
-      (resolve: () => void): void => {
-        this.on(
-          TestCall.Event.Open,
-          (peerConnection: RTCPeerConnection): void => {
-            if (peerConnection === this._sender) {
-              resolve();
-            }
-          },
-        );
-      },
-    );
-
-    // Set up a promise that resolves when the data channel of both
-    // PCs is open.
-    const waitBothDataChannelOpen: Promise<[void, void]> = Promise.all([
-      waitForPromise(waitForRecipientDataChannelOpen, this._timeoutDuration),
-      waitForPromise(waitForSenderDataChannelOpen, this._timeoutDuration),
-    ]);
+    ));
 
     // Create the offer on the sender
     const senderDesc: RTCSessionDescriptionInit =
@@ -289,7 +252,15 @@ export class TestCall extends EventEmitter {
     // Once the offer and answer are set, the connection should start and
     // eventually be established between the two PCs
     // We can wait for the data channel to open on both sides to be sure
-    await waitBothDataChannelOpen;
+    await Promise.all(waitForDataChannelOpen.map((promise: Promise<void>) =>
+      waitForPromise(promise, this._timeoutDuration)));
+  }
+
+  /**
+   * Returns all recorded network time measurements.
+   */
+  getNetworkTiming(): NetworkTiming {
+    return this._networkTiming;
   }
 
   /**
@@ -300,6 +271,66 @@ export class TestCall extends EventEmitter {
    */
   send(data: string): void {
     this._sendDataChannel.send(data);
+  }
+
+  /**
+   * Bind the ice candidate handler to the peer connection.
+   * @param peerConnectionFrom The peer connection to bind the ice candidate
+   * handler to.
+   * @param peerConnectionTo The peer connection to forward the ice candidate
+   * to.
+   */
+  private _bindPeerConnectionIceCandidateHandler(
+    peerConnectionFrom: RTCPeerConnection,
+    peerConnectionTo: RTCPeerConnection,
+  ): void {
+    peerConnectionFrom.onicecandidate = (iceEvent: RTCPeerConnectionIceEvent) => {
+      if (
+        iceEvent.candidate &&
+        iceEvent.candidate.candidate &&
+        iceEvent.candidate.candidate.indexOf('relay') !== -1
+      ) {
+        this.emit(TestCall.Event.IceCandidate, peerConnectionFrom, iceEvent);
+        peerConnectionTo.addIceCandidate(iceEvent.candidate);
+      }
+    };
+  }
+
+  /**
+   * Bind time measuring event handlers.
+   * @param peerConnection The peer connection to bind the time measuring
+   * event handlers to.
+   */
+  private _bindPeerConnectionTimeHandlers(peerConnection: RTCPeerConnection): void {
+    peerConnection.onconnectionstatechange = (): void => {
+      this._networkTiming.peerConnection =
+        this._networkTiming.peerConnection || { start: 0 };
+      switch (peerConnection.connectionState) {
+        case 'connecting':
+          this._networkTiming.peerConnection.start = Date.now();
+          break;
+        case 'connected':
+          this._networkTiming.peerConnection.end = Date.now();
+          this._networkTiming.peerConnection.duration =
+            this._networkTiming.peerConnection.end -
+            this._networkTiming.peerConnection.start;
+          break;
+      }
+    };
+
+    peerConnection.oniceconnectionstatechange = (): void => {
+      this._networkTiming.ice = this._networkTiming.ice || { start: 0 };
+      switch (peerConnection.iceConnectionState) {
+        case 'checking':
+          this._networkTiming.ice.start = Date.now();
+          break;
+        case 'connected':
+          this._networkTiming.ice.end = Date.now();
+          this._networkTiming.ice.duration =
+            this._networkTiming.ice.end - this._networkTiming.ice.start;
+          break;
+      }
+    };
   }
 }
 
