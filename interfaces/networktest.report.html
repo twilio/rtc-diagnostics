@@ -60,7 +60,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>A test report that is emitted with the [[NetworkTest.End]] event.</p>
+						<p>Represents the report generated from a <a href="../classes/networktest.html">NetworkTest</a>.</p>
 					</div>
 				</div>
 			</section>
@@ -103,12 +103,12 @@
 					<div class="tsd-signature tsd-kind-icon">did<wbr>Pass<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L339">lib/NetworkTest/index.ts:339</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L336">lib/NetworkTest/index.ts:336</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Whether or not the <a href="../classes/networktest.html">NetworkTest</a> has passed.</p>
+							<p>Whether or not the test passed. This is <code>false</code> if there are errors that occurred during the test.</p>
 						</div>
 					</div>
 				</section>
@@ -118,12 +118,13 @@
 					<div class="tsd-signature tsd-kind-icon">downlink<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L343">lib/NetworkTest/index.ts:343</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L341">lib/NetworkTest/index.ts:341</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>NetworkInformation downlink</p>
+							<p>The effective bandwidth estimate in megabits per second, rounded to the nearest multiple of 25 kilobits per seconds.
+							Please see <a href="https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlink">NetworkInformation.downlink API</a>.</p>
 						</div>
 					</div>
 				</section>
@@ -133,12 +134,13 @@
 					<div class="tsd-signature tsd-kind-icon">downlink<wbr>Max<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L347">lib/NetworkTest/index.ts:347</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L346">lib/NetworkTest/index.ts:346</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>NetworkInformation downlinkMax</p>
+							<p>The maximum downlink speed, in megabits per second (Mbps), for the underlying connection technology.
+							Please see <a href="https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlinkMax">NetworkInformation.downlinkMax API</a>.</p>
 						</div>
 					</div>
 				</section>
@@ -148,12 +150,13 @@
 					<div class="tsd-signature tsd-kind-icon">effective<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L351">lib/NetworkTest/index.ts:351</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L351">lib/NetworkTest/index.ts:351</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>NetworkInformation effectiveType</p>
+							<p>The effective type of the connection meaning one of &#39;slow-2g&#39;, &#39;2g&#39;, &#39;3g&#39;, or &#39;4g&#39;.
+							Please see <a href="https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType">NetworkInformation.effectiveType API</a>.</p>
 						</div>
 					</div>
 				</section>
@@ -163,12 +166,12 @@
 					<div class="tsd-signature tsd-kind-icon">errors<span class="tsd-signature-symbol">:</span> <a href="../classes/diagnosticerror.html" class="tsd-signature-type">DiagnosticError</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L355">lib/NetworkTest/index.ts:355</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L355">lib/NetworkTest/index.ts:355</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Any error that occured during the run-time of the test.</p>
+							<p>Any errors that occurred during the test.</p>
 						</div>
 					</div>
 				</section>
@@ -178,12 +181,12 @@
 					<div class="tsd-signature tsd-kind-icon">network<wbr>Timing<span class="tsd-signature-symbol">:</span> <a href="networktiming.html" class="tsd-signature-type">NetworkTiming</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L359">lib/NetworkTest/index.ts:359</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L359">lib/NetworkTest/index.ts:359</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Timestamps of various network events as the <a href="../classes/testcall.html">TestCall</a> runs.</p>
+							<p>Network related time measurements.</p>
 						</div>
 					</div>
 				</section>
@@ -193,12 +196,13 @@
 					<div class="tsd-signature tsd-kind-icon">rtt<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L363">lib/NetworkTest/index.ts:363</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L364">lib/NetworkTest/index.ts:364</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>NetworkInformation rtt</p>
+							<p>The estimated effective round-trip time of the current connection, rounded to the nearest multiple of 25 milliseconds.
+							Please see <a href="https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt">NetworkInformation.rtt API</a>.</p>
 						</div>
 					</div>
 				</section>
@@ -208,12 +212,13 @@
 					<div class="tsd-signature tsd-kind-icon">save<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L367">lib/NetworkTest/index.ts:367</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L369">lib/NetworkTest/index.ts:369</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>NetworkInformation saveData</p>
+							<p>Returns <code>true</code> if the user has set a reduced data usage option on the user agent.
+							Please see <a href="https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/saveData">NetworkInformation.saveData API</a>.</p>
 						</div>
 					</div>
 				</section>
@@ -223,12 +228,12 @@
 					<div class="tsd-signature tsd-kind-icon">test<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof testName</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L371">lib/NetworkTest/index.ts:371</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L373">lib/NetworkTest/index.ts:373</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The name of the <a href="../classes/networktest.html">NetworkTest</a>.</p>
+							<p>The name of the test.</p>
 						</div>
 					</div>
 				</section>
@@ -238,13 +243,12 @@
 					<div class="tsd-signature tsd-kind-icon">test<wbr>Timing<span class="tsd-signature-symbol">:</span> <a href="timemeasurement.html" class="tsd-signature-type">TimeMeasurement</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L376">lib/NetworkTest/index.ts:376</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L377">lib/NetworkTest/index.ts:377</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>When the <a href="../classes/networktest.html">NetworkTest</a> starts and ends, and the duration.
-							Set on construction and when the end event fires.</p>
+							<p>Time measurements of test run time.</p>
 						</div>
 					</div>
 				</section>
@@ -254,12 +258,13 @@
 					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/NetworkTest/index.ts#L380">lib/NetworkTest/index.ts:380</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/NetworkTest/index.ts#L382">lib/NetworkTest/index.ts:382</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>NetworkInformation type</p>
+							<p>The type of connection a device is using to communicate with the network.
+							Please see <a href="https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/type">NetworkInformation.type API</a>.</p>
 						</div>
 					</div>
 				</section>
@@ -281,13 +286,13 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/alreadystoppederror.html" class="tsd-kind-icon">Already<wbr>Stopped<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -301,7 +306,7 @@
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-is-external">
+					<li class="current tsd-kind-class">
 						<a href="../classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
 						<ul>
 							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
@@ -351,10 +356,13 @@
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="../classes/networktest.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-overwrite">
+								<a href="../classes/networktest.html#on" class="tsd-kind-icon">on</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/networktest.html#defaultmaxlisteners" class="tsd-kind-icon">default<wbr>Max<wbr>Listeners</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
 								<a href="../classes/networktest.html#testmessage" class="tsd-kind-icon">test<wbr>Message</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
@@ -380,9 +388,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
 								<a href="../classes/networktest.html#off" class="tsd-kind-icon">off</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-								<a href="../classes/networktest.html#on" class="tsd-kind-icon">on</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
 								<a href="../classes/networktest.html#once" class="tsd-kind-icon">once</a>
@@ -415,7 +420,7 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">

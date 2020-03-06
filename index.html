@@ -52,10 +52,57 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#twilio-diagnostic-sdk" id="twilio-diagnostic-sdk" style="color: inherit; text-decoration: none;">
-					<h1>Twilio Diagnostic SDK</h1>
+				<a href="#twilio-diagnostics-sdk" id="twilio-diagnostics-sdk" style="color: inherit; text-decoration: none;">
+					<h1>Twilio Diagnostics SDK</h1>
 				</a>
-				<p>This Diagnostic SDK provides developers with several utility functions that they can use to determine if a user is ready for making and receiving calls.</p>
+				<p>The Diagnostics SDK provides the tools for the developer to determine Voice &amp; Video calling readiness. The SDK provides the methods necessary to identify where the issues are and to provide a mechanism of estimating expected audio quality.</p>
+				<ul>
+					<li><a href="https://twilio.github.io/sdk-diagnostics/globals.html">API Docs</a></li>
+					<li>Quickstart (Coming soon)</li>
+					<li>Changelog (Coming soon)</li>
+				</ul>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<p>The following is an example for running bitrate test. For more information, please refer to the <a href="https://twilio.github.io/sdk-diagnostics/globals.html">API Docs</a></p>
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/diagnostics'</span>;
+
+<span class="hljs-keyword">const</span> bitrateTest = testBitrate({
+ iceServers: [{
+   credential: <span class="hljs-string">'bar'</span>,
+   username: <span class="hljs-string">'foo'</span>,
+   urls: <span class="hljs-string">'turn:global.turn.twilio.com:3478?transport=udp'</span>,
+ }],
+});
+
+bitrateTest.on(<span class="hljs-string">'bitrate'</span>, <span class="hljs-function">(<span class="hljs-params">bitrate</span>) =&gt;</span> {
+ <span class="hljs-built_in">console</span>.log(bitrate);
+});
+
+bitrateTest.on(<span class="hljs-string">'error'</span>, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+ <span class="hljs-built_in">console</span>.log(error);
+});
+
+bitrateTest.on(<span class="hljs-string">'end'</span>, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
+ <span class="hljs-built_in">console</span>.log(report);
+});
+
+setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+ bitrateTest.stop();
+}, <span class="hljs-number">10000</span>);</code></pre>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>Installation</h2>
+				</a>
+				<pre><code>git <span class="hljs-keyword">clone</span> <span class="hljs-title">git</span>@github.com:twilio/sdk-diagnostics.git
+cd sdk-diagnostics
+npm install</code></pre>
+				<a href="#commands" id="commands" style="color: inherit; text-decoration: none;">
+					<h2>Commands</h2>
+				</a>
+				<ul>
+					<li><code>npm run build</code> - builds the artifacts under <code>dist</code> folder</li>
+					<li><code>npm run test</code> - runs unit and integration tests</li>
+				</ul>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -74,13 +121,13 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/alreadystoppederror.html" class="tsd-kind-icon">Already<wbr>Stopped<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -92,10 +139,10 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">

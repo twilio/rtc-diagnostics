@@ -60,7 +60,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Options passed to <a href="../classes/bitratetest.html">BitrateTest</a> constructor</p>
+						<p>Options passed to <a href="../classes/bitratetest.html">BitrateTest</a> constructor.</p>
 					</div>
 				</div>
 			</section>
@@ -93,12 +93,14 @@
 					<div class="tsd-signature tsd-kind-icon">ice<wbr>Servers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RTCIceServer</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/BitrateTest.ts#L329">lib/BitrateTest.ts:329</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/BitrateTest.ts#L378">lib/BitrateTest.ts:378</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The array of ICE server configurations to use</p>
+							<p>The array of <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer">RTCIceServer</a> configurations to use.
+								You need to provide TURN server configurations to ensure that your network bitrate is tested.
+							You you can use <a href="https://www.twilio.com/stun-turn">Twilio&#39;s Network Traversal Service</a> to get TURN credentials.</p>
 						</div>
 					</div>
 				</section>
@@ -122,9 +124,12 @@
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-is-external">
+					<li class="current tsd-kind-class">
 						<a href="../classes/bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
 						<ul>
+							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
+								<a href="../enums/bitratetest.events.html" class="tsd-kind-icon">Events</a>
+							</li>
 							<li class="current tsd-kind-interface tsd-parent-kind-class">
 								<a href="bitratetest.options.html" class="tsd-kind-icon">Options</a>
 								<ul>
@@ -138,6 +143,9 @@
 							</li>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="../classes/bitratetest.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-overwrite">
+								<a href="../classes/bitratetest.html#on" class="tsd-kind-icon">on</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/bitratetest.html#defaultmaxlisteners" class="tsd-kind-icon">default<wbr>Max<wbr>Listeners</a>
@@ -165,9 +173,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
 								<a href="../classes/bitratetest.html#off" class="tsd-kind-icon">off</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-								<a href="../classes/bitratetest.html#on" class="tsd-kind-icon">on</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
 								<a href="../classes/bitratetest.html#once" class="tsd-kind-icon">once</a>
@@ -203,7 +208,7 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -215,10 +220,10 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">

@@ -54,6 +54,17 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Supervises an input device test utilizing a <code>MediaStream</code> passed to it, or an
+							input <code>MediaStream</code> obtained from <code>getUserMedia</code> if no <code>MediaStream</code> was
+							passed via <code>options</code>.
+							The events defined in the enum <a href="../enums/inputtest.events.html">Events</a> are emitted as the test
+						runs.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -151,7 +162,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L178">lib/InputTest.ts:178</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L177">lib/InputTest.ts:177</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -187,14 +198,14 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#on">on</a></p>
+								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L70">lib/InputTest.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L70">lib/InputTest.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Fired by the test upon completion with a parameter of type <a href="../interfaces/inputtest.report.html">Report</a>.</p>
+									<p>Raised upon completion of the test.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -240,14 +251,14 @@
 						</li>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#on">on</a></p>
+								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L83">lib/InputTest.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L83">lib/InputTest.ts:83</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Fired by the test when encountering an error with a parameter of type
+									<p>Raised by the test when encountering an error with a parameter of type
 									<a href="diagnosticerror.html">DiagnosticError</a>.</p>
 								</div>
 							</div>
@@ -290,14 +301,14 @@
 						</li>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#on">on</a></p>
+								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L97">lib/InputTest.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L97">lib/InputTest.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Fired by the test every <a href="../interfaces/inputtest.options.html#pollintervalms">Options.pollIntervalMs</a> amount of
+									<p>Raised by the test every <a href="../interfaces/inputtest.options.html#pollintervalms">Options.pollIntervalMs</a> amount of
 										milliseconds with a parameter of type <code>number</code> that represents the
 									current volume of the audio stream.</p>
 								</div>
@@ -360,7 +371,7 @@
 					<div class="tsd-signature tsd-kind-icon">test<wbr>Name<span class="tsd-signature-symbol">:</span> <a href="../enums/testnames.html#inputaudiodevice" class="tsd-signature-type">InputAudioDevice</a><span class="tsd-signature-symbol"> = TestNames.InputAudioDevice</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L126">lib/InputTest.ts:126</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L125">lib/InputTest.ts:125</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -382,9 +393,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L233">lib/InputTest.ts:233</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L235">lib/InputTest.ts:235</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>The maximum volume detected during the test.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 						</li>
 					</ul>
@@ -450,7 +466,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#emit">emit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L33">lib/InputTest.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L33">lib/InputTest.ts:33</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -486,7 +502,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#emit">emit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L45">lib/InputTest.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L45">lib/InputTest.ts:45</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -516,7 +532,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#emit">emit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L56">lib/InputTest.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L56">lib/InputTest.ts:56</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -935,7 +951,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L202">lib/InputTest.ts:202</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L201">lib/InputTest.ts:201</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1002,7 +1018,7 @@
 					<div class="tsd-signature tsd-kind-icon">default<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L115">lib/InputTest.ts:115</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L114">lib/InputTest.ts:114</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -1016,7 +1032,7 @@
 						<div class="tsd-signature tsd-kind-icon">audio<wbr>Context<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> = AudioContext</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L116">lib/InputTest.ts:116</a></li>
+								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L115">lib/InputTest.ts:115</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -1026,7 +1042,7 @@
 						<div class="tsd-signature tsd-kind-icon">debug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> = false</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L117">lib/InputTest.ts:117</a></li>
+								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L116">lib/InputTest.ts:116</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -1036,7 +1052,7 @@
 						<div class="tsd-signature tsd-kind-icon">duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = Infinity</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L118">lib/InputTest.ts:118</a></li>
+								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L117">lib/InputTest.ts:117</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -1046,7 +1062,7 @@
 						<div class="tsd-signature tsd-kind-icon">enumerate<wbr>Devices<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">enumerateDevices</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L119">lib/InputTest.ts:119</a></li>
+								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L118">lib/InputTest.ts:118</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -1056,7 +1072,7 @@
 						<div class="tsd-signature tsd-kind-icon">get<wbr>User<wbr>Media<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">getUserMedia</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L120">lib/InputTest.ts:120</a></li>
+								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L119">lib/InputTest.ts:119</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -1066,7 +1082,7 @@
 						<div class="tsd-signature tsd-kind-icon">poll<wbr>Interval<wbr>Ms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 100</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/InputTest.ts#L121">lib/InputTest.ts:121</a></li>
+								<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/InputTest.ts#L120">lib/InputTest.ts:120</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -1089,7 +1105,7 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="alreadystoppederror.html" class="tsd-kind-icon">Already<wbr>Stopped<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -1097,7 +1113,7 @@
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-is-external">
+					<li class="current tsd-kind-class">
 						<a href="inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
 						<ul>
 							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
@@ -1188,10 +1204,10 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">

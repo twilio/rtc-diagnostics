@@ -73,11 +73,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="networktiming.html#dnslookup" class="tsd-kind-icon">dns<wbr>Lookup</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="networktiming.html#firstpacket" class="tsd-kind-icon">first<wbr>Packet</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="networktiming.html#ice" class="tsd-kind-icon">ice</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="networktiming.html#peerconnection" class="tsd-kind-icon">peer<wbr>Connection</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="networktiming.html#tls" class="tsd-kind-icon">tls</a></li>
 							</ul>
 						</section>
 					</div>
@@ -86,32 +84,17 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="dnslookup" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> dns<wbr>Lookup</h3>
-					<div class="tsd-signature tsd-kind-icon">dns<wbr>Lookup<span class="tsd-signature-symbol">:</span> <a href="timemeasurement.html" class="tsd-signature-type">TimeMeasurement</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/timing.ts#L31">lib/timing.ts:31</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Measurements for DNS lookups</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="firstpacket" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> first<wbr>Packet</h3>
-					<div class="tsd-signature tsd-kind-icon">first<wbr>Packet<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></div>
+					<div class="tsd-signature tsd-kind-icon">first<wbr>Packet<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/timing.ts#L36">lib/timing.ts:36</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/timing.ts#L30">lib/timing.ts:30</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Millisecond timestamp for when a first packet was received</p>
+							<p>A millisecond timestamp for when the first packet was received.</p>
 						</div>
 					</div>
 				</section>
@@ -121,12 +104,14 @@
 					<div class="tsd-signature tsd-kind-icon">ice<span class="tsd-signature-symbol">:</span> <a href="timemeasurement.html" class="tsd-signature-type">TimeMeasurement</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/timing.ts#L41">lib/timing.ts:41</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/timing.ts#L37">lib/timing.ts:37</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Measurements for establishing TLS connection</p>
+							<p>Measurements for establishing ICE connection.
+								This is measured from ICE connection <code>checking</code> to <code>connected</code> state.
+							See <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceConnectionState">RTCPeerConnection.iceConnectionState</a> for more information.</p>
 						</div>
 					</div>
 				</section>
@@ -136,27 +121,14 @@
 					<div class="tsd-signature tsd-kind-icon">peer<wbr>Connection<span class="tsd-signature-symbol">:</span> <a href="timemeasurement.html" class="tsd-signature-type">TimeMeasurement</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/timing.ts#L46">lib/timing.ts:46</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/f68558b/lib/timing.ts#L44">lib/timing.ts:44</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Measurements for establishing a connection</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="tls" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> tls</h3>
-					<div class="tsd-signature tsd-kind-icon">tls<span class="tsd-signature-symbol">:</span> <a href="timemeasurement.html" class="tsd-signature-type">TimeMeasurement</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/a0892eb/lib/timing.ts#L51">lib/timing.ts:51</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Measurements for TLS handshake</p>
+							<p>Measurements for establishing a PeerConnection.
+								This is measured from PeerConnection <code>connecting</code> to <code>connected</code> state.
+							See <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/connectionState">RTCPeerConnection.connectionState</a> for more information.</p>
 						</div>
 					</div>
 				</section>
@@ -178,13 +150,13 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/alreadystoppederror.html" class="tsd-kind-icon">Already<wbr>Stopped<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -196,10 +168,10 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -223,9 +195,6 @@
 						<a href="networktiming.html" class="tsd-kind-icon">Network<wbr>Timing</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="networktiming.html#dnslookup" class="tsd-kind-icon">dns<wbr>Lookup</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="networktiming.html#firstpacket" class="tsd-kind-icon">first<wbr>Packet</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
@@ -233,9 +202,6 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="networktiming.html#peerconnection" class="tsd-kind-icon">peer<wbr>Connection</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="networktiming.html#tls" class="tsd-kind-icon">tls</a>
 							</li>
 						</ul>
 					</li>
