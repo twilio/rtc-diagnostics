@@ -1,4 +1,5 @@
 /**
+ * @internalapi
  * Error that is thrown by the utility `waitForPromise`.
  */
 export class PromiseTimedOutError extends Error {

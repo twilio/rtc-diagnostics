@@ -4,16 +4,19 @@ import {
 } from '../polyfills';
 
 /**
+ * @internalapi
  * Helper type that defines the type of the options we expect.
  */
 export type InputOptions = Record<string, any>;
 
 /**
+ * @internalapi
  * Helper type for what a [[ValidatorFunction]] should return;
  */
 export type Validity = string | undefined;
 
 /**
+ * @internalapi
  * Helper type for validation. All validators should have this typing.
  * If the option is invalid, then the validator should return a string
  * describing why, otherwise return nothing or `undefined`.
@@ -21,6 +24,7 @@ export type Validity = string | undefined;
 export type ValidatorFunction = (option: any) => Validity | Promise<Validity>;
 
 /**
+ * @internalapi
  * Helper type for validation. Defines the configuration that `validateOptions`
  * expects.
  */
@@ -30,6 +34,7 @@ export type ValidatorConfig<T extends InputOptions> = Partial<Record<
 >>;
 
 /**
+ * @internalapi
  * Helper type for validation. Defines the record that describes the invalidity
  * of options if they are found invalid.
  */
@@ -39,6 +44,7 @@ export type InvalidityRecord<T extends InputOptions> = Partial<Record<
 >>;
 
 /**
+ * @internalapi
  * Helper type for audio device validation.
  */
 interface AudioDeviceValidatorOptions {
@@ -47,6 +53,7 @@ interface AudioDeviceValidatorOptions {
 }
 
 /**
+ * @internalapi
  * Return a function that validates an audio device by ID. It will returns a
  * `string` representing why the ID is invalid, or nothing if it is valid. Will
  * throw if `enumerateDevices` is not supported by the system.
@@ -115,6 +122,7 @@ export function createAudioDeviceValidator(
 }
 
 /**
+ * @internalapi
  * Validate that an option is a valid device ID to pass to `getUserMedia` or
  * `setSinkId`.
  * @param option The option to check is a valid device ID to pass to
@@ -129,6 +137,7 @@ export function validateDeviceId(option: any): Validity {
 }
 
 /**
+ * @internalapi
  * Validate that an option is a valid string.
  * @param option The option to check is a valid string.
  * @returns If the option is not valid, return a string that describes why it is
@@ -142,6 +151,7 @@ export function validateString(option: any): Validity {
 }
 
 /**
+ * @internalapi
  * Validate a time-based parameter, i.e. duration or poll interval.
  * @param option The duration of time to validate
  * @returns A possibly undefined string, if the time is valid it will return
@@ -163,6 +173,7 @@ export function validateTime(option: any): Validity {
 }
 
 /**
+ * @internalapi
  * Validate that an option is neither `undefined` nor `null`.
  * @param option The option to check exists.
  * @returns A possibly undefined string, if the option exists it will return
@@ -175,6 +186,7 @@ export function validateExists(option: any): Validity {
 }
 
 /**
+ * @internalapi
  * Validate input options to the [[InputTest]].
  * @param inputOptions The options to validate.
  * @param config A record of option names to either a single

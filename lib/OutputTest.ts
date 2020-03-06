@@ -59,14 +59,14 @@ export declare interface OutputTest {
   ): boolean;
 
   /**
-   * Fires when the test ends. The stop condition depends on if the option
+   * Raised when the test ends. The stop condition depends on if the option
    * to loop was set to `true` or `false`. If `false`, then the test ends either
    * when the audio file is finished playing, or when a time has elapsed
    * greater than [[OutputTest.Options.duration]].
    * @event
    * @param event [[OutputTest.Events.End]]
    * @param listener A listener function that expects the following parameters
-   * when the event fires:
+   * when the event is raised:
    * - A boolean representing whether or not the test passed.
    * - A [[OutputTest.Report]] that summarizes the run time of the test.
    * @returns This [[OutputTest]] instance.
@@ -76,11 +76,11 @@ export declare interface OutputTest {
     listener: (didPass: boolean, report: OutputTest.Report) => any,
   ): this;
   /**
-   * Fires when the test has run into an error, fatal or not.
+   * Raised when the test has run into an error, fatal or not.
    * @event
    * @param event [[OutputTest.Events.Error]]
    * @param listener A listener function that expects the following parameters
-   * when the event fires:
+   * when the event is raised:
    * - The [[DiagnosticError]].
    * @returns This [[OutputTest]] instance.
    */
@@ -89,13 +89,13 @@ export declare interface OutputTest {
     listener: (error: DiagnosticError) => any,
   ): this;
   /**
-   * Fires every [[OutputTest.Options.pollIntervalMs]] after the test
+   * Raised every [[OutputTest.Options.pollIntervalMs]] after the test
    * starts successfully. Will have a `number` parameter representing the
    * current volume of the audio file.
    * @event
    * @param event [[OutputTest.Events.Volume]]
    * @param listener A listener function that expects the following parameters
-   * when the event fires:
+   * when the event is raised:
    * - A number representing the volume of the audio source.
    * @returns This [[OutputTest]] instance.
    */
@@ -111,7 +111,7 @@ export declare interface OutputTest {
  * `options` parameter.
  *
  * If the data at `testURI` is unable to be loaded, meaning the error event is
- * fired on the audio element, then the test ends immediately with an error in
+ * raised on the audio element, then the test ends immediately with an error in
  * the report.
  *
  * If `doLoop` is set to `false`, then the test will run for either the option
@@ -431,8 +431,8 @@ export class OutputTest extends EventEmitter {
 
 export namespace OutputTest {
   /**
-   * Events that the OutputTest will emit as it runs. Please see
-   * [[OutputTest.emit]] and [[OutputTest.on]] for how to listen to these
+   * Events that the OutputTest will emit as it runs.
+   * Please see [[OutputTest.on]] for how to listen to these
    * events.
    */
   export enum Events {
@@ -442,8 +442,7 @@ export namespace OutputTest {
   }
 
   /**
-   * Possible options for the [[OutputTest]]. Both the helper function and the
-   * constructor accepts a `Partial` of this.
+   * Options passed to [[OutputTest]] constructor.
    */
   export interface Options {
     /**
@@ -451,48 +450,58 @@ export namespace OutputTest {
      * @private
      */
     audioContextFactory?: typeof window.AudioContext;
+
     /**
      * A constuctor that is used to create an [[AudioElement]], useful for
      * mocks.
      * @private
      */
     audioElementFactory?: new (...args: any[]) => AudioElement;
+
     /**
      * Whether or not to log debug statements to the console.
+     * @private
      */
     debug: boolean;
+
     /**
      * The `deviceId` of the audio device to attempt to play audio out of.
-     * This option is directly passed to [[AudioElement.setSinkId]].
+     * This option is directly passed to [HTMLMediaElement.setSinkId](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/setSinkId).
      */
     deviceId?: string;
+
     /**
      * Whether or not to loop the audio.
      * See [[OutputTest]] for details on the behavior of "timing out".
      */
     doLoop: boolean;
+
     /**
-     * Duration to run the test for. If this amount of time elapses, the test
+     * Duration in milliseconds to run the test for. If this amount of time elapses, the test
      * is considered "timed out".
      * See [[OutputTest]] for details on the behavior of "timing out".
      */
     duration: number;
+
     /**
      * Used to mock the call to `enumerateDevices`.
      * @private
      */
     enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
+
     /**
      * Set [[OutputTest.Report.didPass]] to true or not upon test timeout.
      * See [[OutputTest]] for details on the behavior of "timing out".
      */
     passOnTimeout: boolean;
+
     /**
-     * The polling rate and how often the test emits a volume event.
+     * The polling rate to emit volume events in milliseconds.
      */
     pollIntervalMs: number;
+
     /**
-     * The URI of the audio file.
+     * The URI of the audio file to use for the test.
      */
     testURI: string;
   }
@@ -503,31 +512,35 @@ export namespace OutputTest {
    */
   export interface Report {
     /**
-     * The `deviceId` of the audio device. Can be any audio device listed by
-     * `navigator.mediaDevices.enumerateAudioDevices` with the `type` of
-     * `output`.
+     * The `deviceId` of the audio device used to play audio out of.
      */
     deviceId: string | undefined;
+
     /**
-     * Whether or not the [[OutputTest]] should be considered passing.
+     * Whether or not the test passed. See [[OutputTest]] for determining pass or fail.
      */
     didPass: boolean;
+
     /**
      * Any errors that occurred during the run-time of the [[OutputTest]].
      */
     errors: DiagnosticError[];
+
     /**
      * Name of the test, set to [[OutputTest.testName]].
      */
     testName: typeof OutputTest.testName;
+
     /**
      * Time measurements of test run time.
      */
     testTiming: TimeMeasurement;
+
     /**
-     * The URI of the audio file.
+     * The URI of the audio file used during the test.
      */
     testURI: string;
+
     /**
      * The volume values emitted by the test during its run-time.
      */
@@ -536,7 +549,7 @@ export namespace OutputTest {
 }
 
 /**
- * Helper function that creates an OutputTest object.
+ * Test an audio output device and measures the volume.
  * @param deviceId
  * @param options
  */

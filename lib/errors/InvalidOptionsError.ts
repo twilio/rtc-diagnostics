@@ -1,6 +1,7 @@
 import { DiagnosticError } from './DiagnosticError';
 
 /**
+ * @internalapi
  * Error that is thrown when there are invalid options passed to a test.
  */
 export class InvalidOptionsError<

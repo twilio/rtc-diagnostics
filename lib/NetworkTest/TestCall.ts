@@ -2,6 +2,9 @@ import { EventEmitter } from 'events';
 import { NetworkTiming } from '../timing';
 import { waitForPromise } from '../utils/TimeoutPromise';
 
+/**
+ * @internalapi
+ */
 export declare interface TestCall {
   /**
    * This event is emitted when the `RTCPeerConnection`'s `RTCDataChannel` is
@@ -60,7 +63,7 @@ export declare interface TestCall {
   ): boolean;
 
   /**
-   * Fired when one of the two `RTCPeerConnection`s has their `RTCDataChannel`
+   * Raised when one of the two `RTCPeerConnection`s has their `RTCDataChannel`
    * closed.
    * @param event [[TestCall.Event.Close]]
    * @param listener A callback that expects the following parameters:
@@ -73,7 +76,7 @@ export declare interface TestCall {
     listener: (peerConnection: RTCPeerConnection) => any,
   ): this;
   /**
-   * Fired when one of the two `RTCPeerConnection`s receives an ICE candidate.
+   * Raised when one of the two `RTCPeerConnection`s receives an ICE candidate.
    * @param event [[TestCall.Event.IceCandidate]]
    * @param listener A callback that expects the following parameters:
    * - The `RTCPeerConnection` that received the event.
@@ -88,7 +91,7 @@ export declare interface TestCall {
     ) => any,
   ): this;
   /**
-   * Fired when the recipient-designated `RTCPeerConnection` receives a message
+   * Raised when the recipient-designated `RTCPeerConnection` receives a message
    * from the sender.
    * @param event [[TestCall.Event.Message]]
    * @param listener A callback that expects the following parameters:
@@ -100,7 +103,7 @@ export declare interface TestCall {
     listener: (message: MessageEvent) => any,
   ): this;
   /**
-   * Fired when one fo the two `RTCPeerConnection`s receives an open event from
+   * Raised when one fo the two `RTCPeerConnection`s receives an open event from
    * their `RTCDataChannel`.
    * @param event [[TestCall.Event.Open]]
    * @param listener A callback that expects the following parameters:
@@ -364,9 +367,9 @@ export namespace TestCall {
     timeoutDuration: number;
   }
   /**
-   * Used in conjunction with the events fired from this class to determine
+   * Used in conjunction with the events raised from this class to determine
    * which leg of the call is connected.
-   * For example, the [[TestCall.Events.Open]] event fires with the information
+   * For example, the [[TestCall.Events.Open]] event is raised with the information
    * `Recipient` or `Sender` signifying which side of the data channel was just
    * opened.
    */

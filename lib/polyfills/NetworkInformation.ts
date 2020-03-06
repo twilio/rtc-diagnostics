@@ -1,4 +1,5 @@
 /**
+ * @internalapi
  * These datatypes are defined by the spec found on this site:
  * https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation
  */
@@ -13,16 +14,24 @@ export type NetworkInformation = Readonly<Partial<{
 }>>;
 
 /**
+ * @internalapi
  * Declare the member `connection` on the `window.navigator` global.
  */
 interface PolyfillWindow extends Window {
   navigator: Navigator & { connection: NetworkInformation };
 }
+
+/**
+ * @internalapi
+ */
 const polyfillWindow: PolyfillWindow | undefined =
   typeof window !== 'undefined'
     ? window as unknown as PolyfillWindow
     : undefined;
 
+/**
+ * @internalapi
+ */
 export const networkInformationPolyfill: NetworkInformation | undefined =
   typeof polyfillWindow !== 'undefined' && polyfillWindow.navigator &&
   polyfillWindow.navigator.connection

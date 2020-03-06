@@ -59,7 +59,7 @@ export declare interface InputTest {
   ): boolean;
 
   /**
-   * Fired by the test upon completion with a parameter of type [[Report]].
+   * Raised upon completion of the test.
    * @param event [[InputTest.Events.End]]
    * @param listener A callback that expects the following parameters:
    *  A `boolean` which represents if the test passed.
@@ -72,7 +72,7 @@ export declare interface InputTest {
     listener: (didPass: boolean, report: InputTest.Report) => any,
   ): this;
   /**
-   * Fired by the test when encountering an error with a parameter of type
+   * Raised by the test when encountering an error with a parameter of type
    * [[DiagnosticError]].
    * @param event [[InputTest.Events.Error]]
    * @param listener A callback that expects the following parameters:
@@ -85,7 +85,7 @@ export declare interface InputTest {
     listener: (error: DiagnosticError) => any,
   ): this;
   /**
-   * Fired by the test every [[Options.pollIntervalMs]] amount of
+   * Raised by the test every [[Options.pollIntervalMs]] amount of
    * milliseconds with a parameter of type `number` that represents the
    * current volume of the audio stream.
    * @param event [[InputTest.Events.Volume]]
@@ -229,6 +229,9 @@ export class InputTest extends EventEmitter {
     return report;
   }
 
+  /**
+   * The maximum volume detected during the test.
+   */
   get maxVolume(): number {
     return this._maxValue;
   }
@@ -416,8 +419,7 @@ export class InputTest extends EventEmitter {
 
 export namespace InputTest {
   /**
-   * Possible events that an `InputTest` might emit. See [[InputTest.emit]] and
-   * [[InputTest.on]].
+   * Possible events that an `InputTest` might emit. See [[InputTest.on]].
    */
   export enum Events {
     End = 'end',
@@ -426,31 +428,34 @@ export namespace InputTest {
   }
 
   /**
-   * Report that will be emitted by the [[InputTest]] once the test has
-   * finished.
+   * Represents the report generated from an [[InputTest]].
    */
   export interface Report {
     /**
-     * The device ID that is passed to the test constructor.
+     * The device ID used to get a MediaStream from using [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia).
      */
     deviceId: MediaTrackConstraintSet['deviceId'];
+
     /**
-     * Whether or not the test passed as determined by
-     * [[InputTest._determinePass]]
+     * Whether or not the test passed. This is `true` if no errors were detected or if the volumes are not silent.
      */
     didPass: boolean;
+
     /**
-     * Any errors that occurred during the run-time of the test.
+     * Any errors that occurred during the test.
      */
     errors: DiagnosticError[];
+
     /**
-     * The name of the test, should be `input-volume`.
+     * The name of the test.
      */
     testName: typeof InputTest.testName;
+
     /**
      * Time measurements of test run time.
      */
     testTiming: TimeMeasurement;
+
     /**
      * The volume values emitted by the test during its run-time.
      */
@@ -458,7 +463,7 @@ export namespace InputTest {
   }
 
   /**
-   * Options that can be passed to the `InputTest`.
+   * Options passed to [[InputTest]] constructor.
    */
   export interface Options {
     /**
@@ -466,37 +471,44 @@ export namespace InputTest {
      * @private
      */
     audioContextFactory?: typeof window.AudioContext;
+
     /**
      * Whether or not to log debug statements to the console.
+     * @private
      */
     debug: boolean;
+
     /**
-     * The device ID to try to get a MediaStream from using `getUserMedia`.
+     * The device ID to try to get a MediaStream from using [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia).
      */
     deviceId?: MediaTrackConstraintSet['deviceId'];
+
     /**
-     * Duration of time to run the test in ms
+     * Duration of time to run the test in ms.
      */
     duration: number;
+
     /**
      * Used to mock the call to `enumerateDevices`.
      * @private
      */
     enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
+
     /**
      * Used to mock calls to `getUserMedia`.
      * @private
      */
     getUserMedia?: typeof window.navigator.mediaDevices.getUserMedia;
+
     /**
-     * The polling rate to emit volume events.
+     * The polling rate to emit volume events in milliseconds.
      */
     pollIntervalMs: number;
   }
 }
 
 /**
- * Helper function that instantiates a `InputTest` for the user.
+ * Test an audio input device and measures the volume.
  * @param deviceId
  * @param options
  */

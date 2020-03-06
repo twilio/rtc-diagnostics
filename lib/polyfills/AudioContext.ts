@@ -17,6 +17,7 @@ declare global {
 }
 
 /**
+ * @internalapi
  * Common error that can be thrown when the polyfill is unable to work.
  */
 export const AudioContextUnsupportedError: UnsupportedError =
@@ -25,6 +26,7 @@ export const AudioContextUnsupportedError: UnsupportedError =
   );
 
 /**
+ * @internalapi
  * Attempts to polyfill `AudioContext`.
  */
 export const AudioContextPolyfill: typeof window.AudioContext | undefined =

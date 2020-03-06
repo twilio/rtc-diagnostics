@@ -1,5 +1,8 @@
 import { DiagnosticError } from './DiagnosticError';
 
+/**
+ * @internalapi
+ */
 export class InvalidOptionError extends DiagnosticError {
   error: DiagnosticError | DOMError | DOMException | undefined;
   option: string;

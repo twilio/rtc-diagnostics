@@ -2,18 +2,49 @@ import { EventEmitter } from 'events';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { NetworkTiming, TimeMeasurement } from './timing';
 
-const MAX_NUMBER_OF_PACKETS_TO_SEND = 100;
-const BYTES_KEEP_BUFFERED = 1024 * MAX_NUMBER_OF_PACKETS_TO_SEND;
+export declare interface BitrateTest {
+  /**
+   * Raised every second with a `bitrate` parameter in kbps which represents the connection's bitrate since the last time this event was raised.
+   * @param event [[BitrateTest.Events.Bitrate]].
+   * @param listener A callback with a `bitrate`(kbps) parameter since the last time this event was raised.
+   * @returns This [[BitrateTest]] instance.
+   * @event
+   */
+  on(
+    event: BitrateTest.Events.Bitrate,
+    listener: (bitrate: number) => any,
+  ): this;
 
-const CHECK_BITRATE_INTERVAL = 1000;
-const SEND_DATA_INTERVAL = 1;
-const TEST_PACKET = Array(1024).fill('h').join('');
+  /**
+   * Raised when the test encounters an error.
+   * @param event [[BitrateTest.Events.Error]].
+   * @param listener A callback with a [[DiagnosticError]] parameter.
+   * @returns This [[BitrateTest]] instance.
+   * @event
+   */
+  on(
+    event: BitrateTest.Events.Error,
+    listener: (error: DiagnosticError) => any,
+  ): this;
+
+  /**
+   * Raised upon completion of the test.
+   * @param event [[BitrateTest.Events.End]].
+   * @param listener A callback with a [[BitrateTest.Report]] parameter.
+   * @returns This [[BitrateTest]] instance.
+   * @event
+   */
+  on(
+    event: BitrateTest.Events.End,
+    listener: (report: BitrateTest.Report) => any,
+  ): this;
+}
 
 /**
- * A {@link BitrateTest} runs bitrate-related tests while connected to a TURN server.
- * @publicapi
+ * Runs bitrate related tests while connected to a TURN server.
+ * The events defined in the enum [[Events]] are emitted as the test runs.
  */
-class BitrateTest extends EventEmitter {
+export class BitrateTest extends EventEmitter {
   /**
    * Name of this test
    */
@@ -85,7 +116,7 @@ class BitrateTest extends EventEmitter {
   private _values: number[] = [];
 
   /**
-   * Construct a {@link BitrateTest} instance
+   * Construct a [[BitrateTest]] instance.
    * @constructor
    * @param options
    */
@@ -112,7 +143,7 @@ class BitrateTest extends EventEmitter {
   }
 
   /**
-   * Stops the current test
+   * Stops the current test.
    */
   stop(): void {
     clearInterval(this._sendDataIntervalId!);
@@ -124,7 +155,7 @@ class BitrateTest extends EventEmitter {
     this._testTiming.end = Date.now();
     this._testTiming.duration = this._testTiming.end - this._testTiming.start;
 
-    this.emit('end', this._getReport());
+    this.emit(BitrateTest.Events.End, this._getReport());
   }
 
   /**
@@ -145,7 +176,7 @@ class BitrateTest extends EventEmitter {
     this._lastCheckedTimestamp = now;
     this._lastBytesChecked = this._totalBytesReceived;
     this._values.push(bitrate);
-    this.emit('bitrate', bitrate);
+    this.emit(BitrateTest.Events.Bitrate, bitrate);
   }
 
   /**
@@ -174,7 +205,7 @@ class BitrateTest extends EventEmitter {
   private _onError(message: string, error?: DOMError, isFatal?: boolean): void {
     const diagnosticError = new DiagnosticError(error, message);
     this._errors.push(diagnosticError);
-    this.emit('error', diagnosticError);
+    this.emit(BitrateTest.Events.Error, diagnosticError);
 
     if (isFatal) {
       this.stop();
@@ -235,14 +266,18 @@ class BitrateTest extends EventEmitter {
    * Send packets using data channel
    */
   private _sendData(): void {
+    const testPacket = Array(1024).fill('h').join('');
+    const maxNumberPackets = 100;
+    const bytesKeepBuffered = 1024 * maxNumberPackets;
+
     if (!this._rtcDataChannel || this._rtcDataChannel.readyState !== 'open') {
       return;
     }
-    for (let i = 0; i < MAX_NUMBER_OF_PACKETS_TO_SEND; ++i) {
-      if (this._rtcDataChannel.bufferedAmount >= BYTES_KEEP_BUFFERED) {
+    for (let i = 0; i < maxNumberPackets; ++i) {
+      if (this._rtcDataChannel.bufferedAmount >= bytesKeepBuffered) {
         break;
       }
-      this._rtcDataChannel.send(TEST_PACKET);
+      this._rtcDataChannel.send(testPacket);
     }
   }
 
@@ -258,8 +293,8 @@ class BitrateTest extends EventEmitter {
     }
 
     this._rtcDataChannel.onopen = () => {
-      this._sendDataIntervalId = setInterval(() => this._sendData(), SEND_DATA_INTERVAL);
-      this._checkBitrateIntervalId = setInterval(() => this._checkBitrate(), CHECK_BITRATE_INTERVAL);
+      this._sendDataIntervalId = setInterval(() => this._sendData(), 1);
+      this._checkBitrateIntervalId = setInterval(() => this._checkBitrate(), 1000);
     };
 
     this._pcReceiver.ondatachannel = (dataChannelEvent: RTCDataChannelEvent) => {
@@ -302,7 +337,7 @@ class BitrateTest extends EventEmitter {
   }
 
   /**
-   * Starts the test
+   * Starts the test.
    */
   private _startTest(): void {
     this._testTiming.start = Date.now();
@@ -321,64 +356,72 @@ class BitrateTest extends EventEmitter {
   }
 }
 
-namespace BitrateTest {
+export namespace BitrateTest {
   /**
-   * Options passed to {@link BitrateTest} constructor
+   * Possible events that a [[BitrateTest]] might emit. See [[BitrateTest.on]].
+   */
+  export enum Events {
+    Bitrate = 'bitrate',
+    End = 'end',
+    Error = 'error',
+  }
+
+  /**
+   * Options passed to [[BitrateTest]] constructor.
    */
   export interface Options {
     /**
-     * The array of ICE server configurations to use
+     * The array of [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer) configurations to use.
+     * You need to provide TURN server configurations to ensure that your network bitrate is tested.
+     * You you can use [Twilio's Network Traversal Service](https://www.twilio.com/stun-turn) to get TURN credentials.
      */
     iceServers: RTCIceServer[];
   }
 
   /**
-   * Represents the report generated from the {@link BitrateTest}
+   * Represents the report generated from a [[BitrateTest]].
    */
   export interface Report {
     /**
-     * Average bitrate calculated during the test
+     * Average bitrate calculated during the test.
      */
     averageBitrate: number;
 
     /**
-     * Whether the test passed
+     * Whether or not the test passed. This is `false` if there are errors that occurred or if there are no bitrate values collected during the test.
      */
     didPass: boolean;
 
     /**
-     * Errors detected during the test
+     * Any errors that occurred during the test.
      */
     errors: DiagnosticError[];
 
     /**
-     * Network related timing measurements
+     * Network related time measurements.
      */
     networkTiming: NetworkTiming;
 
     /**
-     * The name of the test
+     * The name of the test.
      */
     testName: string;
 
     /**
-     * Timing measurements of the test
+     * Time measurements of test run time.
      */
     testTiming: TimeMeasurement;
 
     /**
-     * Bitrate values collected during the test
+     * Bitrate values collected during the test.
      */
     values: number[];
   }
 }
 
 /**
- * Create a new {@link BitrateTest} instance and runs bitrate-related tests
- * @param options
+ * Tests your bitrate while connected to a TURN server.
  */
-export const testBitrate = (options: BitrateTest.Options): BitrateTest => {
+export function testBitrate(options: BitrateTest.Options): BitrateTest {
   return new BitrateTest(options);
-};
-
-export default BitrateTest;
+}
