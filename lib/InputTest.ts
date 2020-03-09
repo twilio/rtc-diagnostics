@@ -162,10 +162,9 @@ export class InputTest extends EventEmitter {
    */
   private _options: InputTest.Options;
   /**
-   * A timestamp that is set when the test starts it's set up (during
-   * construction), not after successfully initializing.
+   * A timestamp that is set when the test starts after a successful call to getUserMedia.
    */
-  private _startTime: number;
+  private _startTime: number | undefined;
   /**
    * Volume values generated from the audio source during the run time of the
    * test.
@@ -185,8 +184,6 @@ export class InputTest extends EventEmitter {
     super();
 
     this._options = { ...InputTest.defaultOptions, ...options };
-
-    this._startTime = Date.now();
 
     // We need to use a `setTimeout` here to prevent a race condition.
     // This allows event listeners to bind before the test starts.
@@ -217,13 +214,17 @@ export class InputTest extends EventEmitter {
       didPass,
       errors: this._errors,
       testName: InputTest.testName,
-      testTiming: {
+      values: this._values,
+    };
+
+    if (this._startTime) {
+      report.testTiming = {
         duration: this._endTime - this._startTime,
         end: this._endTime,
         start: this._startTime,
-      },
-      values: this._values,
-    };
+      };
+    }
+
     this.emit(InputTest.Events.End, didPass, report);
 
     return report;
@@ -337,6 +338,9 @@ export class InputTest extends EventEmitter {
 
       this._defaultDevices = await getDefaultDevices();
 
+      // Only starts the timer after successfully getting devices
+      this._startTime = Date.now();
+
       if (!this._options.audioContextFactory) {
         throw AudioContextUnsupportedError;
       }
@@ -373,7 +377,7 @@ export class InputTest extends EventEmitter {
           ) / frequencyDataBytes.length;
         this._onVolume(volume);
 
-        if (Date.now() - this._startTime > this._options.duration) {
+        if (Date.now() - this._startTime! > this._options.duration) {
           this.stop();
         } else {
           this._volumeTimeout = setTimeout(
@@ -454,7 +458,7 @@ export namespace InputTest {
     /**
      * Time measurements of test run time.
      */
-    testTiming: TimeMeasurement;
+    testTiming?: TimeMeasurement;
 
     /**
      * The volume values emitted by the test during its run-time.
