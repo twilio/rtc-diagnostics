@@ -509,7 +509,7 @@ export namespace InputTest {
 
 /**
  * Test an audio input device and measures the volume.
- * @param deviceId
+ * @param deviceId The `deviceId` to pass to [getUserMedia].
  * @param options
  */
 export function testInputDevice(): InputTest;
