@@ -15,6 +15,7 @@ import {
 } from './polyfills';
 import { getDefaultDevices } from './polyfills/enumerateDevices';
 import { AudioElement, TimeMeasurement } from './types';
+import { determineSilent } from './utils/DetermineSilent';
 import {
   InvalidityRecord,
   validateDeviceId,
@@ -121,6 +122,8 @@ export declare interface OutputTest {
  * If the test times out (as defined by the `duration` in the `options`
  * paramater), then the test is considered passing or not by the `passOnTimeout`
  * option and ends.
+ *
+ * If the more than 50% of the volume levels are silient, then the test is considered failing.
  */
 export class OutputTest extends EventEmitter {
   /**
@@ -210,9 +213,9 @@ export class OutputTest extends EventEmitter {
   }
 
   /**
-   * Stops the test. The call can be given a pass parameter for cases where the
-   * user is able to hear and not.
-   * @param pass
+   * Stops the test.
+   * @param pass whether or not the test should pass. If set to false, will
+   * override the result from determining whether audio is silent from the collected volume values.
    */
   stop(pass: boolean = true): OutputTest.Report | undefined {
     if (this._endTime) {
@@ -229,7 +232,7 @@ export class OutputTest extends EventEmitter {
         this._defaultDevices.audiooutput &&
         this._defaultDevices.audiooutput.deviceId
       ),
-      didPass: pass,
+      didPass: pass && determineSilent(this._values),
       errors: this._errors,
       testName: OutputTest.testName,
       testTiming: {
