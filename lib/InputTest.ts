@@ -503,8 +503,8 @@ export namespace InputTest {
 
 /**
  * Test an audio input device and measures the volume.
- * @param deviceId
- * @param options
+ * @param deviceId The `deviceId` to pass to [getUserMedia].
+ * @param options [[IInputTest.Options]] to pass to the test.
  */
 export function testInputDevice(): InputTest;
 
