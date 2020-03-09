@@ -24,13 +24,11 @@ describe('testOutputDevice', function() {
     let report: OutputTest.Report;
 
     before(async function() {
-      const audioContextFactory: typeof AudioContext = mockAudioContextFactory({
-        analyserNodeOptions: { volumeValues },
-      }) as any;
-
       report = await new Promise(resolve => {
         testOutputDevice(undefined, {
-          audioContextFactory,
+          audioContextFactory: mockAudioContextFactory({
+            analyserNodeOptions: { volumeValues },
+          }) as any,
           audioElementFactory,
           duration: defaultDuration,
           enumerateDevices: mockEnumerateDevicesFactory({
@@ -76,8 +74,8 @@ describe('testOutputDevice', function() {
       });
     });
 
-    it('should pass', function() {
-      assert(report.didPass);
+    it('should not pass', function() {
+      assert(!report.didPass);
     });
 
     // it('both start and end timestamps should be set', function() {
@@ -229,7 +227,9 @@ describe('testOutputDevice', function() {
   it('should allow `deviceId` if `setSinkId` is supported', async function() {
     const report = await new Promise(resolve => {
       const test = testOutputDevice('foobar', {
-        audioContextFactory: mockAudioContextFactory() as any,
+        audioContextFactory: mockAudioContextFactory({
+          analyserNodeOptions: { volumeValues: 100 },
+        }) as any,
         audioElementFactory,
         duration: defaultDuration,
         enumerateDevices: mockEnumerateDevicesFactory({
@@ -237,7 +237,7 @@ describe('testOutputDevice', function() {
         }),
         pollIntervalMs: defaultPollIntervalMs,
       });
-      test.on(OutputTest.Events.End, r => resolve(r));
+      test.on(OutputTest.Events.End, (_, r) => resolve(r));
       test.stop(true);
     });
     assert(report);

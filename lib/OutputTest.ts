@@ -232,7 +232,7 @@ export class OutputTest extends EventEmitter {
         this._defaultDevices.audiooutput &&
         this._defaultDevices.audiooutput.deviceId
       ),
-      didPass: pass && determineSilent(this._values),
+      didPass: pass && !determineSilent(this._values),
       errors: this._errors,
       testName: OutputTest.testName,
       testTiming: {
