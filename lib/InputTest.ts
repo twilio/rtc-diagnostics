@@ -109,9 +109,14 @@ export declare interface InputTest {
  */
 export class InputTest extends EventEmitter {
   /**
+   * Name of the test.
+   */
+  static testName: TestNames.InputAudioDevice = TestNames.InputAudioDevice;
+
+  /**
    * Default options for the `InputTest`.
    */
-  static defaultOptions: InputTest.Options = {
+  private static defaultOptions: InputTest.Options = {
     audioContextFactory: AudioContext,
     debug: false,
     duration: Infinity,
@@ -119,10 +124,6 @@ export class InputTest extends EventEmitter {
     getUserMedia,
     pollIntervalMs: 100,
   };
-  /**
-   * Name of the test.
-   */
-  static testName: TestNames.InputAudioDevice = TestNames.InputAudioDevice;
 
   /**
    * An `AudioContext` to use for generating volume values.
@@ -174,14 +175,14 @@ export class InputTest extends EventEmitter {
   /**
    * The timeout that causes the volume event to loop; created by `setTimeout`.
    */
-  private _volumeTimeout: NodeJS.Timeout | null = null;
+  private _volumeTimeout: number | null = null;
 
   /**
    * Initializes the `startTime` and `options`.
    * @param deviceIdOrTrack
    * @param options
    */
-  constructor(options: Partial<InputTest.Options> = {}) {
+  constructor(options?: InputTest.Options) {
     super();
 
     this._options = { ...InputTest.defaultOptions, ...options };
@@ -373,7 +374,7 @@ export class InputTest extends EventEmitter {
           ) / frequencyDataBytes.length;
         this._onVolume(volume);
 
-        if (Date.now() - this._startTime > this._options.duration) {
+        if (Date.now() - this._startTime > this._options.duration!) {
           this.stop();
         } else {
           this._volumeTimeout = setTimeout(
@@ -476,7 +477,7 @@ export namespace InputTest {
      * Whether or not to log debug statements to the console.
      * @private
      */
-    debug: boolean;
+    debug?: boolean;
 
     /**
      * The device ID to try to get a MediaStream from using [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia).
@@ -485,8 +486,9 @@ export namespace InputTest {
 
     /**
      * Duration of time to run the test in ms.
+     * @default Infinity
      */
-    duration: number;
+    duration?: number;
 
     /**
      * Used to mock the call to `enumerateDevices`.
@@ -502,26 +504,18 @@ export namespace InputTest {
 
     /**
      * The polling rate to emit volume events in milliseconds.
+     * @default 100
      */
-    pollIntervalMs: number;
+    pollIntervalMs?: number;
   }
 }
 
 /**
  * Test an audio input device and measures the volume.
- * @param deviceId The `deviceId` to pass to [getUserMedia].
- * @param options [[IInputTest.Options]] to pass to the test.
+ * @param options
  */
-export function testInputDevice(): InputTest;
-
 export function testInputDevice(
-  deviceId: MediaTrackConstraintSet['deviceId'],
-  options?: Partial<InputTest.Options>,
-): InputTest;
-
-export function testInputDevice(
-  deviceId?: MediaTrackConstraintSet['deviceId'],
-  options: Partial<InputTest.Options> = {},
+  options?: InputTest.Options,
 ): InputTest {
-  return new InputTest({ ...options, deviceId });
+  return new InputTest(options);
 }
