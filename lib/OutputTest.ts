@@ -345,8 +345,6 @@ export class OutputTest extends EventEmitter {
         }
       }
 
-      this._defaultDevices = await getDefaultDevices();
-
       const source: MediaElementAudioSourceNode =
         this._audioContext.createMediaElementSource(this._audioElement);
       source.connect(this._audioContext.destination);
@@ -396,6 +394,9 @@ export class OutputTest extends EventEmitter {
 
       this._playPromise = this._audioElement.play();
       await this._playPromise;
+
+      this._defaultDevices = await getDefaultDevices();
+
       this._volumeTimeout = setTimeout(
         volumeEvent,
         this._options.pollIntervalMs,
