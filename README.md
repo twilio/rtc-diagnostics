@@ -1,5 +1,5 @@
 # Twilio Diagnostics SDK
-The Diagnostics SDK provides the tools for the developer to determine Voice & Video calling readiness. The SDK provides the methods necessary to identify where the issues are and to provide a mechanism of estimating expected audio quality.
+The Diagnostics SDK provides tools that help the developer in determining Voice & Video calling readiness. The SDK provides methods that assist in identifying potential issues and provides mechanisms to estimate expected audio quality.
 
 * [API Docs](https://twilio.github.io/sdk-diagnostics/globals.html)
 * Quickstart (Coming soon)
