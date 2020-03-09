@@ -123,7 +123,7 @@ export declare interface OutputTest {
  * paramater), then the test is considered passing or not by the `passOnTimeout`
  * option and ends.
  *
- * If the more than 50% of the volume levels are silient, then the test is considered failing.
+ * If the more than 50% of the volume levels are silent, then the test is considered failing.
  */
 export class OutputTest extends EventEmitter {
   /**
