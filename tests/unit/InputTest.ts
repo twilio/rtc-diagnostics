@@ -28,7 +28,7 @@ describe('testInputDevice', function() {
 
     before(async function() {
       report = await new Promise(resolve => {
-        test = testInputDevice(undefined, {
+        test = testInputDevice({
           audioContextFactory: mockAudioContextFactory({
             analyserNodeOptions: { volumeValues: 100 },
           }) as any,
@@ -57,7 +57,7 @@ describe('testInputDevice', function() {
 
     before(async function() {
       report = await new Promise(resolve => {
-        testInputDevice(undefined, {
+        testInputDevice({
           audioContextFactory: mockAudioContextFactory({
             analyserNodeOptions: { volumeValues: 0 },
           }) as any,
@@ -84,7 +84,7 @@ describe('testInputDevice', function() {
 
     it('when AudioContext is not supported', async function() {
       const report: InputTest.Report = await new Promise(resolve => {
-        const test = testInputDevice(undefined, {
+        const test = testInputDevice({
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
           }),
@@ -104,7 +104,7 @@ describe('testInputDevice', function() {
     });
     it('when getUserMedia is not supported', async function() {
       const report: InputTest.Report = await new Promise(resolve => {
-        const test = testInputDevice(undefined, {
+        const test = testInputDevice({
           audioContextFactory: mockAudioContextFactory() as any,
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
@@ -124,7 +124,7 @@ describe('testInputDevice', function() {
     });
     it('when neither AudioContext or getUserMedia is supported', async function() {
       const report: InputTest.Report = await new Promise(resolve => {
-        const test = testInputDevice(undefined, {
+        const test = testInputDevice({
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
           }),
@@ -144,7 +144,7 @@ describe('testInputDevice', function() {
   });
 
   it('should do nothing if stopped multiple times', function() {
-    const test = testInputDevice(undefined, {
+    const test = testInputDevice({
       audioContextFactory: mockAudioContextFactory({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
@@ -162,7 +162,7 @@ describe('testInputDevice', function() {
 
   it('should report errors if the audio context throws', async function() {
     await assert.rejects(() => new Promise((_, reject) => {
-      const test = testInputDevice(undefined, {
+      const test = testInputDevice({
         audioContextFactory: mockAudioContextFactory({
           analyserNodeOptions: { volumeValues: 100 },
           doThrow: { createAnalyser: true },
