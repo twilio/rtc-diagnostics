@@ -15,13 +15,13 @@ import {
 } from './polyfills';
 import { getDefaultDevices } from './polyfills/enumerateDevices';
 import { AudioElement, TimeMeasurement } from './types';
-import { determineSilent } from './utils/DetermineSilent';
+import { detectSilence } from './utils';
 import {
   InvalidityRecord,
   validateDeviceId,
   validateOptions,
   validateTime,
-} from './utils/OptionValidation';
+} from './utils/optionValidation';
 
 export declare interface OutputTest {
   /**
@@ -232,7 +232,7 @@ export class OutputTest extends EventEmitter {
         this._defaultDevices.audiooutput &&
         this._defaultDevices.audiooutput.deviceId
       ),
-      didPass: pass && !determineSilent(this._values),
+      didPass: pass && !detectSilence(this._values),
       errors: this._errors,
       testName: OutputTest.testName,
       testTiming: {

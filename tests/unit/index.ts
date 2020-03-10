@@ -8,5 +8,6 @@ import './InputTest';
 import './NetworkTest';
 import './OutputTest';
 import './utils';
+import './utils/optionValidation';
 
 import './BitrateTest';
