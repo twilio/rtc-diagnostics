@@ -15,3 +15,10 @@ export interface TimeMeasurement {
   end: number;
   start: number;
 }
+
+/**
+ * Helper type that allows us to mark a subset of an interface's keys as
+ * required.
+ * @internalapi
+ */
+export type SubsetRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;

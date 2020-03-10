@@ -14,7 +14,7 @@ import {
   enumerateDevices,
 } from './polyfills';
 import { getDefaultDevices } from './polyfills/enumerateDevices';
-import { AudioElement, TimeMeasurement } from './types';
+import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
 import {
   InvalidityRecord,
   validateDeviceId,
@@ -131,7 +131,7 @@ export class OutputTest extends EventEmitter {
    * Default options for the [[OutputTest]]. Overwritten by any option passed
    * during the construction of the test.
    */
-  private static defaultOptions: OutputTest.Options = {
+  private static defaultOptions: OutputTest.InternalOptions = {
     audioContextFactory: AudioContext,
     audioElementFactory: Audio,
     debug: false,
@@ -170,7 +170,7 @@ export class OutputTest extends EventEmitter {
    * Options passed to and set in the constructor to be used during the run
    * time of the test.
    */
-  private _options: OutputTest.Options;
+  private _options: OutputTest.InternalOptions;
   /**
    * A Promise that resolves when the `AudioElement` successfully starts playing
    * audio. Will reject if not possible.
@@ -188,7 +188,7 @@ export class OutputTest extends EventEmitter {
   /**
    * Timeout created by `setTimeout`, used to loop the volume logic.
    */
-  private _volumeTimeout: number | null = null;
+  private _volumeTimeout: NodeJS.Timeout | null = null;
 
   /**
    * Sets up several things for the `OutputTest` to run later in the
@@ -373,7 +373,7 @@ export class OutputTest extends EventEmitter {
 
         // Check stop conditions
         const isTimedOut: boolean =
-          Date.now() - this._startTime > this._options.duration!;
+          Date.now() - this._startTime > this._options.duration;
         const stop: boolean = this._options.doLoop
           ? isTimedOut
           : (this._audioElement && this._audioElement.ended) || isTimedOut;
@@ -550,6 +550,13 @@ export namespace OutputTest {
      */
     values: number[];
   }
+
+  /**
+   * Option typing after initialization, so we can have type guarantees.
+   * @private
+   */
+  export type InternalOptions = SubsetRequired<Options,
+    'doLoop' | 'duration' | 'passOnTimeout' | 'pollIntervalMs' | 'testURI'>;
 }
 
 /**

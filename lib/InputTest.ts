@@ -13,7 +13,7 @@ import {
   GetUserMediaUnsupportedError,
 } from './polyfills';
 import { getDefaultDevices } from './polyfills/enumerateDevices';
-import { TimeMeasurement } from './types';
+import { SubsetRequired, TimeMeasurement } from './types';
 import {
   InvalidityRecord,
   validateDeviceId,
@@ -116,7 +116,7 @@ export class InputTest extends EventEmitter {
   /**
    * Default options for the `InputTest`.
    */
-  private static defaultOptions: InputTest.Options = {
+  private static defaultOptions: InputTest.InternalOptions = {
     audioContextFactory: AudioContext,
     debug: false,
     duration: Infinity,
@@ -161,7 +161,7 @@ export class InputTest extends EventEmitter {
    * Options that are passed to and set in the constructor for use during the
    * test.
    */
-  private _options: InputTest.Options;
+  private _options: InputTest.InternalOptions;
   /**
    * A timestamp that is set when the test starts it's set up (during
    * construction), not after successfully initializing.
@@ -175,7 +175,7 @@ export class InputTest extends EventEmitter {
   /**
    * The timeout that causes the volume event to loop; created by `setTimeout`.
    */
-  private _volumeTimeout: number | null = null;
+  private _volumeTimeout: NodeJS.Timeout | null = null;
 
   /**
    * Initializes the `startTime` and `options`.
@@ -374,7 +374,7 @@ export class InputTest extends EventEmitter {
           ) / frequencyDataBytes.length;
         this._onVolume(volume);
 
-        if (Date.now() - this._startTime > this._options.duration!) {
+        if (Date.now() - this._startTime > this._options.duration) {
           this.stop();
         } else {
           this._volumeTimeout = setTimeout(
@@ -508,6 +508,12 @@ export namespace InputTest {
      */
     pollIntervalMs?: number;
   }
+
+  /**
+   * Option typing after initialization, so we can have type guarantees.
+   * @private
+   */
+  export type InternalOptions = SubsetRequired<Options, 'duration' | 'pollIntervalMs'>;
 }
 
 /**
