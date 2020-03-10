@@ -294,19 +294,7 @@ export namespace NetworkTest {
    * Default options for [[NetworkTest]]
    * @private
    */
-  export interface DefaultOptions {
-    /**
-     * A `NetworkInformation` connection. Used for mocking.
-     * @private
-     */
-
-    networkInformation?: NetworkInformation;
-    /**
-     * Timeout in milliseconds. This causes a [[DiagnosticError]] if the test is
-     * unable to connect to the server.
-     */
-    timeoutMs?: number;
-  }
+  export type DefaultOptions = Pick<Options, 'networkInformation' | 'timeoutMs'>;
 
   /**
    * Possible options for the [[NetworkTest]].
