@@ -92,11 +92,11 @@
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="iceservers" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> ice<wbr>Servers</h3>
+					<h3>ice<wbr>Servers</h3>
 					<div class="tsd-signature tsd-kind-icon">ice<wbr>Servers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RTCIceServer</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/NetworkTest/index.ts#L302">lib/NetworkTest/index.ts:302</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/NetworkTest/index.ts#L320">lib/NetworkTest/index.ts:320</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -113,7 +113,7 @@
 					<div class="tsd-signature tsd-kind-icon">network<wbr>Information<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">NetworkInformation</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/NetworkTest/index.ts#L308">lib/NetworkTest/index.ts:308</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/NetworkTest/index.ts#L326">lib/NetworkTest/index.ts:326</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -128,7 +128,7 @@
 					<div class="tsd-signature tsd-kind-icon">peer<wbr>Connection<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof RTCPeerConnection</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/NetworkTest/index.ts#L314">lib/NetworkTest/index.ts:314</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/NetworkTest/index.ts#L332">lib/NetworkTest/index.ts:332</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -139,11 +139,11 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="timeoutms" class="tsd-anchor"></a>
-					<h3>timeout<wbr>Ms</h3>
-					<div class="tsd-signature tsd-kind-icon">timeout<wbr>Ms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> timeout<wbr>Ms</h3>
+					<div class="tsd-signature tsd-kind-icon">timeout<wbr>Ms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/NetworkTest/index.ts#L320">lib/NetworkTest/index.ts:320</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/NetworkTest/index.ts#L339">lib/NetworkTest/index.ts:339</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -151,6 +151,11 @@
 							<p>Timeout in milliseconds. This causes a <a href="../classes/diagnosticerror.html">DiagnosticError</a> if the test is
 							unable to connect to the server.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p>5000</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 			</section>
@@ -196,6 +201,9 @@
 						<ul>
 							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
 								<a href="../enums/networktest.events.html" class="tsd-kind-icon">Events</a>
+							</li>
+							<li class=" tsd-kind-interface tsd-parent-kind-class tsd-is-private">
+								<a href="networktest.defaultoptions.html" class="tsd-kind-icon">Default<wbr>Options</a>
 							</li>
 							<li class="current tsd-kind-interface tsd-parent-kind-class">
 								<a href="networktest.options.html" class="tsd-kind-icon">Options</a>
@@ -276,9 +284,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/networktest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
-							</li>
-							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static">
-								<a href="../classes/networktest.html#defaultoptions" class="tsd-kind-icon">default<wbr>Options</a>
 							</li>
 						</ul>
 					</li>

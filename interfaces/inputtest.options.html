@@ -96,10 +96,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-private">
 					<a name="audiocontextfactory" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> <span class="tsd-flag ts-flagPrivate">Private</span> audio<wbr>Context<wbr>Factory</h3>
-					<div class="tsd-signature tsd-kind-icon">audio<wbr>Context<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof __type</span></div>
+					<div class="tsd-signature tsd-kind-icon">audio<wbr>Context<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof AudioContext</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/InputTest.ts#L473">lib/InputTest.ts:473</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L474">lib/InputTest.ts:474</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -110,11 +110,11 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-private">
 					<a name="debug" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> debug</h3>
-					<div class="tsd-signature tsd-kind-icon">debug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> <span class="tsd-flag ts-flagPrivate">Private</span> debug</h3>
+					<div class="tsd-signature tsd-kind-icon">debug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/InputTest.ts#L479">lib/InputTest.ts:479</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L480">lib/InputTest.ts:480</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -129,7 +129,7 @@
 					<div class="tsd-signature tsd-kind-icon">device<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">MediaTrackConstraintSet[&quot;deviceId&quot;]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/InputTest.ts#L484">lib/InputTest.ts:484</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L485">lib/InputTest.ts:485</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -140,17 +140,22 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="duration" class="tsd-anchor"></a>
-					<h3>duration</h3>
-					<div class="tsd-signature tsd-kind-icon">duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> duration</h3>
+					<div class="tsd-signature tsd-kind-icon">duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/InputTest.ts#L489">lib/InputTest.ts:489</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L491">lib/InputTest.ts:491</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>Duration of time to run the test in ms.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p>Infinity</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-private">
@@ -159,7 +164,7 @@
 					<div class="tsd-signature tsd-kind-icon">enumerate<wbr>Devices<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof enumerateDevices</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/InputTest.ts#L495">lib/InputTest.ts:495</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L497">lib/InputTest.ts:497</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -174,7 +179,7 @@
 					<div class="tsd-signature tsd-kind-icon">get<wbr>User<wbr>Media<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof getUserMedia</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/InputTest.ts#L501">lib/InputTest.ts:501</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L503">lib/InputTest.ts:503</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -185,17 +190,22 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="pollintervalms" class="tsd-anchor"></a>
-					<h3>poll<wbr>Interval<wbr>Ms</h3>
-					<div class="tsd-signature tsd-kind-icon">poll<wbr>Interval<wbr>Ms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> poll<wbr>Interval<wbr>Ms</h3>
+					<div class="tsd-signature tsd-kind-icon">poll<wbr>Interval<wbr>Ms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/InputTest.ts#L506">lib/InputTest.ts:506</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L509">lib/InputTest.ts:509</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The polling rate to emit volume events in milliseconds.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p>100</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 			</section>
@@ -321,9 +331,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/inputtest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
-							</li>
-							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static">
-								<a href="../classes/inputtest.html#defaultoptions" class="tsd-kind-icon">default<wbr>Options</a>
 							</li>
 						</ul>
 					</li>

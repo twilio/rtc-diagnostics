@@ -99,10 +99,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-private">
 					<a name="audiocontextfactory" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> <span class="tsd-flag ts-flagPrivate">Private</span> audio<wbr>Context<wbr>Factory</h3>
-					<div class="tsd-signature tsd-kind-icon">audio<wbr>Context<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof __type</span></div>
+					<div class="tsd-signature tsd-kind-icon">audio<wbr>Context<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof AudioContext</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L452">lib/OutputTest.ts:452</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L452">lib/OutputTest.ts:452</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -117,7 +117,7 @@
 					<div class="tsd-signature tsd-kind-icon">audio<wbr>Element<wbr>Factory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L459">lib/OutputTest.ts:459</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L459">lib/OutputTest.ts:459</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -129,11 +129,11 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-private">
 					<a name="debug" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> debug</h3>
-					<div class="tsd-signature tsd-kind-icon">debug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> <span class="tsd-flag ts-flagPrivate">Private</span> debug</h3>
+					<div class="tsd-signature tsd-kind-icon">debug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L465">lib/OutputTest.ts:465</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L465">lib/OutputTest.ts:465</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -148,7 +148,7 @@
 					<div class="tsd-signature tsd-kind-icon">device<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L471">lib/OutputTest.ts:471</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L471">lib/OutputTest.ts:471</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -160,11 +160,11 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="doloop" class="tsd-anchor"></a>
-					<h3>do<wbr>Loop</h3>
-					<div class="tsd-signature tsd-kind-icon">do<wbr>Loop<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> do<wbr>Loop</h3>
+					<div class="tsd-signature tsd-kind-icon">do<wbr>Loop<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L477">lib/OutputTest.ts:477</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L478">lib/OutputTest.ts:478</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -172,15 +172,20 @@
 							<p>Whether or not to loop the audio.
 							See <a href="../classes/outputtest.html">OutputTest</a> for details on the behavior of &quot;timing out&quot;.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p>true</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="duration" class="tsd-anchor"></a>
-					<h3>duration</h3>
-					<div class="tsd-signature tsd-kind-icon">duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> duration</h3>
+					<div class="tsd-signature tsd-kind-icon">duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L484">lib/OutputTest.ts:484</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L486">lib/OutputTest.ts:486</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -189,6 +194,11 @@
 								is considered &quot;timed out&quot;.
 							See <a href="../classes/outputtest.html">OutputTest</a> for details on the behavior of &quot;timing out&quot;.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p>Infinity</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-private">
@@ -197,7 +207,7 @@
 					<div class="tsd-signature tsd-kind-icon">enumerate<wbr>Devices<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">typeof enumerateDevices</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L490">lib/OutputTest.ts:490</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L492">lib/OutputTest.ts:492</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -208,11 +218,11 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="passontimeout" class="tsd-anchor"></a>
-					<h3>pass<wbr>OnTimeout</h3>
-					<div class="tsd-signature tsd-kind-icon">pass<wbr>OnTimeout<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> pass<wbr>OnTimeout</h3>
+					<div class="tsd-signature tsd-kind-icon">pass<wbr>OnTimeout<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L496">lib/OutputTest.ts:496</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L499">lib/OutputTest.ts:499</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -220,30 +230,40 @@
 							<p>Set <a href="outputtest.report.html#didpass">OutputTest.Report.didPass</a> to true or not upon test timeout.
 							See <a href="../classes/outputtest.html">OutputTest</a> for details on the behavior of &quot;timing out&quot;.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p>true</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="pollintervalms" class="tsd-anchor"></a>
-					<h3>poll<wbr>Interval<wbr>Ms</h3>
-					<div class="tsd-signature tsd-kind-icon">poll<wbr>Interval<wbr>Ms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> poll<wbr>Interval<wbr>Ms</h3>
+					<div class="tsd-signature tsd-kind-icon">poll<wbr>Interval<wbr>Ms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L501">lib/OutputTest.ts:501</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L505">lib/OutputTest.ts:505</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The polling rate to emit volume events in milliseconds.</p>
 						</div>
+						<dl class="tsd-comment-tags">
+							<dt>default</dt>
+							<dd><p>100</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="testuri" class="tsd-anchor"></a>
-					<h3>testURI</h3>
-					<div class="tsd-signature tsd-kind-icon">testURI<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> testURI</h3>
+					<div class="tsd-signature tsd-kind-icon">testURI<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/01dea47/lib/OutputTest.ts#L506">lib/OutputTest.ts:506</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L510">lib/OutputTest.ts:510</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -396,9 +416,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/outputtest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
-							</li>
-							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static">
-								<a href="../classes/outputtest.html#defaultoptions" class="tsd-kind-icon">default<wbr>Options</a>
 							</li>
 						</ul>
 					</li>
