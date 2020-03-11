@@ -55,12 +55,6 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-external">
-							<h3>Enumerations</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum tsd-is-external"><a href="enums/testnames.html" class="tsd-kind-icon">Test<wbr>Names</a></li>
-							</ul>
-						</section>
 						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
@@ -92,21 +86,17 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#inputoptions" class="tsd-kind-icon">Input<wbr>Options</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-external"><a href="globals.html#invalidityrecord" class="tsd-kind-icon">Invalidity<wbr>Record</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-external"><a href="globals.html#subsetrequired" class="tsd-kind-icon">Subset<wbr>Required</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-external"><a href="globals.html#validatorconfig" class="tsd-kind-icon">Validator<wbr>Config</a></li>
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#validatorfunction" class="tsd-kind-icon">Validator<wbr>Function</a></li>
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#validity" class="tsd-kind-icon">Validity</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section tsd-is-external">
-							<h3>Variables</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#incoming_sound_url" class="tsd-kind-icon">INCOMING_<wbr>SOUND_<wbr>URL</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-is-external"><a href="globals.html#createaudiodevicevalidator" class="tsd-kind-icon">create<wbr>Audio<wbr>Device<wbr>Validator</a></li>
+								<li class="tsd-kind-function tsd-is-external"><a href="globals.html#detectsilence" class="tsd-kind-icon">detect<wbr>Silence</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#testbitrate" class="tsd-kind-icon">test<wbr>Bitrate</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a></li>
@@ -130,7 +120,7 @@
 					<div class="tsd-signature tsd-kind-icon">Input<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L10">lib/utils/OptionValidation.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L10">lib/utils/optionValidation.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -142,7 +132,7 @@
 					<div class="tsd-signature tsd-kind-icon">Invalidity<wbr>Record&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">keyof T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L41">lib/utils/OptionValidation.ts:41</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L41">lib/utils/optionValidation.ts:41</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -155,12 +145,37 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
+					<a name="subsetrequired" class="tsd-anchor"></a>
+					<h3>Subset<wbr>Required</h3>
+					<div class="tsd-signature tsd-kind-icon">Subset<wbr>Required&lt;T, K&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">Required</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/types.ts#L24">lib/types.ts:24</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Helper type that allows us to mark a subset of an interface&#39;s keys as
+							required.</p>
+						</div>
+					</div>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>T</h4>
+						</li>
+						<li>
+							<h4>K<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">keyof T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 					<a name="validatorconfig" class="tsd-anchor"></a>
 					<h3>Validator<wbr>Config</h3>
 					<div class="tsd-signature tsd-kind-icon">Validator<wbr>Config&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">keyof T</span><span class="tsd-signature-symbol">, </span><a href="globals.html#validatorfunction" class="tsd-signature-type">ValidatorFunction</a><span class="tsd-signature-symbol"> | </span><a href="globals.html#validatorfunction" class="tsd-signature-type">ValidatorFunction</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L31">lib/utils/OptionValidation.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L31">lib/utils/optionValidation.ts:31</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -178,7 +193,7 @@
 					<div class="tsd-signature tsd-kind-icon">Validator<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L24">lib/utils/OptionValidation.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L24">lib/utils/optionValidation.ts:24</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -214,22 +229,7 @@
 					<div class="tsd-signature tsd-kind-icon">Validity<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L16">lib/utils/OptionValidation.ts:16</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-					</div>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Variables</h2>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
-					<a name="incoming_sound_url" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> INCOMING_<wbr>SOUND_<wbr>URL</h3>
-					<div class="tsd-signature tsd-kind-icon">INCOMING_<wbr>SOUND_<wbr>URL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#x60;https://sdk.twilio.com/js/client/sounds/releases/1.0.0/incoming.mp3?cache&#x3D;${pack.name}+${pack.version}&#x60;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/constants.ts#L7">lib/constants.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L16">lib/utils/optionValidation.ts:16</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -248,7 +248,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L67">lib/utils/OptionValidation.ts:67</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L67">lib/utils/optionValidation.ts:67</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -271,6 +271,35 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-is-external">
+					<a name="detectsilence" class="tsd-anchor"></a>
+					<h3>detect<wbr>Silence</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">detect<wbr>Silence<span class="tsd-signature-symbol">(</span>volumes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/index.ts#L9">lib/utils/index.ts:9</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>volumes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An array of volume values to to analyze.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<p>Whether audio is silent or not.</p>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function">
 					<a name="testbitrate" class="tsd-anchor"></a>
 					<h3>test<wbr>Bitrate</h3>
@@ -281,7 +310,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/BitrateTest.ts#L425">lib/BitrateTest.ts:425</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/BitrateTest.ts#L422">lib/BitrateTest.ts:422</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -309,7 +338,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/InputTest.ts#L517">lib/InputTest.ts:517</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/InputTest.ts#L517">lib/InputTest.ts:517</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -339,7 +368,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/NetworkTest/index.ts#L409">lib/NetworkTest/index.ts:409</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/NetworkTest/index.ts#L397">lib/NetworkTest/index.ts:397</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -369,7 +398,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/OutputTest.ts#L559">lib/OutputTest.ts:559</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/OutputTest.ts#L570">lib/OutputTest.ts:570</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -399,7 +428,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L133">lib/utils/OptionValidation.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L133">lib/utils/optionValidation.ts:133</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -430,7 +459,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L182">lib/utils/OptionValidation.ts:182</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L182">lib/utils/optionValidation.ts:182</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -460,7 +489,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L197">lib/utils/OptionValidation.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L197">lib/utils/optionValidation.ts:197</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -503,7 +532,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L146">lib/utils/OptionValidation.ts:146</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L146">lib/utils/optionValidation.ts:146</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -533,7 +562,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/OptionValidation.ts#L160">lib/utils/OptionValidation.ts:160</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/optionValidation.ts#L160">lib/utils/optionValidation.ts:160</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -563,7 +592,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/e0b6ab4/lib/utils/TimeoutPromise.ts#L9">lib/utils/TimeoutPromise.ts:9</a></li>
+									<li>Defined in <a href="https://github.com/twilio/sdk-diagnostics/blob/4a6a715/lib/utils/index.ts#L26">lib/utils/index.ts:26</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -602,7 +631,7 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-is-external">
+					<li class=" tsd-kind-enum tsd-is-private">
 						<a href="enums/testnames.html" class="tsd-kind-icon">Test<wbr>Names</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -660,6 +689,9 @@
 						<a href="globals.html#invalidityrecord" class="tsd-kind-icon">Invalidity<wbr>Record</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#subsetrequired" class="tsd-kind-icon">Subset<wbr>Required</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#validatorconfig" class="tsd-kind-icon">Validator<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
@@ -668,11 +700,23 @@
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#validity" class="tsd-kind-icon">Validity</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
+					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="globals.html#bytes_keep_buffered" class="tsd-kind-icon">BYTES_<wbr>KEEP_<wbr>BUFFERED</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="globals.html#incoming_sound_url" class="tsd-kind-icon">INCOMING_<wbr>SOUND_<wbr>URL</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#createaudiodevicevalidator" class="tsd-kind-icon">create<wbr>Audio<wbr>Device<wbr>Validator</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#detectsilence" class="tsd-kind-icon">detect<wbr>Silence</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#testbitrate" class="tsd-kind-icon">test<wbr>Bitrate</a>
