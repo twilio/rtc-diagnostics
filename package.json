@@ -1,6 +1,6 @@
 {
   "name": "twilio-diagnostics",
-  "version": "0.0.3-dev",
+  "version": "0.0.3-rc1",
   "description": "Various diagnostics functions to help analyze connections to Twilio",
   "main": "./es5/lib/diagnostics.js",
   "scripts": {
