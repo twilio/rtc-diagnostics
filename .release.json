@@ -1,6 +1,6 @@
 {
   "type": "JavaScript",
-  "travis": true,
+  "travis": "pro",
   "slug": "twilio/sdk-diagnostics",
   "env": {
     "GH_REF": "github.com/twilio/sdk-diagnostics.git"
