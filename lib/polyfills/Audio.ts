@@ -1,6 +1,7 @@
 import { UnsupportedError } from '../errors';
 
 /**
+ * @internalapi
  * We need to redeclare `Audio` on `Window` for old Typescript versions.
  */
 declare global {
@@ -10,6 +11,7 @@ declare global {
 }
 
 /**
+ * @internalapi
  * Common error that can be thrown when the polyfill is unable to work.
  */
 export const AudioUnsupportedError: UnsupportedError =
@@ -18,6 +20,7 @@ export const AudioUnsupportedError: UnsupportedError =
   );
 
 /**
+ * @internalapi
  * This polyfill serves as a clean way to detect if the `HTMLAudioElement`
  * constructor `Audio` does not exist.
  */

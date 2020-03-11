@@ -1,6 +1,7 @@
 import { PromiseTimedOutError } from '../errors';
 
 /**
+ * @internalapi
  * Reject a promise after a specified timeout
  * @param promiseOrArray The promise to timeout.
  * @param timeoutMs The amount of time after which to reject the promise.

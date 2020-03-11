@@ -1,6 +1,7 @@
 import { UnsupportedError } from '../errors';
 
 /**
+ * @internalapi
  * Common error that can be thrown when the polyfill is unable to work.
  */
 export const GetUserMediaUnsupportedError: UnsupportedError =
@@ -9,6 +10,7 @@ export const GetUserMediaUnsupportedError: UnsupportedError =
   );
 
 /**
+ * @internalapi
  * This polyfill serves to rebind `getUserMedia` to the `navigator.mediaDevices`
  * scope.
  */

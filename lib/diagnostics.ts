@@ -4,6 +4,7 @@ import { testNetwork } from './NetworkTest';
 import { testOutputDevice } from './OutputTest';
 
 /**
+ * @internalapi
  * Tell Typescript that we would like to modify the `Twilio` object on the
  * `window` global.
  */

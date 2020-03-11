@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { SinonFakeTimers } from 'sinon';
-import BitrateTest, { testBitrate } from '../../lib/BitrateTest';
+import { BitrateTest, testBitrate } from '../../lib/BitrateTest';
 import { DiagnosticError } from '../../lib/errors/DiagnosticError';
 
 describe('BitrateTest', () => {
@@ -170,7 +170,7 @@ describe('BitrateTest', () => {
 
     it('should throw error on createOffer failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on('error', callback);
+      bitrateTest.on(BitrateTest.Events.Error, callback);
       pcSenderContext.createOffer = () => Promise.reject('foo');
 
       return wait().then(() => {
@@ -182,7 +182,7 @@ describe('BitrateTest', () => {
 
     it('should throw error on sender setLocalDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on('error', callback);
+      bitrateTest.on(BitrateTest.Events.Error, callback);
       pcSenderContext.setLocalDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
@@ -194,7 +194,7 @@ describe('BitrateTest', () => {
 
     it('should throw error on receiver setRemoteDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on('error', callback);
+      bitrateTest.on(BitrateTest.Events.Error, callback);
       pcReceiverContext.setRemoteDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
@@ -206,7 +206,7 @@ describe('BitrateTest', () => {
 
     it('should throw error on createAnswer failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on('error', callback);
+      bitrateTest.on(BitrateTest.Events.Error, callback);
       pcReceiverContext.createAnswer = () => Promise.reject('foo');
 
       return wait().then(() => {
@@ -218,7 +218,7 @@ describe('BitrateTest', () => {
 
     it('should throw error on receiver setLocalDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on('error', callback);
+      bitrateTest.on(BitrateTest.Events.Error, callback);
       pcReceiverContext.setLocalDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
@@ -230,7 +230,7 @@ describe('BitrateTest', () => {
 
     it('should throw error on sender setRemoteDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on('error', callback);
+      bitrateTest.on(BitrateTest.Events.Error, callback);
       pcSenderContext.setRemoteDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
@@ -256,7 +256,7 @@ describe('BitrateTest', () => {
 
     it('should emit error on createDataChannel failure', (done) => {
       pcSenderContext.createDataChannel = () => { throw new Error(); };
-      bitrateTest.on('error', (error: DiagnosticError) => {
+      bitrateTest.on(BitrateTest.Events.Error, (error: DiagnosticError) => {
         assert.equal(error.message, 'Error creating data channel');
         sinon.assert.notCalled(bitrateTest.stop as any);
         done();
@@ -330,7 +330,7 @@ describe('BitrateTest', () => {
 
         it('should not emit bitrate if no sample data is available', () => {
           const callback = sinon.stub();
-          bitrateTest.on('bitrate', callback);
+          bitrateTest.on(BitrateTest.Events.Bitrate, callback);
 
           sendMessage(message);
           clock.tick(1000);
@@ -340,7 +340,7 @@ describe('BitrateTest', () => {
 
         it('should emit bitrate', () => {
           const callback = sinon.stub();
-          bitrateTest.on('bitrate', callback);
+          bitrateTest.on(BitrateTest.Events.Bitrate, callback);
 
           sendMessage(message);
           clock.tick(1500);
@@ -354,7 +354,7 @@ describe('BitrateTest', () => {
 
         it('should stop emitting bitrate on stop', () => {
           const callback = sinon.stub();
-          bitrateTest.on('bitrate', callback);
+          bitrateTest.on(BitrateTest.Events.Bitrate, callback);
 
           sendMessage(message);
           clock.tick(1200);
@@ -371,7 +371,7 @@ describe('BitrateTest', () => {
 
         it('should emit end event on stop', () => {
           const callback = sinon.stub();
-          bitrateTest.on('end', callback);
+          bitrateTest.on(BitrateTest.Events.End, callback);
           sendMessage(message);
           clock.tick(1200);
           sendMessage(message);
@@ -385,9 +385,9 @@ describe('BitrateTest', () => {
 
         it('should generate a report', (done) => {
           const values: number[] = [];
-          bitrateTest.on('bitrate', (bitrate: number) => values.push(bitrate));
+          bitrateTest.on(BitrateTest.Events.Bitrate, (bitrate: number) => values.push(bitrate));
 
-          bitrateTest.on('end', (report: BitrateTest.Report) => {
+          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
             assert.deepStrictEqual(report, {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
               didPass: true,
@@ -417,7 +417,7 @@ describe('BitrateTest', () => {
         });
 
         it('should not pass test if no values are found', (done) => {
-          bitrateTest.on('end', (report: BitrateTest.Report) => {
+          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
             assert.deepStrictEqual(report.didPass, false);
             done();
           });
@@ -433,9 +433,9 @@ describe('BitrateTest', () => {
             },
           });
           const errors: DiagnosticError[] = [];
-          bitrateTest.on('error', (error: DiagnosticError) => errors.push(error));
+          bitrateTest.on(BitrateTest.Events.Error, (error: DiagnosticError) => errors.push(error));
 
-          bitrateTest.on('end', (report: BitrateTest.Report) => {
+          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
             assert.deepStrictEqual(report.errors, errors);
             assert.deepStrictEqual(report.didPass, false);
             done();
@@ -460,7 +460,7 @@ describe('BitrateTest', () => {
 
         describe('connection timing', () => {
           it('should include PeerConnection timing', (done) => {
-            bitrateTest.on('end', (report: BitrateTest.Report) => {
+            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
               const { start, end, duration } = report.networkTiming.peerConnection!;
               assert.equal(start, 1001);
               assert.equal(end, 2001);
@@ -480,7 +480,7 @@ describe('BitrateTest', () => {
           });
 
           it('should include IceConnection timing', (done) => {
-            bitrateTest.on('end', (report: BitrateTest.Report) => {
+            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
               const { start, end, duration } = report.networkTiming.ice!;
               assert.equal(start, 1001);
               assert.equal(end, 2001);

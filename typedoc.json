@@ -1,4 +1,9 @@
 {
+  "exclude": [
+    "lib/diagnostics.ts",
+    "lib/polyfills/**/*",
+    "tests/**/*"
+  ],
   "mode": "file",
   "out": "docs"
 }

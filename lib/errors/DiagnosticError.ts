@@ -1,4 +1,5 @@
 /**
+ * @internalapi
  * Generic Diagnostic SDK error that provides a superclass for all other errors.
  */
 export class DiagnosticError extends Error {

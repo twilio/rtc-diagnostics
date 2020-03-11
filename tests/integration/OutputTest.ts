@@ -22,7 +22,7 @@ describe('testOutputDevice', function() {
 
       before(async function() {
         outputTestReport = await new Promise(resolve => {
-          const test = testOutputDevice(undefined, {
+          const test = testOutputDevice({
             duration: defaultTestDuration,
             passOnTimeout: false,
             pollIntervalMs: defaultTestPollIntervalMs,
@@ -58,7 +58,7 @@ describe('testOutputDevice', function() {
 
       before(async function() {
         outputTestReport = await new Promise(resolve => {
-          const test = testOutputDevice(undefined, {
+          const test = testOutputDevice({
             duration: Infinity,
             pollIntervalMs: defaultTestPollIntervalMs,
           });
@@ -106,7 +106,7 @@ describe('testOutputDevice', function() {
 
     before(async function() {
       outputTestReport = await new Promise(resolve => {
-        const test = testOutputDevice(undefined, {
+        const test = testOutputDevice({
           duration: Infinity,
           pollIntervalMs: defaultTestPollIntervalMs,
         });
@@ -132,7 +132,7 @@ describe('testOutputDevice', function() {
 
     before(async function() {
       outputTestReport = await new Promise(resolve => {
-        const test = testOutputDevice(undefined, {
+        const test = testOutputDevice({
           duration: Infinity,
           pollIntervalMs: defaultTestPollIntervalMs,
           testURI: INCOMING_SOUND_URL,
@@ -166,7 +166,7 @@ describe('testOutputDevice', function() {
 
     before(async function() {
       outputTestReport = await new Promise(resolve => {
-        const test = testOutputDevice(undefined, {
+        const test = testOutputDevice({
           duration: Infinity,
           pollIntervalMs: defaultTestPollIntervalMs,
           testURI: '',
