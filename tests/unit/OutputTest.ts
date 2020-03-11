@@ -11,7 +11,7 @@ import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockAudioElementFactory } from '../mocks/MockAudioElement';
 import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
 
-const defaultDuration = 5;
+const defaultDuration = 100;
 const defaultPollIntervalMs = 1;
 
 describe('testOutputDevice', function() {
