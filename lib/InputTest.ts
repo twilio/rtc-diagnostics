@@ -13,7 +13,7 @@ import {
   GetUserMediaUnsupportedError,
 } from './polyfills';
 import { getDefaultDevices } from './polyfills/enumerateDevices';
-import { TimeMeasurement } from './types';
+import { SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {
   InvalidityRecord,
@@ -110,9 +110,14 @@ export declare interface InputTest {
  */
 export class InputTest extends EventEmitter {
   /**
+   * Name of the test.
+   */
+  static testName: TestNames.InputAudioDevice = TestNames.InputAudioDevice;
+
+  /**
    * Default options for the `InputTest`.
    */
-  static defaultOptions: InputTest.Options = {
+  private static defaultOptions: InputTest.InternalOptions = {
     audioContextFactory: AudioContext,
     debug: false,
     duration: Infinity,
@@ -120,10 +125,6 @@ export class InputTest extends EventEmitter {
     getUserMedia,
     pollIntervalMs: 100,
   };
-  /**
-   * Name of the test.
-   */
-  static testName: TestNames.InputAudioDevice = TestNames.InputAudioDevice;
 
   /**
    * An `AudioContext` to use for generating volume levels.
@@ -161,7 +162,7 @@ export class InputTest extends EventEmitter {
    * Options that are passed to and set in the constructor for use during the
    * test.
    */
-  private _options: InputTest.Options;
+  private _options: InputTest.InternalOptions;
   /**
    * A timestamp that is set when the test starts after a successful call to getUserMedia.
    */
@@ -181,7 +182,7 @@ export class InputTest extends EventEmitter {
    * @param deviceIdOrTrack
    * @param options
    */
-  constructor(options: Partial<InputTest.Options> = {}) {
+  constructor(options?: InputTest.Options) {
     super();
 
     this._options = { ...InputTest.defaultOptions, ...options };
@@ -470,7 +471,7 @@ export namespace InputTest {
      * Whether or not to log debug statements to the console.
      * @private
      */
-    debug: boolean;
+    debug?: boolean;
 
     /**
      * The device ID to try to get a MediaStream from using [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia).
@@ -479,8 +480,9 @@ export namespace InputTest {
 
     /**
      * Duration of time to run the test in ms.
+     * @default Infinity
      */
-    duration: number;
+    duration?: number;
 
     /**
      * Used to mock the call to `enumerateDevices`.
@@ -496,26 +498,24 @@ export namespace InputTest {
 
     /**
      * The polling rate to emit volume events in milliseconds.
+     * @default 100
      */
-    pollIntervalMs: number;
+    pollIntervalMs?: number;
   }
+
+  /**
+   * Option typing after initialization, so we can have type guarantees.
+   * @private
+   */
+  export type InternalOptions = SubsetRequired<Options, 'duration' | 'pollIntervalMs'>;
 }
 
 /**
  * Test an audio input device and measures the volume.
- * @param deviceId The `deviceId` to pass to [getUserMedia].
- * @param options [[IInputTest.Options]] to pass to the test.
+ * @param options
  */
-export function testInputDevice(): InputTest;
-
 export function testInputDevice(
-  deviceId: MediaTrackConstraintSet['deviceId'],
-  options?: Partial<InputTest.Options>,
-): InputTest;
-
-export function testInputDevice(
-  deviceId?: MediaTrackConstraintSet['deviceId'],
-  options: Partial<InputTest.Options> = {},
+  options?: InputTest.Options,
 ): InputTest {
-  return new InputTest({ ...options, deviceId });
+  return new InputTest(options);
 }

@@ -34,7 +34,7 @@ describe('testNetwork', function() {
             },
           }) as any,
           timeoutMs,
-        });
+        } as any);
         test.on(NetworkTest.Events.Error, errorHandler);
         test.on(NetworkTest.Events.End, (r: NetworkTest.Report) => {
           endHandler(r);
@@ -59,7 +59,7 @@ describe('testNetwork', function() {
             },
           }) as any,
           timeoutMs,
-        });
+        } as any);
         test.on(NetworkTest.Events.Error, errorHandler);
         test.on(NetworkTest.Events.End, (r: NetworkTest.Report) => {
           endHandler(r);
@@ -82,7 +82,7 @@ describe('testNetwork', function() {
             },
           }) as any,
           timeoutMs,
-        });
+        } as any);
         test.on(NetworkTest.Events.Error, errorHandler);
         test.on(NetworkTest.Events.End, (r: NetworkTest.Report) => {
           endHandler(r);
@@ -111,7 +111,7 @@ describe('testNetwork', function() {
             },
           }) as any,
           timeoutMs,
-        });
+        } as any);
         test.on(NetworkTest.Events.Error, errorHandler);
         test.on(NetworkTest.Events.End, (r: NetworkTest.Report) => {
           endHandler(r);

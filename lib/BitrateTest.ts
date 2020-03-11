@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, TEST_PACKET } from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { NetworkTiming, TimeMeasurement } from './timing';
 
@@ -266,18 +267,14 @@ export class BitrateTest extends EventEmitter {
    * Send packets using data channel
    */
   private _sendData(): void {
-    const testPacket = Array(1024).fill('h').join('');
-    const maxNumberPackets = 100;
-    const bytesKeepBuffered = 1024 * maxNumberPackets;
-
     if (!this._rtcDataChannel || this._rtcDataChannel.readyState !== 'open') {
       return;
     }
-    for (let i = 0; i < maxNumberPackets; ++i) {
-      if (this._rtcDataChannel.bufferedAmount >= bytesKeepBuffered) {
+    for (let i = 0; i < MAX_NUMBER_PACKETS; ++i) {
+      if (this._rtcDataChannel.bufferedAmount >= BYTES_KEEP_BUFFERED) {
         break;
       }
-      this._rtcDataChannel.send(testPacket);
+      this._rtcDataChannel.send(TEST_PACKET);
     }
   }
 
