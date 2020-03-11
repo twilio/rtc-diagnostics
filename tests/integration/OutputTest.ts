@@ -11,10 +11,12 @@ import {
   testOutputDevice,
 } from '../../lib/OutputTest';
 
-const defaultTestDuration = 100;
+const suiteTimeout = 10000;
+const defaultTestDuration = 5000;
 const defaultTestPollIntervalMs = 10;
 
 describe('testOutputDevice', function() {
+  this.timeout(suiteTimeout);
   describe('when not given a testURI', function() {
     describe('when allowed to time out', function() {
       let outputTestReport: OutputTest.Report;
@@ -58,6 +60,7 @@ describe('testOutputDevice', function() {
 
       before(async function() {
         outputTestReport = await new Promise(resolve => {
+          let timeoutId: any;
           const test = testOutputDevice({
             duration: Infinity,
             pollIntervalMs: defaultTestPollIntervalMs,
@@ -67,9 +70,10 @@ describe('testOutputDevice', function() {
           });
           test.on(OutputTest.Events.End, (_, report) => {
             outputTestEvents.push(OutputTest.Events.End);
+            clearTimeout(timeoutId);
             setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
           });
-          setTimeout(() => test.stop(true), defaultTestDuration);
+          timeoutId = setTimeout(() => test.stop(true), defaultTestDuration);
         });
       });
 
@@ -106,6 +110,7 @@ describe('testOutputDevice', function() {
 
     before(async function() {
       outputTestReport = await new Promise(resolve => {
+        let timeoutId: any;
         const test = testOutputDevice({
           duration: Infinity,
           pollIntervalMs: defaultTestPollIntervalMs,
@@ -115,9 +120,10 @@ describe('testOutputDevice', function() {
         });
         test.on(OutputTest.Events.End, (_, report) => {
           outputTestEvents.push(OutputTest.Events.End);
+          clearTimeout(timeoutId);
           setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
         });
-        setTimeout(() => test.stop(false), defaultTestDuration);
+        timeoutId = setTimeout(() => test.stop(false), defaultTestDuration);
       });
     });
 
@@ -132,6 +138,7 @@ describe('testOutputDevice', function() {
 
     before(async function() {
       outputTestReport = await new Promise(resolve => {
+        let timeoutId: any;
         const test = testOutputDevice({
           duration: Infinity,
           pollIntervalMs: defaultTestPollIntervalMs,
@@ -142,12 +149,13 @@ describe('testOutputDevice', function() {
         });
         test.on(OutputTest.Events.End, (_, report) => {
           outputTestEvents.push(OutputTest.Events.End);
+          clearTimeout(timeoutId);
           setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
         });
         test.on(OutputTest.Events.Error, () => {
           outputTestEvents.push(OutputTest.Events.Error);
         });
-        setTimeout(() => test.stop(true), defaultTestDuration);
+        timeoutId = setTimeout(() => test.stop(true), defaultTestDuration);
       });
     });
 

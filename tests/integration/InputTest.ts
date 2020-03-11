@@ -59,8 +59,8 @@ describe('testInputDevice', function() {
       assert('errors' in report);
       assert.equal(report.errors.length, 0);
       assert('testTiming' in report);
-      assert('start' in report.testTiming);
-      assert('end' in report.testTiming);
+      assert('start' in report.testTiming!);
+      assert('end' in report.testTiming!);
       assert('didPass' in report);
       assert('testName' in report);
       assert(report.testName === InputTest.testName);
@@ -134,8 +134,8 @@ describe('testInputDevice', function() {
       assert('errors' in report);
       assert.equal(report.errors.length, 0);
       assert('testTiming' in report);
-      assert('start' in report.testTiming);
-      assert('end' in report.testTiming);
+      assert('start' in report.testTiming!);
+      assert('end' in report.testTiming!);
       assert('didPass' in report);
       assert('testName' in report);
       assert(report.testName === InputTest.testName);

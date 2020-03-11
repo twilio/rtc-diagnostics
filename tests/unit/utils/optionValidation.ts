@@ -6,7 +6,7 @@ import {
   createAudioDeviceValidator,
   validateOptions,
   validateTime,
-} from '../../../lib/utils/OptionValidation';
+} from '../../../lib/utils/optionValidation';
 import { mockEnumerateDevicesFactory } from '../../mocks/mockEnumerateDevices';
 
 describe('OptionValidation', function() {

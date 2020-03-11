@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { NetworkTiming } from '../timing';
-import { waitForPromise } from '../utils/TimeoutPromise';
+import { waitForPromise } from '../utils';
 
 /**
  * @internalapi

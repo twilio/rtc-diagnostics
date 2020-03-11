@@ -14,12 +14,13 @@ import {
 } from './polyfills';
 import { getDefaultDevices } from './polyfills/enumerateDevices';
 import { SubsetRequired, TimeMeasurement } from './types';
+import { detectSilence } from './utils';
 import {
   InvalidityRecord,
   validateDeviceId,
   validateOptions,
   validateTime,
-} from './utils/OptionValidation';
+} from './utils/optionValidation';
 
 export declare interface InputTest {
   /**
@@ -47,7 +48,7 @@ export declare interface InputTest {
     error: DiagnosticError,
   ): boolean;
   /**
-   * This event is emitted with a volume value every
+   * This event is emitted with a volume level every
    * [[InputTest.Options.pollIntervalMs]] after the test starts succesfully.
    * @param event [[InputTest.Events.Volume]]
    * @param value The current volume of the audio source.
@@ -126,7 +127,7 @@ export class InputTest extends EventEmitter {
   };
 
   /**
-   * An `AudioContext` to use for generating volume values.
+   * An `AudioContext` to use for generating volume levels.
    */
   private _audioContext: AudioContext | null = null;
   /**
@@ -150,7 +151,7 @@ export class InputTest extends EventEmitter {
    */
   private readonly _errors: DiagnosticError[] = [];
   /**
-   * The maximum volume value from the audio source.
+   * The maximum volume level from the audio source.
    */
   private _maxValue: number = 0;
   /**
@@ -163,12 +164,11 @@ export class InputTest extends EventEmitter {
    */
   private _options: InputTest.InternalOptions;
   /**
-   * A timestamp that is set when the test starts it's set up (during
-   * construction), not after successfully initializing.
+   * A timestamp that is set when the test starts after a successful call to getUserMedia.
    */
-  private _startTime: number;
+  private _startTime: number | undefined;
   /**
-   * Volume values generated from the audio source during the run time of the
+   * Volume levels generated from the audio source during the run time of the
    * test.
    */
   private readonly _values: number[] = [];
@@ -187,8 +187,6 @@ export class InputTest extends EventEmitter {
 
     this._options = { ...InputTest.defaultOptions, ...options };
 
-    this._startTime = Date.now();
-
     // We need to use a `setTimeout` here to prevent a race condition.
     // This allows event listeners to bind before the test starts.
     setTimeout(() => this._startTest());
@@ -197,7 +195,7 @@ export class InputTest extends EventEmitter {
   /**
    * Stop the currently running `InputTest`.
    * @param pass whether or not the test should pass. If set to false, will
-   * override the result from `determinePass`.
+   * override the result from determining whether audio is silent from the collected volume levels.
    */
   stop(pass: boolean = true): InputTest.Report | undefined {
     if (this._endTime) {
@@ -209,7 +207,7 @@ export class InputTest extends EventEmitter {
     this._cleanup();
 
     this._endTime = Date.now();
-    const didPass: boolean = pass && this._determinePass();
+    const didPass: boolean = pass && !detectSilence(this._values);
     const report: InputTest.Report = {
       deviceId: this._options.deviceId || (
         this._defaultDevices.audioinput &&
@@ -218,13 +216,17 @@ export class InputTest extends EventEmitter {
       didPass,
       errors: this._errors,
       testName: InputTest.testName,
-      testTiming: {
+      values: this._values,
+    };
+
+    if (this._startTime) {
+      report.testTiming = {
         duration: this._endTime - this._startTime,
         end: this._endTime,
         start: this._startTime,
-      },
-      values: this._values,
-    };
+      };
+    }
+
     this.emit(InputTest.Events.End, didPass, report);
 
     return report;
@@ -257,17 +259,6 @@ export class InputTest extends EventEmitter {
     if (this._audioContext) {
       this._audioContext.close();
     }
-  }
-
-  private _determinePass(): boolean {
-    // TODO Come up with a better algorithm for deciding if the volume values
-    // resulting in a success
-
-    // Loops over every sample, checks to see if it was completely silent by
-    // checking if the average of the amplitudes is 0, and returns whether or
-    // not more than 50% of the samples were silent.
-    return this._values.length > 3 &&
-      (this._values.filter((v: number) => v > 0).length / this._values.length) > 0.5;
   }
 
   /**
@@ -338,6 +329,9 @@ export class InputTest extends EventEmitter {
 
       this._defaultDevices = await getDefaultDevices();
 
+      // Only starts the timer after successfully getting devices
+      this._startTime = Date.now();
+
       if (!this._options.audioContextFactory) {
         throw AudioContextUnsupportedError;
       }
@@ -374,7 +368,7 @@ export class InputTest extends EventEmitter {
           ) / frequencyDataBytes.length;
         this._onVolume(volume);
 
-        if (Date.now() - this._startTime > this._options.duration) {
+        if (Date.now() - this._startTime! > this._options.duration) {
           this.stop();
         } else {
           this._volumeTimeout = setTimeout(
@@ -455,10 +449,10 @@ export namespace InputTest {
     /**
      * Time measurements of test run time.
      */
-    testTiming: TimeMeasurement;
+    testTiming?: TimeMeasurement;
 
     /**
-     * The volume values emitted by the test during its run-time.
+     * The volume levels emitted by the test during its run-time.
      */
     values: number[];
   }

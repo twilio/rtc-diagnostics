@@ -9,8 +9,8 @@ import {
   networkInformationPolyfill as networkInformation,
 } from '../polyfills/NetworkInformation';
 import { NetworkTiming, TimeMeasurement } from '../timing';
-import { validateOptions, validateTime } from '../utils/OptionValidation';
-import { waitForPromise } from '../utils/TimeoutPromise';
+import { waitForPromise } from '../utils';
+import { validateOptions, validateTime } from '../utils/optionValidation';
 import { TestCall } from './TestCall';
 
 export declare interface NetworkTest {
