@@ -1,13 +1,13 @@
 {
-  "name": "twilio-diagnostics",
+  "name": "@twilio/rtc-diagnostics",
   "version": "1.0.0-dev",
   "description": "Various diagnostics functions to help analyze connections to Twilio",
   "main": "./es5/lib/diagnostics.js",
   "types": "./es5/lib/diagnostics.d.ts",
   "scripts": {
     "build": "npm-run-all clean docs build:es5 build:dist build:dist-min",
-    "build:dist": "rimraf ./dist && node ./scripts/build.js ./LICENSE.md ./dist/diagnostics.js",
-    "build:dist-min": "uglifyjs ./dist/diagnostics.js -o ./dist/diagnostics.min.js --comments \"/^! twilio-diagnostics.js/\" -b beautify=false,ascii_only=true",
+    "build:dist": "rimraf ./dist && node ./scripts/build.js ./LICENSE.md ./dist/rtc-diagnostics.js",
+    "build:dist-min": "uglifyjs ./dist/rtc-diagnostics.js -o ./dist/rtc-diagnostics.min.js --comments \"/^! rtc-diagnostics.js/\" -b beautify=false,ascii_only=true",
     "build:es5": "rimraf ./es5 && tsc",
     "build:release": "npm-run-all lint build status",
     "clean": "rimraf ./dist ./coverage ./es5 ./docs",

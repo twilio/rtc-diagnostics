@@ -1,5 +1,5 @@
-# Twilio Diagnostics SDK
-The Diagnostics SDK provides tools that help the developer in determining Voice & Video calling readiness. The SDK provides methods that assist in identifying potential issues and provides mechanisms to estimate expected audio quality.
+# Twilio RTC Diagnostics SDK
+The RTC Diagnostics SDK provides tools that help the developer in determining Voice & Video calling readiness. The SDK provides methods that assist in identifying potential issues and provides mechanisms to estimate expected audio quality.
 
 * [API Docs](https://twilio.github.io/sdk-diagnostics/globals.html)
 * Quickstart (Coming soon)
@@ -10,7 +10,7 @@ Usage
 The following is an example for running bitrate test. For more information, please refer to the [API Docs](https://twilio.github.io/sdk-diagnostics/globals.html)
 
 ```ts
-import { testBitrate } from 'twilio-diagnostics';
+import { testBitrate } from '@twilio/rtc-diagnostics';
 
 const bitrateTest = testBitrate({
  iceServers: [{
