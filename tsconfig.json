@@ -1,6 +1,7 @@
 {
   "include": ["lib/**/*.ts", "tests/**/*.ts"],
   "compilerOptions": {
+    "declaration": true,
     "target": "es5",
     "lib": ["es5", "es6", "es2016", "es2017.object", "dom"],
     "module": "commonjs",

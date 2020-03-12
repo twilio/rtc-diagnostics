@@ -1,6 +1,6 @@
 {
   "type": "JavaScript",
-  "travis": true,
+  "travis": "pro",
   "slug": "twilio/sdk-diagnostics",
   "env": {
     "GH_REF": "github.com/twilio/sdk-diagnostics.git"
@@ -26,6 +26,13 @@
         "git push origin ${BRANCH} --tags",
         "git fetch --all",
         "git checkout ${RELEASE_VERSION}",
+        "git rm -rf docs",
+        "git commit -nm \"Preparing gh-pages\"",
+        "git subtree add --prefix docs origin gh-pages",
+        "npm run docs",
+        "git stage docs -f",
+        "git commit -nm \"${RELEASE_VERSION}\"",
+        "git subtree push --prefix docs origin gh-pages",
         "git checkout ${BRANCH}",
         "git reset --hard origin/${BRANCH}"
       ]

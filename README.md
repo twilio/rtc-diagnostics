@@ -10,7 +10,7 @@ Usage
 The following is an example for running bitrate test. For more information, please refer to the [API Docs](https://twilio.github.io/sdk-diagnostics/globals.html)
 
 ```ts
-import { testBitrate } from '@twilio/diagnostics';
+import { testBitrate } from 'twilio-diagnostics';
 
 const bitrateTest = testBitrate({
  iceServers: [{
