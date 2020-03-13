@@ -1,7 +1,7 @@
-import { testBitrate } from './BitrateTest';
-import { testInputDevice } from './InputTest';
-import { testNetwork } from './NetworkTest';
-import { testOutputDevice } from './OutputTest';
+import { BitrateTest, testBitrate } from './BitrateTest';
+import { InputTest, testInputDevice } from './InputTest';
+import { NetworkTest, testNetwork } from './NetworkTest';
+import { OutputTest, testOutputDevice } from './OutputTest';
 
 /**
  * @internalapi
@@ -23,6 +23,20 @@ declare global {
 window.Twilio = window.Twilio || {};
 window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
+  testBitrate,
+  testInputDevice,
+  testNetwork,
+  testOutputDevice,
+};
+
+/**
+ * Expose the tests if installed as a npm module for both TS and JS
+ */
+export {
+  BitrateTest,
+  InputTest,
+  NetworkTest,
+  OutputTest,
   testBitrate,
   testInputDevice,
   testNetwork,
