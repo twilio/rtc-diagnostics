@@ -27,13 +27,11 @@ export declare interface OutputTest {
   /**
    * This event is emitted when the test ends.
    * @param event [[OutputTest.Events.End]]
-   * @param didPass A boolean representing the passing state of the test.
    * @param report A summary of the test.
    * @private
    */
   emit(
     event: OutputTest.Events.End,
-    didPass: boolean,
     report: OutputTest.Report,
   ): boolean;
   /**
@@ -68,13 +66,12 @@ export declare interface OutputTest {
    * @param event [[OutputTest.Events.End]]
    * @param listener A listener function that expects the following parameters
    * when the event is raised:
-   * - A boolean representing whether or not the test passed.
    * - A [[OutputTest.Report]] that summarizes the run time of the test.
    * @returns This [[OutputTest]] instance.
    */
   on(
     event: OutputTest.Events.End,
-    listener: (didPass: boolean, report: OutputTest.Report) => any,
+    listener: (report: OutputTest.Report) => any,
   ): this;
   /**
    * Raised when the test has run into an error, fatal or not.
@@ -243,7 +240,7 @@ export class OutputTest extends EventEmitter {
       testURI: this._options.testURI,
       values: this._values,
     };
-    this.emit(OutputTest.Events.End, report.didPass, report);
+    this.emit(OutputTest.Events.End, report);
 
     return report;
   }
@@ -515,8 +512,7 @@ export namespace OutputTest {
   }
 
   /**
-   * The test summary that is emitted when the OutputTest ends with event
-   * [[OutputTest.Events.End]].
+   * Represents the report generated from an [[OutputTest]].
    */
   export interface Report {
     /**

@@ -39,16 +39,12 @@ describe('testInputDevice', function() {
           getUserMedia,
           pollIntervalMs: defaultPollIntervalMs,
         });
-        test.on(InputTest.Events.End, (_, r) => resolve(r));
+        test.on(InputTest.Events.End, (r) => resolve(r));
       });
     });
 
     it('should have passed', function() {
       assert(report.didPass);
-    });
-
-    it('should return a max volume value of 100', function() {
-      assert.equal(test.maxVolume, 100);
     });
   });
 
@@ -67,7 +63,7 @@ describe('testInputDevice', function() {
           }),
           getUserMedia,
           pollIntervalMs: defaultPollIntervalMs,
-        }).on(InputTest.Events.End, (_, r) => resolve(r));
+        }).on(InputTest.Events.End, (r) => resolve(r));
       });
     });
 
@@ -93,7 +89,7 @@ describe('testInputDevice', function() {
         test.on(InputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(InputTest.Events.End, (_, r) => resolve(r));
+        test.on(InputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.didPass, false);
@@ -113,7 +109,7 @@ describe('testInputDevice', function() {
         test.on(InputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(InputTest.Events.End, (_, r) => resolve(r));
+        test.on(InputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.didPass, false);
@@ -132,7 +128,7 @@ describe('testInputDevice', function() {
         test.on(InputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(InputTest.Events.End, (_, r) => resolve(r));
+        test.on(InputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.didPass, false);

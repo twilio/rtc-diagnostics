@@ -35,7 +35,7 @@ describe('testOutputDevice', function() {
           test.on(OutputTest.Events.Error, () => {
             outputTestEvents.push(OutputTest.Events.Error);
           });
-          test.on(OutputTest.Events.End, (_, report) => {
+          test.on(OutputTest.Events.End, (report) => {
             outputTestEvents.push(OutputTest.Events.End);
             setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
           });
@@ -68,7 +68,7 @@ describe('testOutputDevice', function() {
           test.on(OutputTest.Events.Volume, () => {
             outputTestEvents.push(OutputTest.Events.Volume);
           });
-          test.on(OutputTest.Events.End, (_, report) => {
+          test.on(OutputTest.Events.End, (report) => {
             outputTestEvents.push(OutputTest.Events.End);
             clearTimeout(timeoutId);
             setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
@@ -118,7 +118,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Volume, () => {
           outputTestEvents.push(OutputTest.Events.Volume);
         });
-        test.on(OutputTest.Events.End, (_, report) => {
+        test.on(OutputTest.Events.End, (report) => {
           outputTestEvents.push(OutputTest.Events.End);
           clearTimeout(timeoutId);
           setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
@@ -147,7 +147,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Volume, () => {
           outputTestEvents.push(OutputTest.Events.Volume);
         });
-        test.on(OutputTest.Events.End, (_, report) => {
+        test.on(OutputTest.Events.End, (report) => {
           outputTestEvents.push(OutputTest.Events.End);
           clearTimeout(timeoutId);
           setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
@@ -182,7 +182,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Volume, () => {
           outputTestEvents.push(OutputTest.Events.Volume);
         });
-        test.on(OutputTest.Events.End, (_, report) => {
+        test.on(OutputTest.Events.End, (report) => {
           outputTestEvents.push(OutputTest.Events.End);
           setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
         });

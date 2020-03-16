@@ -1,13 +1,57 @@
 # Twilio RTC Diagnostics SDK
 The RTC Diagnostics SDK provides tools that help the developer in determining Voice & Video calling readiness. The SDK provides methods that assist in identifying potential issues and provides mechanisms to estimate expected audio quality.
 
-* [API Docs](https://twilio.github.io/sdk-diagnostics/globals.html)
+* [API Docs](https://twilio.github.io/rtc-diagnostics/globals.html)
 * Quickstart (Coming soon)
 * Changelog (Coming soon)
 
+Installation
+------------
+
+### Building the project locally
+
+```bash
+# Clone repository
+git clone git@github.com:twilio/rtc-diagnostics.git
+cd rtc-diagnostics
+
+# Install dependencies
+npm install
+
+# Build the artifacts under dist folder
+npm run build
+```
+
+### NPM
+You can install directly from npm.
+```
+npm install @twilio/rtc-diagnostics --save
+```
+
+Or install from a local directory.
+```
+npm install /local-path-to-repo/rtc-diagnostics
+```
+
+Using this method, you can import `rtc-diagnostics` like so:
+```ts
+import { testBitrate } from '@twilio/rtc-diagnostics';
+```
+
+### Script tag
+You can also include `rtc-diagnostics.js` directly in your web app using a `<script>` tag.
+ ```html
+ <script src="https://my-server-path/rtc-diagnostics.js"></script>
+ ```
+ 
+ Using this method, `rtc-diagnostics.js` will set a browser global:
+ ```ts
+ const { testBitrate } = Twilio.Diagnostics;
+ ```
+
 Usage
 ------------
-The following is an example for running bitrate test. For more information, please refer to the [API Docs](https://twilio.github.io/sdk-diagnostics/globals.html)
+The following is an example for running bitrate test. For more information, please refer to the [API Docs](https://twilio.github.io/rtc-diagnostics/globals.html)
 
 ```ts
 import { testBitrate } from '@twilio/rtc-diagnostics';
@@ -37,17 +81,6 @@ setTimeout(() => {
 }, 10000);
 ```
 
-Installation
-------------
-
-```
-git clone git@github.com:twilio/sdk-diagnostics.git
-cd sdk-diagnostics
-npm install
-```
-
-Commands
-------------
-
-* `npm run build` - builds the artifacts under `dist` folder
-* `npm run test` - runs unit and integration tests
+License
+-------
+See [LICENSE.md](LICENSE.md)

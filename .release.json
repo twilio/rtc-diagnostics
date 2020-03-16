@@ -1,9 +1,9 @@
 {
   "type": "JavaScript",
   "travis": "pro",
-  "slug": "twilio/sdk-diagnostics",
+  "slug": "twilio/rtc-diagnostics",
   "env": {
-    "GH_REF": "github.com/twilio/sdk-diagnostics.git"
+    "GH_REF": "github.com/twilio/rtc-diagnostics.git"
   },
   "plans": {
     "release": {
