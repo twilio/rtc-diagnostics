@@ -27,13 +27,11 @@ export declare interface InputTest {
    * This event is emitted with a boolean representing if the test passed and a
    * test report when the test ends.
    * @param event [[InputTest.Events.End]]
-   * @param didPass Whether or not the test passed.
    * @param report Summary of the test.
    * @private
    */
   emit(
     event: InputTest.Events.End,
-    didPass: boolean,
     report: InputTest.Report,
   ): boolean;
   /**
@@ -63,14 +61,13 @@ export declare interface InputTest {
    * Raised upon completion of the test.
    * @param event [[InputTest.Events.End]]
    * @param listener A callback that expects the following parameters:
-   *  A `boolean` which represents if the test passed.
    *  An [[InputTest.Report]] that summarizes the test.
    * @returns This [[InputTest]] instance.
    * @event
    */
   on(
     event: InputTest.Events.End,
-    listener: (didPass: boolean, report: InputTest.Report) => any,
+    listener: (report: InputTest.Report) => any,
   ): this;
   /**
    * Raised by the test when encountering an error with a parameter of type
@@ -227,16 +224,9 @@ export class InputTest extends EventEmitter {
       };
     }
 
-    this.emit(InputTest.Events.End, didPass, report);
+    this.emit(InputTest.Events.End, report);
 
     return report;
-  }
-
-  /**
-   * The maximum volume detected during the test.
-   */
-  get maxVolume(): number {
-    return this._maxValue;
   }
 
   /**

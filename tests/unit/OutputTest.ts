@@ -35,7 +35,7 @@ describe('testOutputDevice', function() {
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
           pollIntervalMs: defaultPollIntervalMs,
-        }).on(OutputTest.Events.End, (_p, r) => resolve(r));
+        }).on(OutputTest.Events.End, (r) => resolve(r));
       });
     });
 
@@ -70,7 +70,7 @@ describe('testOutputDevice', function() {
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
           pollIntervalMs: defaultPollIntervalMs,
-        }).on(OutputTest.Events.End, (_p, r) => resolve(r));
+        }).on(OutputTest.Events.End, (r) => resolve(r));
       });
     });
 
@@ -107,7 +107,7 @@ describe('testOutputDevice', function() {
           resolve(result);
         }
       });
-      test.on(OutputTest.Events.End, (_, r) => {
+      test.on(OutputTest.Events.End, (r) => {
         result['report'] = r;
         if (result.error && result.report) {
           resolve(result);
@@ -139,7 +139,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(OutputTest.Events.End, (_, r) => resolve(r));
+        test.on(OutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.didPass, false);
@@ -159,7 +159,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(OutputTest.Events.End, (_, r) => resolve(r));
+        test.on(OutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.didPass, false);
@@ -178,7 +178,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(OutputTest.Events.End, (_, r) => resolve(r));
+        test.on(OutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.didPass, false);
@@ -238,7 +238,7 @@ describe('testOutputDevice', function() {
         }),
         pollIntervalMs: defaultPollIntervalMs,
       });
-      test.on(OutputTest.Events.End, (_, r) => resolve(r));
+      test.on(OutputTest.Events.End, (r) => resolve(r));
       test.stop(true);
     });
     assert(report);

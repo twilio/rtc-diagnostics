@@ -30,7 +30,7 @@ describe('testInputDevice', function() {
         });
         test.on(InputTest.Events.Error, errorHandler);
         test.on(InputTest.Events.Volume, volumeHandler);
-        test.on(InputTest.Events.End, (_, r) => {
+        test.on(InputTest.Events.End, (r) => {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
@@ -105,7 +105,7 @@ describe('testInputDevice', function() {
         });
         test.on(InputTest.Events.Error, errorHandler);
         test.on(InputTest.Events.Volume, volumeHandler);
-        test.on(InputTest.Events.End, (_, r) => {
+        test.on(InputTest.Events.End, (r) => {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
