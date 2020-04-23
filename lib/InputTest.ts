@@ -176,8 +176,7 @@ export class InputTest extends EventEmitter {
 
   /**
    * Initializes the `startTime` and `options`.
-   * @param deviceIdOrTrack
-   * @param options
+   * @param options Optional settings to pass to the test.
    */
   constructor(options?: InputTest.Options) {
     super();

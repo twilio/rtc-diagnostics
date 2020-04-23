@@ -257,4 +257,18 @@ describe('testOutputDevice', function() {
       test.on(OutputTest.Events.Error, err => reject(err));
     }));
   });
+
+  it('should throw during setup when there are no detected output devices', async function() {
+    await assert.rejects(() => new Promise((_, reject) => {
+      const test = testOutputDevice({
+        audioContextFactory: mockAudioContextFactory() as any,
+        audioElementFactory: mockAudioElementFactory() as any,
+        deviceId: 'foobar',
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [],
+        }),
+      });
+      test.on(OutputTest.Events.Error, err => reject(err));
+    }));
+  });
 });
