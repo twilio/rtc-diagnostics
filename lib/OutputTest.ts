@@ -13,7 +13,10 @@ import {
   AudioUnsupportedError,
   enumerateDevices,
 } from './polyfills';
-import { getDefaultDevices } from './polyfills/enumerateDevices';
+import {
+  EnumerateDevicesUnsupportedError,
+  getDefaultDevices,
+} from './polyfills/enumerateDevices';
 import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {
@@ -320,10 +323,13 @@ export class OutputTest extends EventEmitter {
         throw new InvalidOptionsError(invalidReasons);
       }
 
-      const devices: MediaDeviceInfo[] | undefined =
-        await this._options.enumerateDevices?.();
+      if (!this._options.enumerateDevices) {
+        throw EnumerateDevicesUnsupportedError;
+      }
 
-      const numberOutputDevices: number | undefined = devices?.filter(
+      const devices: MediaDeviceInfo[] = await this._options.enumerateDevices();
+
+      const numberOutputDevices: number = devices.filter(
         (device: MediaDeviceInfo) => device.kind === 'audiooutput',
       ).length;
 

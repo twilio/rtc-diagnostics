@@ -43,10 +43,12 @@ describe('testOutputDevice', function() {
       assert(report.didPass);
     });
 
-    // it('both start and end timestamps should be set', function() {
-    //   assert(report.startTime);
-    //   assert(report.endTime);
-    // });
+    it('timestamps should be set', function() {
+      assert(report.testTiming);
+      assert(report.testTiming.duration);
+      assert(report.testTiming.end);
+      assert(report.testTiming.start);
+    });
 
     it(`all volume values should be ${volumeValues}`, function() {
       assert(report.values.every(v => v === volumeValues));
@@ -78,10 +80,12 @@ describe('testOutputDevice', function() {
       assert(!report.didPass);
     });
 
-    // it('both start and end timestamps should be set', function() {
-    //   assert(report.startTime);
-    //   assert(report.endTime);
-    // });
+    it('timestamps should be set', function() {
+      assert(report.testTiming);
+      assert(report.testTiming.duration);
+      assert(report.testTiming.end);
+      assert(report.testTiming.start);
+    });
 
     it('all volume values should be 0', function() {
       assert(report.values.every(v => v === 0));
@@ -253,6 +257,17 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
         }),
+      });
+      test.on(OutputTest.Events.Error, err => reject(err));
+    }));
+  });
+
+  it('should throw during setup when `enumerateDevices` is not supported', async function() {
+    await assert.rejects(() => new Promise((_, reject) => {
+      const test = testOutputDevice({
+        audioContextFactory: mockAudioContextFactory() as any,
+        audioElementFactory: mockAudioElementFactory() as any,
+        deviceId: 'foobar',
       });
       test.on(OutputTest.Events.Error, err => reject(err));
     }));
