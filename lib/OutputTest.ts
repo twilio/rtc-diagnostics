@@ -13,7 +13,10 @@ import {
   AudioUnsupportedError,
   enumerateDevices,
 } from './polyfills';
-import { getDefaultDevices } from './polyfills/enumerateDevices';
+import {
+  EnumerateDevicesUnsupportedError,
+  getDefaultDevices,
+} from './polyfills/enumerateDevices';
 import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {
@@ -195,7 +198,7 @@ export class OutputTest extends EventEmitter {
    * `_startTest` function.
    * An `AudioContext` is created if none is passed in the `options` parameter
    * and the `_startTime` is immediately set.
-   * @param options
+   * @param options Optional settings to pass to the test.
    */
   constructor(options?: OutputTest.Options) {
     super();
@@ -318,6 +321,20 @@ export class OutputTest extends EventEmitter {
 
       if (invalidReasons) {
         throw new InvalidOptionsError(invalidReasons);
+      }
+
+      if (!this._options.enumerateDevices) {
+        throw EnumerateDevicesUnsupportedError;
+      }
+
+      const devices: MediaDeviceInfo[] = await this._options.enumerateDevices();
+
+      const numberOutputDevices: number = devices.filter(
+        (device: MediaDeviceInfo) => device.kind === 'audiooutput',
+      ).length;
+
+      if (numberOutputDevices === 0) {
+        throw new DiagnosticError(undefined, 'No output devices found.');
       }
 
       if (!this._options.audioContextFactory) {

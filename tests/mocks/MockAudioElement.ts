@@ -1,7 +1,7 @@
 // tslint:disable no-empty
 
 export const mockAudioElementFactory = (
-  options: MockAudioElement.Options,
+  options: MockAudioElement.Options = {},
 ) => class {
   loop = false;
   setSinkId?: () => void;
