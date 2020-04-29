@@ -3,6 +3,7 @@
 import { DiagnosticError } from '../../lib/errors';
 import { MockAnalyserNode } from './MockAnalyserNode';
 import { MockMediaElementAudioSourceNode } from './MockMediaElementAudioSourceNode';
+import { MockMediaStreamAudioDestinationNode } from './MockMediaStreamAudioDestinationNode';
 import { MockMediaStreamAudioSourceNode } from './MockMediaStreamAudioSourceNode';
 
 const defaultMockAudioContextFactoryOptions: MockAudioContext.Options = {
@@ -25,6 +26,12 @@ export const mockAudioContextFactory = (
     }
     return new MockMediaElementAudioSourceNode();
   }
+  createMediaStreamDestination() {
+    if (options.doThrow?.createMediaStreamDestination) {
+      throw new DiagnosticError();
+    }
+    return new MockMediaStreamAudioDestinationNode();
+  }
   createMediaStreamSource() {
     if (options.doThrow && options.doThrow.createMediaStreamSource) {
       throw new DiagnosticError();
@@ -39,6 +46,7 @@ export declare namespace MockAudioContext {
     doThrow?: {
       createAnalyser?: boolean;
       createMediaElementSource?: boolean;
+      createMediaStreamDestination?: boolean;
       createMediaStreamSource?: boolean;
     };
   }

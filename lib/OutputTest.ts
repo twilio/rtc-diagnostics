@@ -12,11 +12,11 @@ import {
   AudioContextUnsupportedError,
   AudioUnsupportedError,
   enumerateDevices,
-} from './polyfills';
-import {
   EnumerateDevicesUnsupportedError,
   getDefaultDevices,
-} from './polyfills/enumerateDevices';
+  getUserMedia,
+  GetUserMediaUnsupportedError,
+} from './polyfills';
 import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {
@@ -141,19 +141,28 @@ export class OutputTest extends EventEmitter {
     doLoop: true,
     duration: Infinity,
     enumerateDevices,
+    getUserMedia,
     passOnTimeout: true,
     pollIntervalMs: 100,
     testURI: INCOMING_SOUND_URL,
   };
 
   /**
+   * Holds `AudioElement`s that are attached to the DOM to load and play audio.
+   * Also contains the `Promise`s that resolve when the `AudioElement`
+   * successfully starts playing audio. Will reject if not possible.
+   */
+  private _audio: {
+    dest: { element?: AudioElement, playPromise?: Promise<void> },
+    src: { element?: AudioElement, playPromise?: Promise<void> },
+  } = {
+    dest: {},
+    src: {},
+  };
+  /**
    * An `AudioContext` that is used to process the audio source.
    */
   private _audioContext: AudioContext | null = null;
-  /**
-   * An `AudioElement` that is attached to the DOM to play audio.
-   */
-  private _audioElement: AudioElement | null = null;
   /**
    * The default media devices when starting the test.
    */
@@ -174,11 +183,6 @@ export class OutputTest extends EventEmitter {
    * time of the test.
    */
   private _options: OutputTest.InternalOptions;
-  /**
-   * A Promise that resolves when the `AudioElement` successfully starts playing
-   * audio. Will reject if not possible.
-   */
-  private _playPromise: Promise<void> | null = null;
   /**
    * A timestamp of when the test starts. This is set in the constructor and not
    * when the test succesfully starts.
@@ -258,17 +262,23 @@ export class OutputTest extends EventEmitter {
     if (this._audioContext) {
       this._audioContext.close();
     }
-    if (this._playPromise) {
-      this._playPromise.then(() => {
+
+    const cleanupAudioElement = (
+      audio?: {
+        element?: AudioElement,
+        playPromise?: Promise<void>,
+      },
+    ) => {
+      audio?.playPromise?.then(() => {
         // we need to try to wait for the call to play to finish before we can
         // pause the audio
-        if (this._audioElement) {
-          this._audioElement.pause();
-        }
+        audio?.element?.pause();
       }).catch(() => {
         // this means play errored out so we do nothing
       });
-    }
+    };
+
+    Object.values(this._audio).forEach(cleanupAudioElement);
   }
 
   /**
@@ -327,6 +337,16 @@ export class OutputTest extends EventEmitter {
         throw EnumerateDevicesUnsupportedError;
       }
 
+      if (!this._options.getUserMedia) {
+        throw GetUserMediaUnsupportedError;
+      }
+      const mediaStream = await this._options.getUserMedia({
+        audio: true,
+      });
+      // We just need to have succesfully called `getUserMedia` to properly
+      // enumerate devices, so we can just close out the tracks we got.
+      mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+
       const devices: MediaDeviceInfo[] = await this._options.enumerateDevices();
 
       const numberOutputDevices: number = devices.filter(
@@ -345,14 +365,26 @@ export class OutputTest extends EventEmitter {
       if (!this._options.audioElementFactory) {
         throw AudioUnsupportedError;
       }
-      this._audioElement =
+
+      // We need two audio elements, one to load the media from the URI and
+      // one to output audio.
+      // We are unable to use a single audio element because the media stream
+      // is redirected to an `AnalyserNode` within the `AudioContext` and
+      // cannot be routed to a specific output device from that.
+      // To work around this, we output to a `MediaStream` from the
+      // `AudioContext` and that is given to the output `AudioElement`, which
+      // `setSinkId` can be called on.
+      this._audio.src.element =
         new this._options.audioElementFactory(this._options.testURI);
-      this._audioElement.setAttribute('crossorigin', 'anonymous');
-      this._audioElement.loop = !!this._options.doLoop;
+      this._audio.src.element.setAttribute('crossorigin', 'anonymous');
+      this._audio.src.element.loop = !!this._options.doLoop;
+
+      this._audio.dest.element = new this._options.audioElementFactory();
+      this._audio.dest.element.loop = !!this._options.doLoop;
 
       if (this._options.deviceId) {
-        if (this._audioElement.setSinkId) {
-          await this._audioElement.setSinkId(this._options.deviceId);
+        if (this._audio.dest.element.setSinkId) {
+          await this._audio.dest.element.setSinkId(this._options.deviceId);
         } else {
           // Non-fatal error
           this._onError(new UnsupportedError(
@@ -362,14 +394,19 @@ export class OutputTest extends EventEmitter {
         }
       }
 
-      const source: MediaElementAudioSourceNode =
-        this._audioContext.createMediaElementSource(this._audioElement);
-      source.connect(this._audioContext.destination);
+      const sourceNode: MediaElementAudioSourceNode =
+        this._audioContext.createMediaElementSource(this._audio.src.element);
+
+      const destinationNode: MediaStreamAudioDestinationNode =
+        this._audioContext.createMediaStreamDestination();
+      sourceNode.connect(destinationNode);
+
+      this._audio.dest.element.srcObject = destinationNode.stream;
 
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
       analyser.fftSize = 64;
-      source.connect(analyser);
+      sourceNode.connect(analyser);
 
       const frequencyDataBytes: Uint8Array =
         new Uint8Array(analyser.frequencyBinCount);
@@ -391,7 +428,7 @@ export class OutputTest extends EventEmitter {
           Date.now() - this._startTime > this._options.duration;
         const stop: boolean = this._options.doLoop
           ? isTimedOut
-          : (this._audioElement && this._audioElement.ended) || isTimedOut;
+          : this._audio.src.element?.ended || isTimedOut;
 
         if (stop) {
           if (this._options.passOnTimeout === false) {
@@ -409,8 +446,13 @@ export class OutputTest extends EventEmitter {
         }
       };
 
-      this._playPromise = this._audioElement.play();
-      await this._playPromise;
+      this._audio.src.playPromise = this._audio.src.element.play();
+      this._audio.dest.playPromise = this._audio.dest.element.play();
+
+      await Promise.all([
+        this._audio.src.playPromise,
+        this._audio.dest.playPromise,
+      ]);
 
       this._defaultDevices = await getDefaultDevices();
 
@@ -508,6 +550,12 @@ export namespace OutputTest {
      * @private
      */
     enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
+
+    /**
+     * Used to mock calls to `getUserMedia`.
+     * @private
+     */
+    getUserMedia?: typeof window.navigator.mediaDevices.getUserMedia;
 
     /**
      * Set [[OutputTest.Report.didPass]] to true or not upon test timeout.
