@@ -5,9 +5,9 @@ import {
   PromiseTimedOutError,
 } from '../errors';
 import {
+  networkInformation,
   NetworkInformation,
-  networkInformationPolyfill as networkInformation,
-} from '../polyfills/NetworkInformation';
+} from '../polyfills';
 import { NetworkTiming, TimeMeasurement } from '../timing';
 import { waitForPromise } from '../utils';
 import { validateOptions, validateTime } from '../utils/optionValidation';
@@ -255,11 +255,30 @@ export class NetworkTest extends EventEmitter {
       this._testCall.close();
     }
 
+    this._endTime = Date.now();
+
     // Use the network information polyfill, if the info is `undefined` then
     // use an empty object so all members will be `undefined`.
-    const info: NetworkInformation = this._options.networkInformation || {};
+    // We can't spread `this._options.networkInformation` because it is a class
+    // where all the members we want data from are getter functions.
+    const infoKeys = [
+      'downlink',
+      'downlinkMax',
+      'effectiveType',
+      'rtt',
+      'saveData',
+      'type',
+    ] as const;
 
-    this._endTime = Date.now();
+    const info: NetworkInformation = this._options.networkInformation
+      ? infoKeys.reduce(
+        (reduction: Record<string, any>, infoKey: keyof NetworkInformation) => ({
+          ...reduction,
+          [infoKey]: this._options.networkInformation?.[infoKey],
+        }),
+        {},
+      )
+      : {};
 
     const testCallNetworkTiming: NetworkTiming = this._testCall
       ? this._testCall.getNetworkTiming()
@@ -269,20 +288,15 @@ export class NetworkTest extends EventEmitter {
     // the values will always be `undefined`.
     const report: NetworkTest.Report = {
       didPass: didPass && this._determinePass(),
-      downlink: info.downlink,
-      downlinkMax: info.downlinkMax,
-      effectiveType: info.effectiveType,
       errors: this._errors,
       networkTiming: { ...this._networkTiming, ...testCallNetworkTiming },
-      rtt: info.rtt,
-      saveData: info.saveData,
       testName: NetworkTest.testName,
       testTiming: {
         duration: this._endTime - this._startTime,
         end: this._endTime,
         start: this._startTime,
       },
-      type: info.type,
+      ...info,
     };
 
     this.emit(NetworkTest.Events.End, report);
