@@ -6,7 +6,9 @@ import {
 } from './MockRTCDataChannel';
 
 export const mockRTCPeerConnectionFactory = (
-  options: MockRTCPeerConnection.Options,
+  options: MockRTCPeerConnection.Options = {
+    candidate: 'test',
+  },
 ) => {
   const mockRTCDataChannel =
     mockRTCDataChannelFactory(options.mockRTCDataChannelFactoryOptions);
@@ -18,7 +20,7 @@ export const mockRTCPeerConnectionFactory = (
       return new mockRTCDataChannel();
     }
     async createOffer() {
-      if (options.doThrow && options.doThrow.createOffer) {
+      if (options.doThrow?.createOffer) {
         throw new Error();
       }
     }
@@ -38,6 +40,6 @@ export namespace MockRTCPeerConnection {
     doThrow?: {
       createOffer?: boolean;
     };
-    mockRTCDataChannelFactoryOptions: MockRTCDataChannel.Options;
+    mockRTCDataChannelFactoryOptions?: MockRTCDataChannel.Options;
   }
 }

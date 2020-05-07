@@ -25,14 +25,7 @@ describe('testNetwork', function() {
     const report: NetworkTest.Report =
       await new Promise((resolve: (report: NetworkTest.Report) => void) => {
         const test = testNetwork({
-          peerConnectionFactory: mockRTCPeerConnectionFactory({
-            candidate: 'test',
-            mockRTCDataChannelFactoryOptions: {
-              doClose: true,
-              doMessage: true,
-              doOpen: true,
-            },
-          }) as any,
+          peerConnectionFactory: mockRTCPeerConnectionFactory() as any,
           timeoutMs,
         } as any);
         test.on(NetworkTest.Events.Error, errorHandler);
@@ -44,6 +37,52 @@ describe('testNetwork', function() {
     assert(report);
     assert(report.didPass);
     assert(report.networkTiming);
+  });
+
+  describe('should contain the correct values from NetworkInformation in report', function() {
+    const configs = [ [
+      'when some values are undefined', {
+        downlink: 2,
+        downlinkMax: undefined,
+      }, (report: NetworkTest.Report) => {
+        assert('downlink' in report);
+        assert(!('downlinkMax' in report));
+      },
+    ], [
+      'when NetworkInformation is undefined',
+      undefined,
+      (report: NetworkTest.Report) => {
+        assert(!('downlink' in report));
+        assert(!('downlinkMax' in report));
+      },
+    ], [
+      'when every value is defined', {
+        downlink: 1,
+        downlinkMax: 2,
+      }, (report: NetworkTest.Report) => {
+        assert('downlink' in report);
+        assert('downlinkMax' in report);
+      },
+    ] ] as const;
+
+    configs.forEach(([title, mockNetworkInformation, verify]) => {
+      it(title, async function() {
+        const report: NetworkTest.Report =
+          await new Promise((resolve: (report: NetworkTest.Report) => void) => {
+            const test = testNetwork({
+              networkInformation: mockNetworkInformation,
+              peerConnectionFactory: mockRTCPeerConnectionFactory() as any,
+              timeoutMs,
+            } as any);
+            test.on(NetworkTest.Events.Error, errorHandler);
+            test.on(NetworkTest.Events.End, (r: NetworkTest.Report) => {
+              endHandler(r);
+              setTimeout(() => resolve(r), timeoutMs);
+            });
+          });
+        verify(report);
+      });
+    });
   });
 
   it('should still return a report without any ice candidates', async function() {
