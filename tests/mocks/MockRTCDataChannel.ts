@@ -1,6 +1,12 @@
 // tslint:disable no-empty
 
-export const mockRTCDataChannelFactory = (options: MockRTCDataChannel.Options) => class {
+export const mockRTCDataChannelFactory = (
+  options: MockRTCDataChannel.Options = {
+    doClose: true,
+    doMessage: true,
+    doOpen: true,
+  },
+) => class {
   set onmessage(listener: (...args: any) => void) {
     setTimeout(() => options.doMessage && listener({ data: 'Ahoy, world!' }), 10);
   }

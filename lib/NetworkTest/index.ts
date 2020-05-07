@@ -5,9 +5,9 @@ import {
   PromiseTimedOutError,
 } from '../errors';
 import {
+  networkInformation,
   NetworkInformation,
-  networkInformationPolyfill as networkInformation,
-} from '../polyfills/NetworkInformation';
+} from '../polyfills';
 import { NetworkTiming, TimeMeasurement } from '../timing';
 import { waitForPromise } from '../utils';
 import { validateOptions, validateTime } from '../utils/optionValidation';
@@ -255,11 +255,36 @@ export class NetworkTest extends EventEmitter {
       this._testCall.close();
     }
 
+    this._endTime = Date.now();
+
     // Use the network information polyfill, if the info is `undefined` then
     // use an empty object so all members will be `undefined`.
-    const info: NetworkInformation = this._options.networkInformation || {};
+    // We can't spread `this._options.networkInformation` because it is a class
+    // where all the members we want data from are getter functions.
+    const networkInfoKeys = [
+      'downlink',
+      'downlinkMax',
+      'effectiveType',
+      'rtt',
+      'saveData',
+      'type',
+    ] as const;
 
-    this._endTime = Date.now();
+    const networkInfo: NetworkInformation = networkInfoKeys.reduce((
+        reduction: NetworkInformation,
+        networkInfoKey: keyof NetworkInformation,
+      ) => {
+        const networkInfoValue: NetworkInformation[keyof NetworkInformation] =
+          this._options.networkInformation?.[networkInfoKey];
+        return Boolean(networkInfoValue) || typeof networkInfoValue === 'number'
+          ? ({
+            ...reduction,
+            [networkInfoKey]: networkInfoValue,
+          })
+          : reduction;
+      },
+      {},
+    );
 
     const testCallNetworkTiming: NetworkTiming = this._testCall
       ? this._testCall.getNetworkTiming()
@@ -269,20 +294,15 @@ export class NetworkTest extends EventEmitter {
     // the values will always be `undefined`.
     const report: NetworkTest.Report = {
       didPass: didPass && this._determinePass(),
-      downlink: info.downlink,
-      downlinkMax: info.downlinkMax,
-      effectiveType: info.effectiveType,
       errors: this._errors,
       networkTiming: { ...this._networkTiming, ...testCallNetworkTiming },
-      rtt: info.rtt,
-      saveData: info.saveData,
       testName: NetworkTest.testName,
       testTiming: {
         duration: this._endTime - this._startTime,
         end: this._endTime,
         start: this._startTime,
       },
-      type: info.type,
+      ...networkInfo,
     };
 
     this.emit(NetworkTest.Events.End, report);
@@ -344,16 +364,22 @@ export namespace NetworkTest {
     /**
      * The effective bandwidth estimate in megabits per second, rounded to the nearest multiple of 25 kilobits per seconds.
      * Please see [NetworkInformation.downlink API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlink).
+     * This information comes directly from the browser as part of `navigator.connection` and may not be supported by all browsers.
+     * In the case that the browser does not provide this value, the report will not include this field.
      */
     downlink?: number;
     /**
      * The maximum downlink speed, in megabits per second (Mbps), for the underlying connection technology.
      * Please see [NetworkInformation.downlinkMax API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlinkMax).
+     * This information comes directly from the browser as part of `navigator.connection` and may not be supported by all browsers.
+     * In the case that the browser does not provide this value, the report will not include this field.
      */
     downlinkMax?: number;
     /**
      * The effective type of the connection meaning one of 'slow-2g', '2g', '3g', or '4g'.
      * Please see [NetworkInformation.effectiveType API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType).
+     * This information comes directly from the browser as part of `navigator.connection` and may not be supported by all browsers.
+     * In the case that the browser does not provide this value, the report will not include this field.
      */
     effectiveType?: string;
     /**
@@ -367,11 +393,15 @@ export namespace NetworkTest {
     /**
      * The estimated effective round-trip time of the current connection, rounded to the nearest multiple of 25 milliseconds.
      * Please see [NetworkInformation.rtt API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt).
+     * This information comes directly from the browser as part of `navigator.connection` and may not be supported by all browsers.
+     * In the case that the browser does not provide this value, the report will not include this field.
      */
     rtt?: number;
     /**
      * Returns `true` if the user has set a reduced data usage option on the user agent.
      * Please see [NetworkInformation.saveData API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/saveData).
+     * This information comes directly from the browser as part of `navigator.connection` and may not be supported by all browsers.
+     * In the case that the browser does not provide this value, the report will not include this field.
      */
     saveData?: boolean;
     /**
@@ -385,6 +415,8 @@ export namespace NetworkTest {
     /**
      * The type of connection a device is using to communicate with the network.
      * Please see [NetworkInformation.type API](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/type).
+     * This information comes directly from the browser as part of `navigator.connection` and may not be supported by all browsers.
+     * In the case that the browser does not provide this value, the report will not include this field.
      */
     type?: string;
   }

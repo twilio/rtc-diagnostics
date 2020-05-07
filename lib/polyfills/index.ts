@@ -17,4 +17,5 @@ export {
 } from './getUserMedia';
 export {
   networkInformationPolyfill as networkInformation,
+  NetworkInformation,
 } from './NetworkInformation';
