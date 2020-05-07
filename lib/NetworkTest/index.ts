@@ -276,7 +276,7 @@ export class NetworkTest extends EventEmitter {
       ) => {
         const networkInfoValue: NetworkInformation[keyof NetworkInformation] =
           this._options.networkInformation?.[networkInfoKey];
-        return typeof networkInfoValue !== 'undefined'
+        return Boolean(networkInfoValue) || typeof networkInfoValue === 'number'
           ? ({
             ...reduction,
             [networkInfoKey]: networkInfoValue,

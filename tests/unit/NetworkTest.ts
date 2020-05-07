@@ -49,6 +49,30 @@ describe('testNetwork', function() {
         assert(!('downlinkMax' in report));
       },
     ], [
+      'when some values are empty string', {
+        downlink: 2,
+        downlinkMax: '',
+      }, (report: NetworkTest.Report) => {
+        assert('downlink' in report);
+        assert(!('downlinkMax' in report));
+      },
+    ], [
+      'when some values are null', {
+        downlink: 2,
+        downlinkMax: null,
+      }, (report: NetworkTest.Report) => {
+        assert('downlink' in report);
+        assert(!('downlinkMax' in report));
+      },
+    ], [
+      'when some values are 0', {
+        downlink: 2,
+        downlinkMax: 0,
+      }, (report: NetworkTest.Report) => {
+        assert('downlink' in report);
+        assert('downlinkMax' in report);
+      },
+    ], [
       'when NetworkInformation is undefined',
       undefined,
       (report: NetworkTest.Report) => {
