@@ -31,19 +31,17 @@ export const enumerateDevicesPolyfill: typeof navigator.mediaDevices.enumerateDe
  * Firefox does not have a device ID that is "default". To get that device ID,
  * we need to enumerate all the devices and grab the first of each "kind".
  */
-export async function getDefaultDevices(): Promise<Partial<Record<
+export function getDefaultDevices(devices: MediaDeviceInfo[]): Partial<Record<
   MediaDeviceKind,
   MediaDeviceInfo
->>> {
+>> {
   const defaultDeviceIds: Partial<Record<
     MediaDeviceKind,
     MediaDeviceInfo
   >> = {};
 
-  if (enumerateDevicesPolyfill) {
-    for (const device of (await enumerateDevicesPolyfill()).reverse()) {
-      defaultDeviceIds[device.kind] = device;
-    }
+  for (const device of devices.reverse()) {
+    defaultDeviceIds[device.kind] = device;
   }
 
   return defaultDeviceIds;

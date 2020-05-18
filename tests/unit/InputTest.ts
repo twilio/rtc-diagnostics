@@ -161,7 +161,7 @@ describe('testInputDevice', function() {
       const test = testInputDevice({
         audioContextFactory: mockAudioContextFactory({
           analyserNodeOptions: { volumeValues: 100 },
-          doThrow: { createAnalyser: true },
+          throw: { createAnalyser: new DiagnosticError() },
         }) as any,
         duration: defaultDuration,
         enumerateDevices: mockEnumerateDevicesFactory({

@@ -1,11 +1,16 @@
 // tslint:disable only-arrow-functions
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { DiagnosticError } from '../../lib/errors';
 import {
   OutputTest,
   testOutputDevice,
 } from '../../lib/OutputTest';
+import {
+  DOMError,
+  DOMException,
+} from '../../lib/polyfills/errors';
 import { AudioElement } from '../../lib/types';
 import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockAudioElementFactory } from '../mocks/MockAudioElement';
@@ -93,6 +98,103 @@ describe('testOutputDevice', function() {
     it('all volume values should be 0', function() {
       assert(report.values.every(v => v === 0));
     });
+  });
+
+  it('should report if passed normally', async function() {
+    await Promise.all([true, false].map(pass => (async () => {
+      const report: OutputTest.Report = await new Promise(resolve => {
+        const test = testOutputDevice({
+          audioContextFactory: mockAudioContextFactory({
+            analyserNodeOptions: { volumeValues },
+          }) as any,
+          audioElementFactory,
+          enumerateDevices: mockEnumerateDevicesFactory({
+            devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+          }),
+          getUserMedia: mockGetUserMediaFactory() as any,
+          pollIntervalMs: defaultPollIntervalMs,
+        });
+        test.on(OutputTest.Events.End, resolve);
+        setTimeout(() => {
+          test.stop(pass);
+        }, defaultDuration);
+      });
+      assert(report);
+      assert.equal(report.didPass, pass);
+    })()));
+  });
+
+  it('should report if passed normally', async function() {
+    const report: OutputTest.Report = await new Promise(resolve => {
+      const test = testOutputDevice({
+        audioContextFactory: mockAudioContextFactory({
+          analyserNodeOptions: { volumeValues },
+        }) as any,
+        audioElementFactory,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+        }),
+        getUserMedia: mockGetUserMediaFactory() as any,
+        pollIntervalMs: defaultPollIntervalMs,
+      });
+      test.on(OutputTest.Events.End, resolve);
+      setTimeout(() => {
+        test.stop();
+      }, defaultDuration);
+    });
+    assert(report);
+    assert(report.didPass);
+  });
+
+  it('should report the default device if not passing in a deviceId', async function() {
+    const report: OutputTest.Report = await new Promise(resolve => {
+      const test = testOutputDevice({
+        audioContextFactory: mockAudioContextFactory() as any,
+        audioElementFactory,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{
+            deviceId: 'foo',
+            kind: 'audiooutput',
+          }, {
+            deviceId: 'bar',
+            kind: 'audiooutput',
+          }] as any,
+        }),
+        getUserMedia: mockGetUserMediaFactory() as any,
+      });
+      test.on(OutputTest.Events.End, resolve);
+      setTimeout(() => {
+        test.stop();
+      }, defaultDuration);
+    });
+    assert(report);
+    assert.equal(report.deviceId, 'foo');
+  });
+
+  it('should report the passed device if passing in a deviceId', async function() {
+    const report: OutputTest.Report = await new Promise(resolve => {
+      const test = testOutputDevice({
+        audioContextFactory: mockAudioContextFactory() as any,
+        audioElementFactory,
+        deviceId: 'bar',
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{
+            deviceId: 'foo',
+            kind: 'audiooutput',
+          }, {
+            deviceId: 'bar',
+            kind: 'audiooutput',
+          }] as any,
+        }),
+        getUserMedia: mockGetUserMediaFactory() as any,
+      });
+      test.on(OutputTest.Events.End, resolve);
+      setTimeout(() => {
+        test.stop();
+      }, defaultDuration);
+    });
+    assert(report);
+    assert.equal(report.deviceId, 'bar');
   });
 
   it('should report a failure if allowed to timeout and `passOnTimeout === false`', async function() {
@@ -200,13 +302,14 @@ describe('testOutputDevice', function() {
     });
   });
 
-  it('should throw if stopped twice', function() {
+  it('should warn if stopped twice', function() {
+    const stub = sinon.stub(console, 'warn');
     const test = testOutputDevice({
       audioContextFactory: mockAudioContextFactory({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
       audioElementFactory,
-      debug: false, // prevent console warnings
+      debug: true,
       enumerateDevices: mockEnumerateDevicesFactory({
         devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
       }),
@@ -216,25 +319,47 @@ describe('testOutputDevice', function() {
     assert(report);
     const shouldBeUndefined = test.stop(false);
     assert.equal(shouldBeUndefined, undefined);
+    assert(stub.callCount);
+    stub.restore();
   });
 
-  it('should report an error if the audio context throws', async function() {
-    await assert.rejects(() => new Promise((_, reject) => {
-      const test = testOutputDevice({
-        audioContextFactory: mockAudioContextFactory({
-          analyserNodeOptions: { volumeValues: 100 },
-          doThrow: { createAnalyser: true },
-        }) as any,
-        audioElementFactory,
-        duration: defaultDuration,
-        enumerateDevices: mockEnumerateDevicesFactory({
-          devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
-        }),
-        getUserMedia: mockGetUserMediaFactory() as any,
-        pollIntervalMs: defaultPollIntervalMs,
+  ([
+    [new DiagnosticError(), 'DiagnosticError'],
+    [new DOMError(), 'DOMError'],
+    [new DOMException(), 'DOMException'],
+    [new Error(), 'an unknown error'],
+  ] as const).forEach(([error, name]) => {
+    describe(`should handle ${name}`, function() {
+      let report: OutputTest.Report | undefined;
+
+      beforeEach(async function() {
+        report = await new Promise(resolve => {
+          const test = testOutputDevice({
+            audioContextFactory: mockAudioContextFactory({
+              throw: { construction: error },
+            }) as any,
+            audioElementFactory,
+            duration: defaultDuration,
+            enumerateDevices: mockEnumerateDevicesFactory({
+              devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
+            }),
+            getUserMedia: mockGetUserMediaFactory() as any,
+            pollIntervalMs: defaultPollIntervalMs,
+          });
+          test.on(OutputTest.Events.Error, () => { /* no-op */ });
+          test.on(OutputTest.Events.End, resolve);
+        });
       });
-      test.on(OutputTest.Events.Error, err => reject(err));
-    }));
+
+      it('should report an error', function() {
+        assert(report);
+        assert.equal(report?.errors.length, 1);
+      });
+
+      afterEach(function() {
+        report = undefined;
+      });
+    });
   });
 
   it('should allow `deviceId` if `setSinkId` is supported', async function() {
@@ -298,5 +423,52 @@ describe('testOutputDevice', function() {
       });
       test.on(OutputTest.Events.Error, err => reject(err));
     }));
+  });
+
+  it('should throw `InvalidOptions` error if passed invalid options', async function() {
+    const report: OutputTest.Report = await new Promise(resolve => {
+      const test = testOutputDevice({
+        audioContextFactory: mockAudioContextFactory() as any,
+        audioElementFactory: mockAudioElementFactory() as any,
+        deviceId: {} as any, // is invalid because not type `string`
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{
+            deviceId: 'foobar',
+            groupId: 'biffbazz',
+            kind: 'audioinput',
+            label: 'test-device',
+            toJSON: () => 'some-json',
+          }],
+        }) as any,
+      });
+      test.on(OutputTest.Events.Error, () => { /* no-op */ });
+      test.on(OutputTest.Events.End, resolve);
+    });
+    assert.equal(report.errors.length, 1);
+    assert(report.errors[0] instanceof DiagnosticError);
+    assert.equal(report.errors[0].name, 'InvalidOptionsError');
+  });
+
+  it('should throw `UnsupportedError` if `gUM` is not defined', async function() {
+    const report: OutputTest.Report = await new Promise(resolve => {
+      const test = testOutputDevice({
+        audioContextFactory: mockAudioContextFactory() as any,
+        audioElementFactory: mockAudioElementFactory() as any,
+        enumerateDevices: mockEnumerateDevicesFactory({
+          devices: [{
+            deviceId: 'foobar',
+            groupId: 'biffbazz',
+            kind: 'audioinput',
+            label: 'test-device',
+            toJSON: () => 'some-json',
+          }],
+        }) as any,
+      });
+      test.on(OutputTest.Events.Error, () => { /* no-op */ });
+      test.on(OutputTest.Events.End, resolve);
+    });
+    assert.equal(report.errors.length, 1);
+    assert(report.errors[0] instanceof DiagnosticError);
+    assert.equal(report.errors[0].name, 'UnsupportedError');
   });
 });

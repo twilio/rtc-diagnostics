@@ -17,6 +17,10 @@ import {
   getUserMedia,
   GetUserMediaUnsupportedError,
 } from './polyfills';
+import {
+  DOMError,
+  DOMException,
+} from './polyfills/errors';
 import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {
@@ -336,6 +340,9 @@ export class OutputTest extends EventEmitter {
       if (!this._options.enumerateDevices) {
         throw EnumerateDevicesUnsupportedError;
       }
+      this._defaultDevices = getDefaultDevices(
+        await this._options.enumerateDevices(),
+      );
 
       if (!this._options.getUserMedia) {
         throw GetUserMediaUnsupportedError;
@@ -453,8 +460,6 @@ export class OutputTest extends EventEmitter {
         this._audio.src.playPromise,
         this._audio.dest.playPromise,
       ]);
-
-      this._defaultDevices = await getDefaultDevices();
 
       this._volumeTimeout = setTimeout(
         volumeEvent,
