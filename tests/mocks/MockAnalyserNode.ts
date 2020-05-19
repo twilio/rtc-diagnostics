@@ -10,6 +10,7 @@ export class MockAnalyserNode {
   constructor(options: MockAnalyserNode.Options = MockAnalyserNode.defaultOptions) {
     this._options = options;
   }
+  connect() {}
   disconnect() {}
   getByteFrequencyData(byteArray: Uint8Array) {
     byteArray.fill(this._options.volumeValues);

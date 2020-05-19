@@ -15,7 +15,6 @@ import { AudioElement } from '../../lib/types';
 import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockAudioElementFactory } from '../mocks/MockAudioElement';
 import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
-import { mockGetUserMediaFactory } from '../mocks/mockGetUserMedia';
 
 const defaultDuration = 100;
 const defaultPollIntervalMs = 1;
@@ -40,7 +39,6 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          getUserMedia: mockGetUserMediaFactory() as any,
           pollIntervalMs: defaultPollIntervalMs,
         }).on(OutputTest.Events.End, (r) => resolve(r));
       });
@@ -78,7 +76,6 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          getUserMedia: mockGetUserMediaFactory() as any,
           pollIntervalMs: defaultPollIntervalMs,
         }).on(OutputTest.Events.End, (r) => resolve(r));
       });
@@ -111,7 +108,6 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          getUserMedia: mockGetUserMediaFactory() as any,
           pollIntervalMs: defaultPollIntervalMs,
         });
         test.on(OutputTest.Events.End, resolve);
@@ -134,7 +130,6 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
         }),
-        getUserMedia: mockGetUserMediaFactory() as any,
         pollIntervalMs: defaultPollIntervalMs,
       });
       test.on(OutputTest.Events.End, resolve);
@@ -160,7 +155,6 @@ describe('testOutputDevice', function() {
             kind: 'audiooutput',
           }] as any,
         }),
-        getUserMedia: mockGetUserMediaFactory() as any,
       });
       test.on(OutputTest.Events.End, resolve);
       setTimeout(() => {
@@ -186,7 +180,6 @@ describe('testOutputDevice', function() {
             kind: 'audiooutput',
           }] as any,
         }),
-        getUserMedia: mockGetUserMediaFactory() as any,
       });
       test.on(OutputTest.Events.End, resolve);
       setTimeout(() => {
@@ -207,7 +200,6 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
         }),
-        getUserMedia: mockGetUserMediaFactory() as any,
         passOnTimeout: false,
         pollIntervalMs: defaultPollIntervalMs,
       });
@@ -245,7 +237,6 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          getUserMedia: mockGetUserMediaFactory() as any,
         });
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -266,7 +257,6 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          getUserMedia: mockGetUserMediaFactory() as any,
         });
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -286,7 +276,6 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          getUserMedia: mockGetUserMediaFactory() as any,
         });
         test.on(OutputTest.Events.Error, () => {
           // do nothing, prevent rejection
@@ -313,7 +302,6 @@ describe('testOutputDevice', function() {
       enumerateDevices: mockEnumerateDevicesFactory({
         devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
       }),
-      getUserMedia: mockGetUserMediaFactory() as any,
     });
     const report = test.stop(false);
     assert(report);
@@ -343,7 +331,6 @@ describe('testOutputDevice', function() {
             enumerateDevices: mockEnumerateDevicesFactory({
               devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
             }),
-            getUserMedia: mockGetUserMediaFactory() as any,
             pollIntervalMs: defaultPollIntervalMs,
           });
           test.on(OutputTest.Events.Error, () => { /* no-op */ });
@@ -374,7 +361,6 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
         }),
-        getUserMedia: mockGetUserMediaFactory() as any,
         pollIntervalMs: defaultPollIntervalMs,
       });
       test.on(OutputTest.Events.End, (r) => resolve(r));
@@ -392,7 +378,6 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
         }),
-        getUserMedia: mockGetUserMediaFactory() as any,
       });
       test.on(OutputTest.Events.Error, err => reject(err));
     }));
@@ -402,9 +387,8 @@ describe('testOutputDevice', function() {
     await assert.rejects(() => new Promise((_, reject) => {
       const test = testOutputDevice({
         audioContextFactory: mockAudioContextFactory() as any,
-        audioElementFactory: mockAudioElementFactory() as any,
+        audioElementFactory,
         deviceId: 'foobar',
-        getUserMedia: mockGetUserMediaFactory() as any,
       });
       test.on(OutputTest.Events.Error, err => reject(err));
     }));
@@ -419,7 +403,6 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [],
         }),
-        getUserMedia: mockGetUserMediaFactory() as any,
       });
       test.on(OutputTest.Events.Error, err => reject(err));
     }));
@@ -447,28 +430,5 @@ describe('testOutputDevice', function() {
     assert.equal(report.errors.length, 1);
     assert(report.errors[0] instanceof DiagnosticError);
     assert.equal(report.errors[0].name, 'InvalidOptionsError');
-  });
-
-  it('should throw `UnsupportedError` if `gUM` is not defined', async function() {
-    const report: OutputTest.Report = await new Promise(resolve => {
-      const test = testOutputDevice({
-        audioContextFactory: mockAudioContextFactory() as any,
-        audioElementFactory: mockAudioElementFactory() as any,
-        enumerateDevices: mockEnumerateDevicesFactory({
-          devices: [{
-            deviceId: 'foobar',
-            groupId: 'biffbazz',
-            kind: 'audioinput',
-            label: 'test-device',
-            toJSON: () => 'some-json',
-          }],
-        }) as any,
-      });
-      test.on(OutputTest.Events.Error, () => { /* no-op */ });
-      test.on(OutputTest.Events.End, resolve);
-    });
-    assert.equal(report.errors.length, 1);
-    assert(report.errors[0] instanceof DiagnosticError);
-    assert.equal(report.errors[0].name, 'UnsupportedError');
   });
 });
