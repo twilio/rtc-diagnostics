@@ -9,15 +9,12 @@ import {
   OutputTest,
   testOutputDevice,
 } from '../../lib/OutputTest';
-import { isFirefox } from './testUtils/browser';
 
 const suiteTimeout = 10000;
 const defaultTestDuration = 5000;
 const defaultTestPollIntervalMs = 10;
 
-const skipIfFirefox = isFirefox() ? describe.skip : describe;
-
-skipIfFirefox('testOutputDevice', function() {
+describe('testOutputDevice', function() {
   this.timeout(suiteTimeout);
   describe('when not given a testURI', function() {
     describe('when allowed to time out', function() {

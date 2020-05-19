@@ -9,10 +9,10 @@ import {
   AudioContext,
   AudioContextUnsupportedError,
   enumerateDevices,
+  EnumerateDevicesUnsupportedError,
   getDefaultDevices,
   getUserMedia,
   GetUserMediaUnsupportedError,
-  EnumerateDevicesUnsupportedError,
 } from './polyfills';
 import { SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';

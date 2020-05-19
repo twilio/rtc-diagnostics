@@ -337,12 +337,27 @@ export class OutputTest extends EventEmitter {
         throw new InvalidOptionsError(invalidReasons);
       }
 
-      if (!this._options.enumerateDevices) {
-        throw EnumerateDevicesUnsupportedError;
+      if (!this._options.audioElementFactory) {
+        throw AudioUnsupportedError;
       }
-      this._defaultDevices = getDefaultDevices(
-        await this._options.enumerateDevices(),
-      );
+      const setSinkIdSupported: boolean =
+        typeof this._options.audioElementFactory.prototype.setSinkId === 'function';
+      if (setSinkIdSupported) {
+        if (!this._options.enumerateDevices) {
+          throw EnumerateDevicesUnsupportedError;
+        }
+
+        const devices: MediaDeviceInfo[] = await this._options.enumerateDevices();
+
+        const numberOutputDevices: number = devices.filter(
+          (device: MediaDeviceInfo) => device.kind === 'audiooutput',
+        ).length;
+        if (numberOutputDevices === 0) {
+          throw new DiagnosticError(undefined, 'No output devices found.');
+        }
+
+        this._defaultDevices = getDefaultDevices(devices);
+      }
 
       if (!this._options.getUserMedia) {
         throw GetUserMediaUnsupportedError;
@@ -354,24 +369,10 @@ export class OutputTest extends EventEmitter {
       // enumerate devices, so we can just close out the tracks we got.
       mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
 
-      const devices: MediaDeviceInfo[] = await this._options.enumerateDevices();
-
-      const numberOutputDevices: number = devices.filter(
-        (device: MediaDeviceInfo) => device.kind === 'audiooutput',
-      ).length;
-
-      if (numberOutputDevices === 0) {
-        throw new DiagnosticError(undefined, 'No output devices found.');
-      }
-
       if (!this._options.audioContextFactory) {
         throw AudioContextUnsupportedError;
       }
       this._audioContext = new this._options.audioContextFactory();
-
-      if (!this._options.audioElementFactory) {
-        throw AudioUnsupportedError;
-      }
 
       // We need two audio elements, one to load the media from the URI and
       // one to output audio.
