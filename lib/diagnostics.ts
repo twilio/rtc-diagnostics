@@ -1,6 +1,5 @@
 import { BitrateTest, testBitrate } from './BitrateTest';
 import { InputTest, testInputDevice } from './InputTest';
-import { NetworkTest, testNetwork } from './NetworkTest';
 import { OutputTest, testOutputDevice } from './OutputTest';
 
 /**
@@ -25,7 +24,6 @@ window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
   testBitrate,
   testInputDevice,
-  testNetwork,
   testOutputDevice,
 };
 
@@ -35,10 +33,8 @@ window.Twilio.Diagnostics = {
 export {
   BitrateTest,
   InputTest,
-  NetworkTest,
   OutputTest,
   testBitrate,
   testInputDevice,
-  testNetwork,
   testOutputDevice,
 };

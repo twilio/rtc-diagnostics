@@ -15,7 +15,3 @@ export {
   getUserMediaPolyfill as getUserMedia,
   GetUserMediaUnsupportedError,
 } from './getUserMedia';
-export {
-  networkInformationPolyfill as networkInformation,
-  NetworkInformation,
-} from './NetworkInformation';
