@@ -4,6 +4,9 @@
  */
 /* tslint:disable ordered-imports */
 
+// Set up global mocks.
+import './mock.ts';
+
 import './InputTest';
 import './NetworkTest';
 import './OutputTest';

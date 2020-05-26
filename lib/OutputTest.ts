@@ -15,10 +15,6 @@ import {
   EnumerateDevicesUnsupportedError,
   getDefaultDevices,
 } from './polyfills';
-import {
-  DOMError,
-  DOMException,
-} from './polyfills/errors';
 import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {

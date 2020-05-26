@@ -7,10 +7,6 @@ import {
   OutputTest,
   testOutputDevice,
 } from '../../lib/OutputTest';
-import {
-  DOMError,
-  DOMException,
-} from '../../lib/polyfills/errors';
 import { AudioElement } from '../../lib/types';
 import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockAudioElementFactory } from '../mocks/MockAudioElement';
@@ -313,8 +309,8 @@ describe('testOutputDevice', function() {
 
   ([
     [new DiagnosticError(), 'DiagnosticError'],
-    [new DOMError(), 'DOMError'],
-    [new DOMException(), 'DOMException'],
+    [new (global as any).DOMError(), 'DOMError'],
+    [new (global as any).DOMException(), 'DOMException'],
     [new Error(), 'an unknown error'],
   ] as const).forEach(([error, name]) => {
     describe(`should handle ${name}`, function() {
