@@ -152,7 +152,7 @@ export function validateString(option: any): Validity {
 
 /**
  * @internalapi
- * Validate a time-based parameter, i.e. duration or poll interval.
+ * Validate a time-based parameter, i.e. duration or interval.
  * @param option The duration of time to validate
  * @returns A possibly undefined string, if the time is valid it will return
  * undefined, otherwise an error message

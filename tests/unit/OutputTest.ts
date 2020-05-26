@@ -12,7 +12,7 @@ import { mockAudioElementFactory } from '../mocks/MockAudioElement';
 import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
 
 const defaultDuration = 100;
-const defaultPollIntervalMs = 1;
+const defaultVolumeEventIntervalMs = 1;
 
 describe('testOutputDevice', function() {
   const audioElementFactory: (new () => AudioElement) = mockAudioElementFactory({
@@ -34,7 +34,7 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          pollIntervalMs: defaultPollIntervalMs,
+          volumeEventIntervalMs: defaultVolumeEventIntervalMs,
         }).on(OutputTest.Events.End, (r) => resolve(r));
       });
     });
@@ -71,7 +71,7 @@ describe('testOutputDevice', function() {
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
-          pollIntervalMs: defaultPollIntervalMs,
+          volumeEventIntervalMs: defaultVolumeEventIntervalMs,
         }).on(OutputTest.Events.End, (r) => resolve(r));
       });
     });
@@ -103,7 +103,7 @@ describe('testOutputDevice', function() {
           devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
         }),
         passOnTimeout: false,
-        pollIntervalMs: defaultPollIntervalMs,
+        volumeEventIntervalMs: defaultVolumeEventIntervalMs,
       });
       test.on(OutputTest.Events.Error, err => {
         result['error'] = err;
@@ -222,7 +222,7 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
         }),
-        pollIntervalMs: defaultPollIntervalMs,
+        volumeEventIntervalMs: defaultVolumeEventIntervalMs,
       });
       test.on(OutputTest.Events.Error, err => reject(err));
     }));
@@ -240,7 +240,7 @@ describe('testOutputDevice', function() {
         enumerateDevices: mockEnumerateDevicesFactory({
           devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
         }),
-        pollIntervalMs: defaultPollIntervalMs,
+        volumeEventIntervalMs: defaultVolumeEventIntervalMs,
       });
       test.on(OutputTest.Events.End, (r) => resolve(r));
       test.stop(true);

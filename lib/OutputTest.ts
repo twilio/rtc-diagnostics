@@ -49,7 +49,7 @@ export declare interface OutputTest {
   ): boolean;
   /**
    * This event is emitted by the test after succesfully starting, and emits
-   * the volume of the audio source every [[OutputTest.Options.pollIntervalMs]]
+   * the volume of the audio source every [[OutputTest.Options.volumeEventIntervalMs]]
    * milliseconds.
    * @param event [[OutputTest.Events.Volume]]
    * @param value The volume of the audio source.
@@ -90,7 +90,7 @@ export declare interface OutputTest {
     listener: (error: DiagnosticError) => any,
   ): this;
   /**
-   * Raised every [[OutputTest.Options.pollIntervalMs]] after the test
+   * Raised every [[OutputTest.Options.volumeEventIntervalMs]] after the test
    * starts successfully. Will have a `number` parameter representing the
    * current volume of the audio file.
    * @event
@@ -142,8 +142,8 @@ export class OutputTest extends EventEmitter {
     duration: Infinity,
     enumerateDevices,
     passOnTimeout: true,
-    pollIntervalMs: 100,
     testURI: INCOMING_SOUND_URL,
+    volumeEventIntervalMs: 100,
   };
 
   /**
@@ -316,7 +316,7 @@ export class OutputTest extends EventEmitter {
         await validateOptions<OutputTest.Options>(this._options, {
           deviceId: validateDeviceId,
           duration: validateTime,
-          pollIntervalMs: validateTime,
+          volumeEventIntervalMs: validateTime,
         });
 
       if (invalidReasons) {
@@ -404,7 +404,7 @@ export class OutputTest extends EventEmitter {
         } else {
           this._volumeTimeout = setTimeout(
             volumeEvent,
-            this._options.pollIntervalMs,
+            this._options.volumeEventIntervalMs,
           );
         }
       };
@@ -416,7 +416,7 @@ export class OutputTest extends EventEmitter {
 
       this._volumeTimeout = setTimeout(
         volumeEvent,
-        this._options.pollIntervalMs,
+        this._options.volumeEventIntervalMs,
       );
     } catch (error) {
       if (error instanceof DiagnosticError) {
@@ -517,15 +517,15 @@ export namespace OutputTest {
     passOnTimeout?: boolean;
 
     /**
-     * The polling rate to emit volume events in milliseconds.
-     * @default 100
-     */
-    pollIntervalMs?: number;
-
-    /**
      * The URI of the audio file to use for the test.
      */
     testURI?: string;
+
+    /**
+     * The interval between emissions of volume events in milliseconds.
+     * @default 100
+     */
+    volumeEventIntervalMs?: number;
   }
 
   /**
@@ -573,7 +573,7 @@ export namespace OutputTest {
    * @private
    */
   export type InternalOptions = SubsetRequired<Options,
-    'doLoop' | 'duration' | 'passOnTimeout' | 'pollIntervalMs' | 'testURI'>;
+    'doLoop' | 'duration' | 'passOnTimeout' | 'volumeEventIntervalMs' | 'testURI'>;
 }
 
 /**

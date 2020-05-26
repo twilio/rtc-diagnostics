@@ -47,7 +47,7 @@ export declare interface InputTest {
   ): boolean;
   /**
    * This event is emitted with a volume level every
-   * [[InputTest.Options.pollIntervalMs]] after the test starts succesfully.
+   * [[InputTest.Options.volumeEventIntervalMs]] after the test starts succesfully.
    * @param event [[InputTest.Events.Volume]]
    * @param value The current volume of the audio source.
    * @private
@@ -83,7 +83,7 @@ export declare interface InputTest {
     listener: (error: DiagnosticError) => any,
   ): this;
   /**
-   * Raised by the test every [[Options.pollIntervalMs]] amount of
+   * Raised by the test every [[Options.volumeEventIntervalMs]] amount of
    * milliseconds with a parameter of type `number` that represents the
    * current volume of the audio stream.
    * @param event [[InputTest.Events.Volume]]
@@ -120,7 +120,7 @@ export class InputTest extends EventEmitter {
     duration: Infinity,
     enumerateDevices,
     getUserMedia,
-    pollIntervalMs: 100,
+    volumeEventIntervalMs: 100,
   };
 
   /**
@@ -261,8 +261,8 @@ export class InputTest extends EventEmitter {
   }
 
   /**
-   * Called every `InputTest._options.pollingRate` ms, emits the volume passed
-   * to it as a `Events.Volume` event.
+   * Called every `InputTest._options.volumeEventIntervalMs` amount of
+   * milliseconds, emits the volume passed to it as a `Events.Volume` event.
    * @param value the volume
    */
   private _onVolume(value: number): void {
@@ -303,7 +303,7 @@ export class InputTest extends EventEmitter {
         await validateOptions<InputTest.Options>(this._options, {
           deviceId: validateDeviceId,
           duration: validateTime,
-          pollIntervalMs: validateTime,
+          volumeEventIntervalMs: validateTime,
         });
       if (invalidReasons) {
         throw new InvalidOptionsError(invalidReasons);
@@ -362,14 +362,14 @@ export class InputTest extends EventEmitter {
         } else {
           this._volumeTimeout = setTimeout(
             volumeEvent,
-            this._options.pollIntervalMs,
+            this._options.volumeEventIntervalMs,
           );
         }
       };
 
       this._volumeTimeout = setTimeout(
         volumeEvent,
-        this._options.pollIntervalMs,
+        this._options.volumeEventIntervalMs,
       );
     } catch (error) {
       if (error instanceof DiagnosticError) {
@@ -486,17 +486,17 @@ export namespace InputTest {
     getUserMedia?: typeof window.navigator.mediaDevices.getUserMedia;
 
     /**
-     * The polling rate to emit volume events in milliseconds.
+     * The interval between emissions of volume events in milliseconds.
      * @default 100
      */
-    pollIntervalMs?: number;
+    volumeEventIntervalMs?: number;
   }
 
   /**
    * Option typing after initialization, so we can have type guarantees.
    * @private
    */
-  export type InternalOptions = SubsetRequired<Options, 'duration' | 'pollIntervalMs'>;
+  export type InternalOptions = SubsetRequired<Options, 'duration' | 'volumeEventIntervalMs'>;
 }
 
 /**
