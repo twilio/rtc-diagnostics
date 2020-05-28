@@ -8,7 +8,6 @@
 import './mock.ts';
 
 import './InputTest';
-import './NetworkTest';
 import './OutputTest';
 import './utils';
 import './utils/optionValidation';
