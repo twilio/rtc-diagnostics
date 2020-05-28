@@ -131,7 +131,7 @@ export function createAudioDeviceValidator(
  * otherwise `undefined`.
  */
 export function validateDeviceId(option: any): Validity {
-  if (option  && typeof option !== 'string') {
+  if (option && typeof option !== 'string') {
     return 'If "deviceId" is defined, it must be a "string".';
   }
 }

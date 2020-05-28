@@ -12,11 +12,9 @@ import {
   AudioContextUnsupportedError,
   AudioUnsupportedError,
   enumerateDevices,
-} from './polyfills';
-import {
   EnumerateDevicesUnsupportedError,
   getDefaultDevices,
-} from './polyfills/enumerateDevices';
+} from './polyfills';
 import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {
@@ -147,13 +145,13 @@ export class OutputTest extends EventEmitter {
   };
 
   /**
+   * Holds `AudioElement`s that are attached to the DOM to load and play audio.
+   */
+  private _audio: AudioElement[] = [];
+  /**
    * An `AudioContext` that is used to process the audio source.
    */
   private _audioContext: AudioContext | null = null;
-  /**
-   * An `AudioElement` that is attached to the DOM to play audio.
-   */
-  private _audioElement: AudioElement | null = null;
   /**
    * The default media devices when starting the test.
    */
@@ -174,11 +172,6 @@ export class OutputTest extends EventEmitter {
    * time of the test.
    */
   private _options: OutputTest.InternalOptions;
-  /**
-   * A Promise that resolves when the `AudioElement` successfully starts playing
-   * audio. Will reject if not possible.
-   */
-  private _playPromise: Promise<void> | null = null;
   /**
    * A timestamp of when the test starts. This is set in the constructor and not
    * when the test succesfully starts.
@@ -258,17 +251,9 @@ export class OutputTest extends EventEmitter {
     if (this._audioContext) {
       this._audioContext.close();
     }
-    if (this._playPromise) {
-      this._playPromise.then(() => {
-        // we need to try to wait for the call to play to finish before we can
-        // pause the audio
-        if (this._audioElement) {
-          this._audioElement.pause();
-        }
-      }).catch(() => {
-        // this means play errored out so we do nothing
-      });
-    }
+    this._audio.forEach((audio: AudioElement) => {
+      audio.pause();
+    });
   }
 
   /**
@@ -318,58 +303,50 @@ export class OutputTest extends EventEmitter {
           duration: validateTime,
           volumeEventIntervalMs: validateTime,
         });
-
       if (invalidReasons) {
         throw new InvalidOptionsError(invalidReasons);
       }
 
-      if (!this._options.enumerateDevices) {
-        throw EnumerateDevicesUnsupportedError;
-      }
-
-      const devices: MediaDeviceInfo[] = await this._options.enumerateDevices();
-
-      const numberOutputDevices: number = devices.filter(
-        (device: MediaDeviceInfo) => device.kind === 'audiooutput',
-      ).length;
-
-      if (numberOutputDevices === 0) {
-        throw new DiagnosticError(undefined, 'No output devices found.');
-      }
-
-      if (!this._options.audioContextFactory) {
-        throw AudioContextUnsupportedError;
-      }
-      this._audioContext = new this._options.audioContextFactory();
-
       if (!this._options.audioElementFactory) {
         throw AudioUnsupportedError;
       }
-      this._audioElement =
-        new this._options.audioElementFactory(this._options.testURI);
-      this._audioElement.setAttribute('crossorigin', 'anonymous');
-      this._audioElement.loop = !!this._options.doLoop;
-
-      if (this._options.deviceId) {
-        if (this._audioElement.setSinkId) {
-          await this._audioElement.setSinkId(this._options.deviceId);
-        } else {
-          // Non-fatal error
-          this._onError(new UnsupportedError(
-            'A `deviceId` was passed to the `OutputTest` but `setSinkId` is ' +
-            'not supported in this browser.',
-          ));
-        }
+      if (!this._options.audioContextFactory) {
+        throw AudioContextUnsupportedError;
       }
 
-      const source: MediaElementAudioSourceNode =
-        this._audioContext.createMediaElementSource(this._audioElement);
-      source.connect(this._audioContext.destination);
+      const setSinkIdSupported: boolean =
+        typeof this._options.audioElementFactory.prototype.setSinkId === 'function';
+      if (setSinkIdSupported) {
+        if (!this._options.enumerateDevices) {
+          throw EnumerateDevicesUnsupportedError;
+        }
+
+        const devices: MediaDeviceInfo[] = await this._options.enumerateDevices();
+
+        const numberOutputDevices: number = devices.filter(
+          (device: MediaDeviceInfo) => device.kind === 'audiooutput',
+        ).length;
+        if (numberOutputDevices === 0) {
+          throw new DiagnosticError(undefined, 'No output devices found.');
+        }
+
+        this._defaultDevices = getDefaultDevices(devices);
+      }
+
+      this._audioContext = new this._options.audioContextFactory();
+
+      const sourceAudio: AudioElement =
+        new this._options.audioElementFactory(this._options.testURI);
+      sourceAudio.setAttribute('crossorigin', 'anonymous');
+      sourceAudio.loop = !!this._options.doLoop;
+
+      const sourceNode: MediaElementAudioSourceNode =
+        this._audioContext.createMediaElementSource(sourceAudio);
 
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
       analyser.fftSize = 64;
-      source.connect(analyser);
+      sourceNode.connect(analyser);
 
       const frequencyDataBytes: Uint8Array =
         new Uint8Array(analyser.frequencyBinCount);
@@ -391,7 +368,7 @@ export class OutputTest extends EventEmitter {
           Date.now() - this._startTime > this._options.duration;
         const stop: boolean = this._options.doLoop
           ? isTimedOut
-          : (this._audioElement && this._audioElement.ended) || isTimedOut;
+          : sourceAudio.ended || isTimedOut;
 
         if (stop) {
           if (this._options.passOnTimeout === false) {
@@ -409,10 +386,32 @@ export class OutputTest extends EventEmitter {
         }
       };
 
-      this._playPromise = this._audioElement.play();
-      await this._playPromise;
+      if (this._options.deviceId && setSinkIdSupported) {
+        const destinationNode: MediaStreamAudioDestinationNode =
+          this._audioContext.createMediaStreamDestination();
+        analyser.connect(destinationNode);
 
-      this._defaultDevices = await getDefaultDevices();
+        const destinationAudio: AudioElement =
+          new this._options.audioElementFactory();
+        destinationAudio.loop = !!this._options.doLoop;
+        destinationAudio.srcObject = destinationNode.stream;
+
+        await destinationAudio.setSinkId?.(this._options.deviceId);
+        await destinationAudio.play();
+        this._audio.push(destinationAudio);
+      } else {
+        if (this._options.deviceId && !setSinkIdSupported) {
+          // Non-fatal error
+          this._onError(new UnsupportedError(
+            'A `deviceId` was passed to the `OutputTest` but `setSinkId` is ' +
+            'not supported in this browser.',
+          ));
+        }
+        analyser.connect(this._audioContext.destination);
+      }
+
+      await sourceAudio.play();
+      this._audio.push(sourceAudio);
 
       this._volumeTimeout = setTimeout(
         volumeEvent,

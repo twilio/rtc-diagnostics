@@ -5,6 +5,7 @@
  */
 export interface AudioElement extends HTMLAudioElement {
   setSinkId?: (sinkId: string) => Promise<void>;
+  sinkId?: string;
 }
 
 /**

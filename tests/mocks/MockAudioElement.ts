@@ -1,19 +1,22 @@
-// tslint:disable no-empty
+// tslint:disable no-empty max-classes-per-file
 
 export const mockAudioElementFactory = (
   options: MockAudioElement.Options = {},
-) => class {
-  loop = false;
-  setSinkId?: () => void;
-  constructor() {
-    if (options.supportSetSinkId) {
-      this.setSinkId = () => {};
-    }
-  }
-  pause() {}
-  async play() {}
-  setAttribute() {}
-};
+) =>
+  options.supportSetSinkId
+    ? class {
+        loop = false;
+        pause() {}
+        async play() {}
+        setAttribute() {}
+        async setSinkId() {}
+      }
+    : class {
+        loop = false;
+        pause() {}
+        async play() {}
+        setAttribute() {}
+      };
 
 export namespace MockAudioElement {
   export interface Options {

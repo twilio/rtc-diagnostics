@@ -2,14 +2,15 @@
 
 export class MockAnalyserNode {
   static defaultOptions: MockAnalyserNode.Options = {
-    volumeValues: 0,
+    volumeValues: 100,
   };
   fftSize = 0;
   smoothingTimeConstant = 0;
   private _options: MockAnalyserNode.Options;
-  constructor(options: MockAnalyserNode.Options) {
+  constructor(options: MockAnalyserNode.Options = MockAnalyserNode.defaultOptions) {
     this._options = options;
   }
+  connect() {}
   disconnect() {}
   getByteFrequencyData(byteArray: Uint8Array) {
     byteArray.fill(this._options.volumeValues);
