@@ -9,7 +9,7 @@ import {
 } from '../../lib/InputTest';
 
 const defaultTestDuration = 500;
-const defaultTestPollIntervalMs = 5;
+const defaultTestVolumeEventIntervalMs = 5;
 
 describe('testInputDevice', function() {
   describe('with a deviceId', function() {
@@ -26,7 +26,7 @@ describe('testInputDevice', function() {
         const test = testInputDevice({
           debug: false,
           duration: defaultTestDuration,
-          pollIntervalMs: defaultTestPollIntervalMs,
+          volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
         });
         test.on(InputTest.Events.Error, errorHandler);
         test.on(InputTest.Events.Volume, volumeHandler);
@@ -34,7 +34,7 @@ describe('testInputDevice', function() {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
-          setTimeout(() => resolve(), defaultTestPollIntervalMs * 3);
+          setTimeout(() => resolve(), defaultTestVolumeEventIntervalMs * 3);
         });
       });
     });
@@ -101,7 +101,7 @@ describe('testInputDevice', function() {
         const test = testInputDevice({
           debug: false,
           duration: defaultTestDuration,
-          pollIntervalMs: defaultTestPollIntervalMs,
+          volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
         });
         test.on(InputTest.Events.Error, errorHandler);
         test.on(InputTest.Events.Volume, volumeHandler);
@@ -109,7 +109,7 @@ describe('testInputDevice', function() {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
-          setTimeout(() => resolve(), defaultTestPollIntervalMs * 3);
+          setTimeout(() => resolve(), defaultTestVolumeEventIntervalMs * 3);
         });
       });
     });

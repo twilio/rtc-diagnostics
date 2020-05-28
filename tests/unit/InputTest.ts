@@ -13,7 +13,7 @@ import { MockMediaStream } from '../mocks/MockMediaStream';
 import { MockTrack } from '../mocks/MockTrack';
 
 const defaultDuration = 100;
-const defaultPollIntervalMs = 10;
+const defaultVolumeEventIntervalMs = 10;
 
 const getUserMedia = mockGetUserMediaFactory({
   mediaStream: new MockMediaStream({
@@ -37,7 +37,7 @@ describe('testInputDevice', function() {
             devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
           }),
           getUserMedia,
-          pollIntervalMs: defaultPollIntervalMs,
+          volumeEventIntervalMs: defaultVolumeEventIntervalMs,
         });
         test.on(InputTest.Events.End, (r) => resolve(r));
       });
@@ -62,7 +62,7 @@ describe('testInputDevice', function() {
             devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
           }),
           getUserMedia,
-          pollIntervalMs: defaultPollIntervalMs,
+          volumeEventIntervalMs: defaultVolumeEventIntervalMs,
         }).on(InputTest.Events.End, (r) => resolve(r));
       });
     });
@@ -168,7 +168,7 @@ describe('testInputDevice', function() {
           devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
         }),
         getUserMedia,
-        pollIntervalMs: defaultPollIntervalMs,
+        volumeEventIntervalMs: defaultVolumeEventIntervalMs,
       });
       test.on(InputTest.Events.Error, e => reject(e));
     }));

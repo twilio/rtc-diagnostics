@@ -12,7 +12,7 @@ import {
 
 const suiteTimeout = 10000;
 const defaultTestDuration = 5000;
-const defaultTestPollIntervalMs = 10;
+const defaultTestVolumeEventIntervalMs = 10;
 
 describe('testOutputDevice', function() {
   this.timeout(suiteTimeout);
@@ -26,7 +26,7 @@ describe('testOutputDevice', function() {
           const test = testOutputDevice({
             duration: defaultTestDuration,
             passOnTimeout: false,
-            pollIntervalMs: defaultTestPollIntervalMs,
+            volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
           });
           test.on(OutputTest.Events.Volume, () => {
             outputTestEvents.push(OutputTest.Events.Volume);
@@ -36,7 +36,7 @@ describe('testOutputDevice', function() {
           });
           test.on(OutputTest.Events.End, (report) => {
             outputTestEvents.push(OutputTest.Events.End);
-            setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
+            setTimeout(() => resolve(report), defaultTestVolumeEventIntervalMs * 3);
           });
         });
       });
@@ -62,7 +62,7 @@ describe('testOutputDevice', function() {
           let timeoutId: any;
           const test = testOutputDevice({
             duration: Infinity,
-            pollIntervalMs: defaultTestPollIntervalMs,
+            volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
           });
           test.on(OutputTest.Events.Volume, () => {
             outputTestEvents.push(OutputTest.Events.Volume);
@@ -70,7 +70,7 @@ describe('testOutputDevice', function() {
           test.on(OutputTest.Events.End, (report) => {
             outputTestEvents.push(OutputTest.Events.End);
             clearTimeout(timeoutId);
-            setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
+            setTimeout(() => resolve(report), defaultTestVolumeEventIntervalMs * 3);
           });
           timeoutId = setTimeout(() => test.stop(true), defaultTestDuration);
         });
@@ -112,7 +112,7 @@ describe('testOutputDevice', function() {
         let timeoutId: any;
         const test = testOutputDevice({
           duration: Infinity,
-          pollIntervalMs: defaultTestPollIntervalMs,
+          volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
         });
         test.on(OutputTest.Events.Volume, () => {
           outputTestEvents.push(OutputTest.Events.Volume);
@@ -120,7 +120,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.End, (report) => {
           outputTestEvents.push(OutputTest.Events.End);
           clearTimeout(timeoutId);
-          setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
+          setTimeout(() => resolve(report), defaultTestVolumeEventIntervalMs * 3);
         });
         timeoutId = setTimeout(() => test.stop(false), defaultTestDuration);
       });
@@ -140,8 +140,8 @@ describe('testOutputDevice', function() {
         let timeoutId: any;
         const test = testOutputDevice({
           duration: Infinity,
-          pollIntervalMs: defaultTestPollIntervalMs,
           testURI: INCOMING_SOUND_URL,
+          volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
         });
         test.on(OutputTest.Events.Volume, () => {
           outputTestEvents.push(OutputTest.Events.Volume);
@@ -149,7 +149,7 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.End, (report) => {
           outputTestEvents.push(OutputTest.Events.End);
           clearTimeout(timeoutId);
-          setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
+          setTimeout(() => resolve(report), defaultTestVolumeEventIntervalMs * 3);
         });
         test.on(OutputTest.Events.Error, () => {
           outputTestEvents.push(OutputTest.Events.Error);
@@ -175,15 +175,15 @@ describe('testOutputDevice', function() {
       outputTestReport = await new Promise(resolve => {
         const test = testOutputDevice({
           duration: Infinity,
-          pollIntervalMs: defaultTestPollIntervalMs,
           testURI: '',
+          volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
         });
         test.on(OutputTest.Events.Volume, () => {
           outputTestEvents.push(OutputTest.Events.Volume);
         });
         test.on(OutputTest.Events.End, (report) => {
           outputTestEvents.push(OutputTest.Events.End);
-          setTimeout(() => resolve(report), defaultTestPollIntervalMs * 3);
+          setTimeout(() => resolve(report), defaultTestVolumeEventIntervalMs * 3);
         });
         test.on(OutputTest.Events.Error, () => {
           outputTestEvents.push(OutputTest.Events.Error);
