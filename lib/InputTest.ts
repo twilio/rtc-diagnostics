@@ -9,10 +9,11 @@ import {
   AudioContext,
   AudioContextUnsupportedError,
   enumerateDevices,
+  EnumerateDevicesUnsupportedError,
+  getDefaultDevices,
   getUserMedia,
   GetUserMediaUnsupportedError,
 } from './polyfills';
-import { getDefaultDevices } from './polyfills/enumerateDevices';
 import { SubsetRequired, TimeMeasurement } from './types';
 import { detectSilence } from './utils';
 import {
@@ -316,7 +317,12 @@ export class InputTest extends EventEmitter {
         audio: { deviceId: this._options.deviceId },
       });
 
-      this._defaultDevices = await getDefaultDevices();
+      if (!this._options.enumerateDevices) {
+        throw EnumerateDevicesUnsupportedError;
+      }
+      this._defaultDevices = getDefaultDevices(
+        await this._options.enumerateDevices(),
+      );
 
       // Only starts the timer after successfully getting devices
       this._startTime = Date.now();
