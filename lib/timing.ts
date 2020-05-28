@@ -25,7 +25,8 @@ export interface TimeMeasurement {
  */
 export interface NetworkTiming {
   /**
-   * A millisecond timestamp for when the first packet was received.
+   * A millisecond timestamp for when the first packet was received by the remote RTCPeerConnection.
+   * See [[BitrateTest]] for more information on how data packets are transmitted between RTCPeerConnections.
    */
   firstPacket?: number;
 

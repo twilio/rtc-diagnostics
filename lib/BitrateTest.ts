@@ -1,11 +1,13 @@
 import { EventEmitter } from 'events';
-import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, TEST_PACKET } from './constants';
+import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, MIN_BITRATE_THRESHOLD, TEST_PACKET } from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { NetworkTiming, TimeMeasurement } from './timing';
 
 export declare interface BitrateTest {
   /**
    * Raised every second with a `bitrate` parameter in kbps which represents the connection's bitrate since the last time this event was raised.
+   * The bitrate value is limited by either your downlink or uplink, whichever is lower.
+   * For example, if your downlink and uplink is 50mbps and 10mbps respectively, bitrate value will not exceed 10mbps.
    * @param event [[BitrateTest.Events.Bitrate]].
    * @param listener A callback with a `bitrate`(kbps) parameter since the last time this event was raised.
    * @returns This [[BitrateTest]] instance.
@@ -18,6 +20,7 @@ export declare interface BitrateTest {
 
   /**
    * Raised when the test encounters an error.
+   * When this happens, the test will immediately stop and emit [[BitrateTest.Events.End]].
    * @param event [[BitrateTest.Events.Error]].
    * @param listener A callback with a [[DiagnosticError]] parameter.
    * @returns This [[BitrateTest]] instance.
@@ -39,11 +42,25 @@ export declare interface BitrateTest {
     event: BitrateTest.Events.End,
     listener: (report: BitrateTest.Report) => any,
   ): this;
+
+  /**
+   * Raised when the test encounters a warning such as HighFirstPacketDuration.
+   * See [[BitrateTest.Warnings]] for more information.
+   * @param event [[BitrateTest.Events.Warning]].
+   * @param listener A callback with a [[BitrateTest.Warnings]] parameter.
+   * @returns This [[BitrateTest]] instance.
+   * @event
+   */
+  on(
+    event: BitrateTest.Events.Warning,
+    listener: (warning: BitrateTest.Warnings) => any,
+  ): this;
 }
 
 /**
- * Runs bitrate related tests while connected to a TURN server.
- * The events defined in the enum [[Events]] are emitted as the test runs.
+ * BitrateTest uses two [RTCPeerConnections](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection) connected via a Twilio TURN server.
+ * Using [RTCDataChannel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel), one RTCPeerConnection will saturate the data channel buffer and will
+ * constantly send data packets to the other RTCPeerConnection. The receiving peer will measure the bitrate base on the amount of packets received every second.
  */
 export class BitrateTest extends EventEmitter {
   /**
@@ -117,6 +134,11 @@ export class BitrateTest extends EventEmitter {
   private _values: number[] = [];
 
   /**
+   * Warnings detected during the test
+   */
+  private _warnings: BitrateTest.Warnings[] = [];
+
+  /**
    * Construct a [[BitrateTest]] instance.
    * @constructor
    * @param options
@@ -184,17 +206,32 @@ export class BitrateTest extends EventEmitter {
    * Generate and returns the report for this test
    */
   private _getReport(): BitrateTest.Report {
-    const averageBitrate = this._values
+    let averageBitrate = this._values
       .reduce((total: number, value: number) => total += value, 0) / this._values.length;
+    averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
+
     return {
-      averageBitrate: isNaN(averageBitrate) ? 0 : averageBitrate,
-      didPass: !this._errors.length && !!this._values.length,
+      averageBitrate,
+      didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
       networkTiming: this._networkTiming,
       testName: BitrateTest.testName,
       testTiming: this._testTiming,
       values: this._values,
+      warnings: this._warnings,
     };
+  }
+
+  /**
+   * Emit a warning if currentStatValue exceeds threshold value
+   * @param name
+   * @param currentStatValue
+   */
+  private _maybeEmitWarning(name: BitrateTest.Warnings, currentStatValue: Number): void {
+    if (currentStatValue > BitrateTest.WarningThresholds[name]) {
+      this._warnings.push(name);
+      this.emit(BitrateTest.Events.Warning, name);
+    }
   }
 
   /**
@@ -203,14 +240,11 @@ export class BitrateTest extends EventEmitter {
    * @param error - The error object
    * @param isFatal - Whether this is a fatal error
    */
-  private _onError(message: string, error?: DOMError, isFatal?: boolean): void {
+  private _onError(message: string, error?: DOMError): void {
     const diagnosticError = new DiagnosticError(error, message);
     this._errors.push(diagnosticError);
     this.emit(BitrateTest.Events.Error, diagnosticError);
-
-    if (isFatal) {
-      this.stop();
-    }
+    this.stop();
   }
 
   /**
@@ -236,6 +270,10 @@ export class BitrateTest extends EventEmitter {
 
     if (!this._networkTiming.firstPacket) {
       this._networkTiming.firstPacket = Date.now();
+      this._maybeEmitWarning(
+        BitrateTest.Warnings.HighFirstPacketDuration,
+        this._networkTiming.firstPacket - this._testTiming.start,
+      );
     }
   }
 
@@ -248,7 +286,7 @@ export class BitrateTest extends EventEmitter {
       this._pcReceiver.setLocalDescription(answer),
       this._pcSender.setRemoteDescription(answer),
     ]).catch((error: DOMError) =>
-      this._onError('Unable to set local or remote description from createAnswer', error, true));
+      this._onError('Unable to set local or remote description from createAnswer', error));
   }
 
   /**
@@ -260,7 +298,7 @@ export class BitrateTest extends EventEmitter {
       this._pcSender.setLocalDescription(offer),
       this._pcReceiver.setRemoteDescription(offer),
     ]).catch((error: DOMError) =>
-      this._onError('Unable to set local or remote description from createOffer', error, true));
+      this._onError('Unable to set local or remote description from createOffer', error));
   }
 
   /**
@@ -285,7 +323,7 @@ export class BitrateTest extends EventEmitter {
     try {
       this._rtcDataChannel = this._pcSender.createDataChannel('sender');
     } catch (e) {
-      this._onError('Error creating data channel', e, true);
+      this._onError('Error creating data channel', e);
       return;
     }
 
@@ -314,7 +352,9 @@ export class BitrateTest extends EventEmitter {
         this._networkTiming.peerConnection.end = Date.now();
 
         const { start, end } = this._networkTiming.peerConnection;
-        this._networkTiming.peerConnection.duration = end - start;
+        const duration = end - start;
+        this._networkTiming.peerConnection.duration = duration;
+        this._maybeEmitWarning(BitrateTest.Warnings.HighPcConnectDuration, duration);
       }
     };
 
@@ -328,7 +368,9 @@ export class BitrateTest extends EventEmitter {
         this._networkTiming.ice.end = Date.now();
 
         const { start, end } = this._networkTiming.ice;
-        this._networkTiming.ice.duration = end - start;
+        const duration = end - start;
+        this._networkTiming.ice.duration = duration;
+        this._maybeEmitWarning(BitrateTest.Warnings.HighIceConnectDuration, duration);
       }
     };
   }
@@ -340,7 +382,7 @@ export class BitrateTest extends EventEmitter {
     this._testTiming.start = Date.now();
 
     if (!this._rtcConfiguration.iceServers) {
-      return this._onError('No iceServers found', undefined, true);
+      return this._onError('No iceServers found', undefined);
     }
 
     this._pcSender.createOffer()
@@ -348,8 +390,8 @@ export class BitrateTest extends EventEmitter {
       .then(() => {
         return this._pcReceiver.createAnswer()
           .then((answer: RTCSessionDescriptionInit) => this._onReceiverAnswerCreated(answer))
-          .catch((error: Error) => this._onError('Unable to create answer', error, true));
-      }).catch((error: Error) => this._onError('Unable to create offer', error, true));
+          .catch((error: Error) => this._onError('Unable to create answer', error));
+      }).catch((error: Error) => this._onError('Unable to create offer', error));
   }
 }
 
@@ -361,7 +403,39 @@ export namespace BitrateTest {
     Bitrate = 'bitrate',
     End = 'end',
     Error = 'error',
+    Warning = 'warning',
   }
+
+  /**
+   * Possible warnings that a [[BitrateTest]] might emit. See [[BitrateTest.on]].
+   */
+  export enum Warnings {
+    /**
+     * Raised when [[NetworkTiming.firstPacket]] took more than 1400ms to arrive to the remote RTCPeerConnection.
+     * The duration is measured from the [[BitrateTest.Report]]'s testTiming.start up to [[NetworkTiming.firstPacket]]
+     */
+    HighFirstPacketDuration = 'high-first-packet-duration',
+
+    /**
+     * Raised when [[NetworkTiming.ice]] connection took more than 300ms to establish
+     */
+    HighIceConnectDuration = 'high-ice-connect-duration',
+
+    /**
+     * Raised when [[NetworkTiming.peerConnection]] took more than 1000ms to establish
+     */
+    HighPcConnectDuration = 'high-pc-connect-duration',
+  }
+
+  /**
+   * Thresholds used for determining when to raise a warning. See [[BitrateTest.Warnings]]
+   * @internalapi
+   */
+  export const WarningThresholds: Record<Warnings, Number> = {
+    [Warnings.HighFirstPacketDuration]: 1400,
+    [Warnings.HighIceConnectDuration]: 300,
+    [Warnings.HighPcConnectDuration]: 1000,
+  };
 
   /**
    * Options passed to [[BitrateTest]] constructor.
@@ -371,6 +445,34 @@ export namespace BitrateTest {
      * The array of [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer) configurations to use.
      * You need to provide TURN server configurations to ensure that your network bitrate is tested.
      * You you can use [Twilio's Network Traversal Service](https://www.twilio.com/stun-turn) to get TURN credentials.
+     *
+     * The following example demonstrates how to use the [twilio npm module](https://www.npmjs.com/package/twilio) to generate
+     * credentials with a ttl of 120 seconds, using UDP protocol, and specifying ashburn as the
+     * [edge location](https://www.twilio.com/docs/global-infrastructure/edge-locations).
+     *
+     * ```ts
+     * import Client from 'twilio';
+     * import { testBitrate } from '@twilio/rtc-diagnostics';
+     *
+     * // Generate the STUN and TURN server credentials with a ttl of 120 seconds
+     * const client = Client(twilioAccountSid, authToken);
+     * const token = await client.tokens.create({ ttl: 120 });
+     *
+     * // Filter for TURN servers.
+     * // Use the following filters if you want to use UDP, TCP, or TLS
+     * // UDP: turn:global.turn.twilio.com:3478?transport=udp
+     * // TCP: turn:global.turn.twilio.com:3478?transport=tcp
+     * // TLS: turn:global.turn.twilio.com:443?transport=tcp
+     * let { urls, username, credential } = token.iceServers
+     *   .find(item => item.url === 'turn:global.turn.twilio.com:3478?transport=udp');
+     *
+     * // By default, global will be used as the default edge location.
+     * // You can replace global with a specific edge name.
+     * urls = urls.replace('global', 'ashburn');
+     *
+     * // Use the TURN credentials using the iceServers parameter
+     * const bitrateTest = testBitrate({ iceServers: [{ urls, username, credential }] });
+     * ```
      */
     iceServers: RTCIceServer[];
   }
@@ -385,7 +487,9 @@ export namespace BitrateTest {
     averageBitrate: number;
 
     /**
-     * Whether or not the test passed. This is `false` if there are errors that occurred or if there are no bitrate values collected during the test.
+     * Whether or not the test passed.
+     * The test is considered to be passing if there were no errors detected and average bitrate is greater than the minimum bitrate required to make a call.
+     * See [Network Bandwidth Requirements](https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements#network-bandwidth-requirements)
      */
     didPass: boolean;
 
@@ -413,11 +517,49 @@ export namespace BitrateTest {
      * Bitrate values collected during the test.
      */
     values: number[];
+
+    /**
+     * Any warnings that occurred during the test.
+     */
+    warnings: Warnings[];
   }
 }
 
 /**
- * Tests your bitrate while connected to a TURN server.
+ * The test uses two [RTCPeerConnections](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection) connected via a Twilio TURN server.
+ * Using [RTCDataChannel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel), one RTCPeerConnection will saturate the data channel buffer and will
+ * constantly send data packets to the other RTCPeerConnection. The receiving peer will measure the bitrate base on the amount of packets received every second.
+ *
+ * Example:
+ * ```ts
+ *   import { testBitrate } from '@twilio/rtc-diagnostics';
+ *
+ *   const bitrateTest = testBitrate({
+ *     iceServers: [{
+ *       credential: 'bar',
+ *       username: 'foo',
+ *       urls: 'turn:global.turn.twilio.com:3478?transport=udp',
+ *     }],
+ *   });
+ *
+ *   bitrateTest.on('bitrate', (bitrate) => {
+ *     console.log(bitrate);
+ *   });
+ *
+ *   bitrateTest.on('error', (error) => {
+ *     console.log(error);
+ *   });
+ *
+ *   bitrateTest.on('end', (report) => {
+ *     console.log(report);
+ *   });
+ *
+ *   // Run the test for 15 seconds
+ *   setTimeout(() => {
+ *     bitrateTest.stop();
+ *   }, 15000);
+ * ```
+ * See [[BitrateTest.Options.iceServers]] for details on how to obtain TURN credentials.
  */
 export function testBitrate(options: BitrateTest.Options): BitrateTest {
   return new BitrateTest(options);

@@ -8,6 +8,13 @@ export const MAX_NUMBER_PACKETS = 100;
 
 /**
  * @private
+ * Minimum bitrate required to pass bitrate test
+ * See https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements#network-bandwidth-requirements
+ */
+export const MIN_BITRATE_THRESHOLD = 100;
+
+/**
+ * @private
  * Data channel buffered amount
  */
 export const BYTES_KEEP_BUFFERED = 1024 * MAX_NUMBER_PACKETS;
