@@ -44,7 +44,8 @@ export declare interface BitrateTest {
   ): this;
 
   /**
-   * Raised when the test encounters a warning.
+   * Raised when the test encounters a warning such as HighFirstPacketDuration.
+   * See [[BitrateTest.Warnings]] for more information.
    * @param event [[BitrateTest.Events.Warning]].
    * @param listener A callback with a [[BitrateTest.Warnings]] parameter.
    * @returns This [[BitrateTest]] instance.
