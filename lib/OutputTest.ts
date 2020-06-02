@@ -576,11 +576,12 @@ export namespace OutputTest {
  * (by default the sound clip is the ringing tone from the `twilio-client.js`
  * SDK) and emitting volume events of the sound clip as it plays.
  * ```ts
- * import { OutputTest } from '@twilio/rtc-diagnostics';
+ * import { OutputTest, testOutputDevice } from '@twilio/rtc-diagnostics';
  * const options: OutputTest.Options = { ... };
- * const outputTest: OutputTest = new OutputTest(options);
+ * // `options` may be left `undefined` to use default option values
+ * const outputTest: OutputTest = testOutputDevice(options);
  * ```
- * The developer can use the volume events to show in the UI that audio is
+ * Applications can use the volume events to show in their UI that audio is
  * playing and that the end-user should be hearing something.
  * ```ts
  * outputTest.on(OutputTest.Events.Volume, (volume: number) => {
@@ -588,7 +589,7 @@ export namespace OutputTest {
  * });
  * ```
  *
- * The developer should expose the [[OutputTest.stop]] method to end-users such
+ * Applications should expose the [[OutputTest.stop]] method to end-users such
  * that if the end-user was able to hear the audio, then [[OutputTest.stop]]
  * should be called with the boolean value `true` or `false` if the clip was not
  * audible.
@@ -632,7 +633,7 @@ export namespace OutputTest {
  * If `doLoop` is set to `true`, it will only run as long as the `duration`
  * option.
  * If the test times out (as defined by the `duration` in the `options`
- * paramater), then the test is considered passing or not by the `passOnTimeout`
+ * parameter), then the test is considered passing or not by the `passOnTimeout`
  * option and ends.
  *
  * ---
@@ -641,11 +642,9 @@ export namespace OutputTest {
  * [[OutputTest.Options]] as its only parameter and will instantiate an
  * [[OutputTest]] object with those options.
  * ```ts
+ * import { OutputTest, testOutputDevice } from '@twilio/rtc-diagnostics';
  * const options: OutputTest.Options = { ... };
- * // This...
  * const outputTest: OutputTest = testOutputDevice(options);
- * // ...is functionally equivalent to
- * const outputTest: OutputTest = new OutputTest(options);
  * ```
  * @param options Options to pass to the [[OutputTest]] constructor.
  */
