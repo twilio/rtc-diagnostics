@@ -77,8 +77,8 @@ describe('testOutputDevice', function() {
       });
     });
 
-    it('should not pass', function() {
-      assert(!report.didPass);
+    it('should pass', function() {
+      assert(report.didPass);
     });
 
     it('timestamps should be set', function() {

@@ -15,8 +15,11 @@ import {
   EnumerateDevicesUnsupportedError,
   getDefaultDevices,
 } from './polyfills';
-import { AudioElement, SubsetRequired, TimeMeasurement } from './types';
-import { detectSilence } from './utils';
+import {
+  AudioElement,
+  SubsetRequired,
+  TimeMeasurement,
+} from './types';
 import {
   InvalidityRecord,
   validateDeviceId,
@@ -105,23 +108,10 @@ export declare interface OutputTest {
 }
 
 /**
- * Supervises an output device test by playing a sound clip that is either the
- * ringing tone for the Client SDK, or defined by the member `testURI` in the
- * `options` parameter.
+ * [[OutputTest]] class that parses options and starts an audio output device
+ * test.
  *
- * If the data at `testURI` is unable to be loaded, meaning the error event is
- * raised on the audio element, then the test ends immediately with an error in
- * the report.
- *
- * If `doLoop` is set to `false`, then the test will run for either the option
- * `duration`, or the full duration of the audio file, which ever is shorter.
- * If `doLoop` is set to `true`, it will only run as long as the `duration`
- * option.
- * If the test times out (as defined by the `duration` in the `options`
- * paramater), then the test is considered passing or not by the `passOnTimeout`
- * option and ends.
- *
- * If the more than 50% of the volume levels are silent, then the test is considered failing.
+ * Please see [[testOutputDevice]] for details and recommended practices.
  */
 export class OutputTest extends EventEmitter {
   /**
@@ -189,8 +179,6 @@ export class OutputTest extends EventEmitter {
   /**
    * Sets up several things for the `OutputTest` to run later in the
    * `_startTest` function.
-   * An `AudioContext` is created if none is passed in the `options` parameter
-   * and the `_startTime` is immediately set.
    * @param options Optional settings to pass to the test.
    */
   constructor(options?: OutputTest.Options) {
@@ -225,7 +213,7 @@ export class OutputTest extends EventEmitter {
         this._defaultDevices.audiooutput &&
         this._defaultDevices.audiooutput.deviceId
       ),
-      didPass: pass && !detectSilence(this._values),
+      didPass: pass,
       errors: this._errors,
       testName: OutputTest.testName,
       testTiming: {
@@ -290,7 +278,8 @@ export class OutputTest extends EventEmitter {
   /**
    * Entry point of the test, called after setup in the constructor.
    * Emits the volume levels of the audio.
-   * @event `OutputTest.Events.Volume`
+   *
+   * @event [[OutputTest.Events.Volume]]
    */
   private async _startTest(): Promise<void> {
     try {
@@ -576,8 +565,89 @@ export namespace OutputTest {
 }
 
 /**
- * Test an audio output device and measures the volume.
- * @param options
+ * [[OutputTest]] tests audio output capabilities. It serves to help diagnose
+ * potential audio device issues that would prevent a user from being able to
+ * hear audio.
+ *
+ * ---
+ *
+ * The [[OutputTest]] class is an `EventEmitter` (please see [[OutputTest.on]] for
+ * events and their details) and helps to diagnose issues by playing a sound clip
+ * (by default the sound clip is the ringing tone from the `twilio-client.js`
+ * SDK) and emitting volume events of the sound clip as it plays.
+ * ```ts
+ * import { OutputTest } from '@twilio/rtc-diagnostics';
+ * const options: OutputTest.Options = { ... };
+ * const outputTest: OutputTest = new OutputTest(options);
+ * ```
+ * The developer can use the volume events to show in the UI that audio is
+ * playing and that the end-user should be hearing something.
+ * ```ts
+ * outputTest.on(OutputTest.Events.Volume, (volume: number) => {
+ *   ui.updateVolume(volume); // Update your UI with the volume value here.
+ * });
+ * ```
+ *
+ * The developer should expose the [[OutputTest.stop]] method to end-users such
+ * that if the end-user was able to hear the audio, then [[OutputTest.stop]]
+ * should be called with the boolean value `true` or `false` if the clip was not
+ * audible.
+ * ```ts
+ * // If the user was able to hear the audio, the UI should indicate they should
+ * // click this button...
+ * const passButton = ...;
+ * passButton.on('click', () => {
+ *   outputTest.stop(false);
+ * });
+ *
+ * // ...conversely, if they were not able to hear the audio, they should click
+ * // this one.
+ * const failButton = ...;
+ * failButton.on('click', () => {
+ *   outputTest.stop(end);
+ * });
+ * ```
+ * Caling [[OutputTest.stop]] will immediately end the test. The value of
+ * [[OutputTest.Report.didPass]] will be the value passed to
+ * [[OutputTest.stop]].
+ *
+ * ---
+ *
+ * The [[OutputTest]] object will always emit a [[OutputTest.Report]] with
+ * the [[OutputTest.Events.End]] event, regardless of the occurence of errors
+ * during the runtime of the test.
+ *
+ * Fatal errors will immediately end the test and emit a report such that
+ * the value of [[OutputTest.Report.didPass]] will be `false` and the value of
+ * [[OutputTest.Report.errors]] will contain the fatal error.
+ *
+ * Non-fatal errors will not end the test, but will be included in the value of
+ * [[OutputTest.Report.errors]] upon completion of the test.
+ *
+ * If the data at `testURI` is unable to be loaded, meaning the error event is
+ * raised on the audio element, a fatal error has occurred.
+ *
+ * If `doLoop` is set to `false`, then the test will run for either the option
+ * `duration`, or the full duration of the audio file, which ever is shorter.
+ * If `doLoop` is set to `true`, it will only run as long as the `duration`
+ * option.
+ * If the test times out (as defined by the `duration` in the `options`
+ * paramater), then the test is considered passing or not by the `passOnTimeout`
+ * option and ends.
+ *
+ * ---
+ *
+ * The function [[testOutputDevice]] serves as factory function that accepts
+ * [[OutputTest.Options]] as its only parameter and will instantiate an
+ * [[OutputTest]] object with those options.
+ * ```ts
+ * const options: OutputTest.Options = { ... };
+ * // This...
+ * const outputTest: OutputTest = testOutputDevice(options);
+ * // ...is functionally equivalent to
+ * const outputTest: OutputTest = new OutputTest(options);
+ * ```
+ * @param options Options to pass to the [[OutputTest]] constructor.
  */
 export function testOutputDevice(
   options?: OutputTest.Options,
