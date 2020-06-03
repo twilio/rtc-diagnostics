@@ -581,7 +581,7 @@ export namespace OutputTest {
  * // `options` may be left `undefined` to use default option values
  * const outputTest: OutputTest = testOutputDevice(options);
  * ```
- * Applications can use the volume events to show in their UI that audio is
+ * The application can use the volume events to show in its UI that audio is
  * playing and that the end-user should be hearing something.
  * ```ts
  * outputTest.on(OutputTest.Events.Volume, (volume: number) => {
@@ -589,10 +589,9 @@ export namespace OutputTest {
  * });
  * ```
  *
- * Applications should expose the [[OutputTest.stop]] method to end-users such
- * that if the end-user was able to hear the audio, then [[OutputTest.stop]]
- * should be called with the boolean value `true` or `false` if the clip was not
- * audible.
+ * The application should ask the end-user to confirm that the sound being played
+ * can be heard. The application should call [[OutputTest.stop]] with `true` if
+ * the end-user hears the sound, and `false` if not.
  * ```ts
  * // If the user was able to hear the audio, the UI should indicate they should
  * // click this button...
