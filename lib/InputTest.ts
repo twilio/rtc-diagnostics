@@ -100,11 +100,10 @@ export declare interface InputTest {
 }
 
 /**
- * Supervises an input device test utilizing a `MediaStream` passed to it, or an
- * input `MediaStream` obtained from `getUserMedia` if no `MediaStream` was
- * passed via `options`.
- * The events defined in the enum [[Events]] are emitted as the test
- * runs.
+ * [[InputTest]] class that parses options and starts an audio input device
+ * test.
+ *
+ * Please see [[testInputDevice]] for details and recommended practices.
  */
 export class InputTest extends EventEmitter {
   /**
@@ -506,8 +505,84 @@ export namespace InputTest {
 }
 
 /**
- * Test an audio input device and measures the volume.
- * @param options
+ * [[InputTest]] tests audio input capabilities. It serves to help diagnose
+ * potential audio device issues that would prevent audio from being recognized
+ * in a WebRTC call.
+ *
+ * ---
+ *
+ * The [[InputTest]] class is an `EventEmitter` (please see [[InputTest.on]] for
+ * events and their details) and helps to diagnose issues by capturing user
+ * audio and emitting the volume levels detected in that media.
+ * ```ts
+ * import { InputTest, testInputDevice } from '@twilio/rtc-diagnostics';
+ * const options: InputTest.Options = { ... };
+ * // `options` may be left `undefined` to use default option values
+ * const inputTest: InputTest = testInputDevice(options);
+ * ```
+ * Applications can use the volume events emitted by the test to update their UI
+ * to show to the user whether or not their media was captured successfully.
+ * ```ts
+ * inputTest.on(InputTest.Events.Volume, (volume: number) => {
+ *   ui.updateVolume(volume); // Update your UI with the volume value here.
+ * });
+ * ```
+ * The test can be normally stopped two ways: allowing the test to time out and
+ * stopping the test manually.
+ *
+ * If the test were allowed to time out, the value of
+ * [[InputTest.Report.didPass]] will be determined by the ratio of silent volume
+ * values in the captured media.
+ *
+ * To end the test manually, the [[InputTest.stop]] method can be exposed to
+ * end-users such that if the end-user sees that emitted volume values are what
+ * they expect, then users can invoke [[InputTest.stop]] with the boolean value
+ * `true` and `false` otherwise.
+ * ```ts
+ * // The UI should indicate that if the volume values are what the user
+ * // expects, they can click this button to pass and stop the test...
+ * const volumeCorrectButton = ...;
+ * volumeCorrectButton.addEventListener('click', () => {
+ *   inputTest.stop(true);
+ * });
+ *
+ * // ...otherwise, if the volume levels are not what they expect, they can
+ * // click this.
+ * const volumeIncorrectButton = ...;
+ * volumeIncorrectButton.addEventListener('click', () => {
+ *   inputTest.stop(false);
+ * });
+ * ```
+ * Calling [[InputTest.stop]] will immediately end the test. The value of
+ * [[InputTest.Report.didPass]] is determined from the ratio of silent audio
+ * levels detected in the user media, but overwritten by passing `false` to
+ * [[InputTest.stop]].
+ *
+ * ---
+ *
+ * The [[InputTest]] object will always emit a [[InputTest.Report]] with the
+ * [[InputTest.Events.End]] event, regardless of the occurrence of errors during
+ * the runtime of the test.
+ *
+ * Fatal errors will immediately end the test and emit a report such that the
+ * value of [[InputTest.Report.didPass]] will be `false` and the value of
+ * [[InputTest.Report.errors]] will contain the fatal error.
+ *
+ * Non-fatal errors will not end the test, but will be included in the value of
+ * [[InputTest.Report.errors]] upon completion of the test.
+ *
+ * ---
+ *
+ * The function [[testInputDevice]] serves as a factory function that accepts
+ * [[InputTest.Options]] as its only parameter and will instantiate an
+ * [[InputTest]] object with those options.
+ * ```ts
+ * import { InputTest, testInputDevice } from '@twilio/rtc-diagnostics';
+ * const options: InputTest.Options = { ... };
+ * const inputTest: InputTest = testInputDevice(options);
+ * ```
+ *
+ * @param options Options to pass to the [[InputTest]] constructor.
  */
 export function testInputDevice(
   options?: InputTest.Options,
