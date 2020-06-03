@@ -530,14 +530,15 @@ export namespace InputTest {
  * The test can be normally stopped two ways: allowing the test to time out and
  * stopping the test manually.
  *
- * If the test were allowed to time out, the value of
+ * If the test was allowed to time out, the value of
  * [[InputTest.Report.didPass]] will be determined by the ratio of silent volume
  * values in the captured media.
  *
- * To end the test manually, the [[InputTest.stop]] method can be exposed to
- * end-users such that if the end-user sees that emitted volume values are what
- * they expect, then users can invoke [[InputTest.stop]] with the boolean value
- * `true` and `false` otherwise.
+ * To end the test manually, the application can ask the end-user to confirm
+ * that the volume levels it emits are what the end-user expects. If so, the
+ * application can call the [[InputTest.stop]] method with `true`. Otherwise,
+ * if the audio values are not expected, the application can call
+ * [[InputTest.stop]] with `false`.
  * ```ts
  * // The UI should indicate that if the volume values are what the user
  * // expects, they can click this button to pass and stop the test...
