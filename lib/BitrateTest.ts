@@ -58,9 +58,11 @@ export declare interface BitrateTest {
 }
 
 /**
- * BitrateTest uses two [RTCPeerConnections](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection) connected via a Twilio TURN server.
+ * BitrateTest uses two [RTCPeerConnections](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
+ * connected via a [Twilio Network Traversal Service](https://www.twilio.com/docs/stun-turn).
  * Using [RTCDataChannel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel), one RTCPeerConnection will saturate the data channel buffer and will
  * constantly send data packets to the other RTCPeerConnection. The receiving peer will measure the bitrate base on the amount of packets received every second.
+ * See [[BitrateTest.Options.iceServers]] for information how to use Twilio NTS.
  */
 export class BitrateTest extends EventEmitter {
   /**
@@ -139,7 +141,8 @@ export class BitrateTest extends EventEmitter {
   private _warnings: BitrateTest.Warnings[] = [];
 
   /**
-   * Construct a [[BitrateTest]] instance.
+   * Construct a [[BitrateTest]] instance. The test will start immediately.
+   * Test should be allowed to run for a minimum of 8 seconds. To stop the test, call [[BitrateTest.stop]].
    * @constructor
    * @param options
    */
@@ -473,6 +476,7 @@ export namespace BitrateTest {
      * // Use the TURN credentials using the iceServers parameter
      * const bitrateTest = testBitrate({ iceServers: [{ urls, username, credential }] });
      * ```
+     * Note, for production code, the above code should not be executed client side as it requires the authToken which must be treated like a private key.
      */
     iceServers: RTCIceServer[];
   }
