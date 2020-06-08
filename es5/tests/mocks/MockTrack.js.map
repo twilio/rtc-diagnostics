@@ -1,1 +1,0 @@
-{"version":3,"file":"MockTrack.js","sourceRoot":"","sources":["../../../tests/mocks/MockTrack.ts"],"names":[],"mappings":";AAAA,0BAA0B;;AAE1B;IAAA;IAEA,CAAC;IADC,wBAAI,GAAJ,cAAQ,CAAC;IACX,gBAAC;AAAD,CAAC,AAFD,IAEC;AAFY,8BAAS","sourcesContent":["// tslint:disable no-empty\n\nexport class MockTrack {\n  stop() {}\n}\n"]}
