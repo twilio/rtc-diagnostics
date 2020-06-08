@@ -57,21 +57,10 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Supervises an output device test by playing a sound clip that is either the
-							ringing tone for the Client SDK, or defined by the member <code>testURI</code> in the
-						<code>options</code> parameter.</p>
+						<p><a href="outputtest.html">OutputTest</a> class that parses options and starts an audio output device
+						test.</p>
 					</div>
-					<p>If the data at <code>testURI</code> is unable to be loaded, meaning the error event is
-						raised on the audio element, then the test ends immediately with an error in
-					the report.</p>
-					<p>If <code>doLoop</code> is set to <code>false</code>, then the test will run for either the option
-						<code>duration</code>, or the full duration of the audio file, which ever is shorter.
-						If <code>doLoop</code> is set to <code>true</code>, it will only run as long as the <code>duration</code>
-						option.
-						If the test times out (as defined by the <code>duration</code> in the <code>options</code>
-						paramater), then the test is considered passing or not by the <code>passOnTimeout</code>
-					option and ends.</p>
-					<p>If the more than 50% of the volume levels are silent, then the test is considered failing.</p>
+					<p>Please see <a href="../globals.html#testoutputdevice">testOutputDevice</a> for details and recommended practices.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -159,15 +148,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L191">lib/OutputTest.ts:191</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L177">lib/OutputTest.ts:177</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets up several things for the <code>OutputTest</code> to run later in the
-										<code>_startTest</code> function.
-										An <code>AudioContext</code> is created if none is passed in the <code>options</code> parameter
-									and the <code>_startTime</code> is immediately set.</p>
+									<code>_startTest</code> function.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -176,6 +163,7 @@
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/outputtest.options.html" class="tsd-signature-type">Options</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
+											<p>Optional settings to pass to the test.</p>
 										</div>
 									</div>
 								</li>
@@ -200,7 +188,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L72">lib/OutputTest.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L76">lib/OutputTest.ts:76</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -255,7 +243,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L85">lib/OutputTest.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L89">lib/OutputTest.ts:89</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -307,12 +295,12 @@
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L100">lib/OutputTest.ts:100</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L104">lib/OutputTest.ts:104</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Raised every <a href="../interfaces/outputtest.options.html#pollintervalms">OutputTest.Options.pollIntervalMs</a> after the test
+									<p>Raised every <a href="../interfaces/outputtest.options.html#volumeeventintervalms">OutputTest.Options.volumeEventIntervalMs</a> after the test
 										starts successfully. Will have a <code>number</code> parameter representing the
 									current volume of the audio file.</p>
 								</div>
@@ -378,7 +366,7 @@
 					<div class="tsd-signature tsd-kind-icon">test<wbr>Name<span class="tsd-signature-symbol">:</span> <a href="../enums/testnames.html#outputaudiodevice" class="tsd-signature-type">OutputAudioDevice</a><span class="tsd-signature-symbol"> = TestNames.OutputAudioDevice</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L129">lib/OutputTest.ts:129</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L120">lib/OutputTest.ts:120</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -448,7 +436,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#emit">emit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L33">lib/OutputTest.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L37">lib/OutputTest.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -477,7 +465,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#emit">emit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L43">lib/OutputTest.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L47">lib/OutputTest.ts:47</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -506,13 +494,13 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="bitratetest.html">BitrateTest</a>.<a href="bitratetest.html#emit">emit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L55">lib/OutputTest.ts:55</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L59">lib/OutputTest.ts:59</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>This event is emitted by the test after succesfully starting, and emits
-										the volume of the audio source every <a href="../interfaces/outputtest.options.html#pollintervalms">OutputTest.Options.pollIntervalMs</a>
+										the volume of the audio source every <a href="../interfaces/outputtest.options.html#volumeeventintervalms">OutputTest.Options.volumeEventIntervalMs</a>
 									milliseconds.</p>
 								</div>
 							</div>
@@ -926,7 +914,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/OutputTest.ts#L217">lib/OutputTest.ts:217</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/OutputTest.ts#L201">lib/OutputTest.ts:201</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1020,9 +1008,6 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class">
-						<a href="networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
@@ -1107,9 +1092,6 @@
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-private tsd-is-external">
-						<a href="testcall.html" class="tsd-kind-icon">Test<wbr>Call</a>
-					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
 					</li>
@@ -1153,6 +1135,9 @@
 						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -1166,9 +1151,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>

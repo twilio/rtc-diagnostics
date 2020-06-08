@@ -289,6 +289,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="audioelement.html#seeking" class="tsd-kind-icon">seeking</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="audioelement.html#setsinkid" class="tsd-kind-icon">set<wbr>Sink<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="audioelement.html#shadowroot" class="tsd-kind-icon">shadow<wbr>Root</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="audioelement.html#sinkid" class="tsd-kind-icon">sink<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="audioelement.html#slot" class="tsd-kind-icon">slot</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="audioelement.html#spellcheck" class="tsd-kind-icon">spellcheck</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="audioelement.html#src" class="tsd-kind-icon">src</a></li>
@@ -3285,7 +3286,7 @@
 					<div class="tsd-signature tsd-kind-icon">set<wbr>Sink<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/types.ts#L7">lib/types.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/types.ts#L7">lib/types.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -3303,6 +3304,16 @@
 							<p>Returns element&#39;s shadow root, if any, and if shadow root&#39;s mode is &quot;open&quot;, and null otherwise.</p>
 						</div>
 					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="sinkid" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> sink<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">sink<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/types.ts#L8">lib/types.ts:8</a></li>
+						</ul>
+					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="slot" class="tsd-anchor"></a>
@@ -5954,16 +5965,10 @@
 						<a href="../classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class">
 						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-private tsd-is-external">
-						<a href="../classes/testcall.html" class="tsd-kind-icon">Test<wbr>Call</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
@@ -6609,6 +6614,9 @@
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="audioelement.html#shadowroot" class="tsd-kind-icon">shadow<wbr>Root</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="audioelement.html#sinkid" class="tsd-kind-icon">sink<wbr>Id</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="audioelement.html#slot" class="tsd-kind-icon">slot</a>
 							</li>
@@ -6926,6 +6934,9 @@
 						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -6939,9 +6950,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>

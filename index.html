@@ -52,14 +52,26 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#twilio-rtc-diagnostics-sdk" id="twilio-rtc-diagnostics-sdk" style="color: inherit; text-decoration: none;">
-					<h1>Twilio RTC Diagnostics SDK</h1>
+				<a href="#voice-diagnostics-sdk" id="voice-diagnostics-sdk" style="color: inherit; text-decoration: none;">
+					<h1>Voice Diagnostics SDK</h1>
 				</a>
-				<p>The RTC Diagnostics SDK provides tools that help the developer in determining Voice &amp; Video calling readiness. The SDK provides methods that assist in identifying potential issues and provides mechanisms to estimate expected audio quality.</p>
+				<p>The Voice Diagnostics SDK provides functions to test input and output audio devices, and the functionality to test network bandwidth requirements towards Twilio’s servers.</p>
+				<p>This SDK requires the use of Twilio NTS to perform the network tests. Using NTS will incur charges as per <a href="https://www.twilio.com/stun-turn/pricing">NTS pricing</a>.</p>
+				<a href="#features" id="features" style="color: inherit; text-decoration: none;">
+					<h2>Features</h2>
+				</a>
 				<ul>
-					<li><a href="https://twilio.github.io/rtc-diagnostics/globals.html">API Docs</a></li>
-					<li>Quickstart (Coming soon)</li>
-					<li>Changelog (Coming soon)</li>
+					<li>Input audio device tests include volume calculation</li>
+					<li>Output audio device tests are done by playing a sound file to the selected device</li>
+					<li>Bandwidth requirements tests</li>
+				</ul>
+				<a href="#prerequisites" id="prerequisites" style="color: inherit; text-decoration: none;">
+					<h2>Prerequisites</h2>
+				</a>
+				<ul>
+					<li>A Twilio account. Sign up for free <a href="https://www.twilio.com/try-twilio">here</a></li>
+					<li>Node.js v10+</li>
+					<li>NPM v6+ (comes installed with newer Node versions)</li>
 				</ul>
 				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
 					<h2>Installation</h2>
@@ -93,7 +105,10 @@ npm run build</code></pre>
 				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 					<h2>Usage</h2>
 				</a>
-				<p>The following is an example for running bitrate test. For more information, please refer to the <a href="https://twilio.github.io/rtc-diagnostics/globals.html">API Docs</a></p>
+				<p>The following are examples for running tests. For more information, please refer to the <a href="https://twilio.github.io/rtc-diagnostics/globals.html">API Docs</a></p>
+				<a href="#bitratetest-example" id="bitratetest-example" style="color: inherit; text-decoration: none;">
+					<h3>BitrateTest Example</h3>
+				</a>
 				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
 
 <span class="hljs-keyword">const</span> bitrateTest = testBitrate({
@@ -119,6 +134,63 @@ bitrateTest.on(<span class="hljs-string">'end'</span>, <span class="hljs-functio
 setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
  bitrateTest.stop();
 }, <span class="hljs-number">10000</span>);</code></pre>
+				<p>See <code>BitrateTest.Options</code> for more information for how to obtain the <code>urls values</code></p>
+				<a href="#inputtest-example" id="inputtest-example" style="color: inherit; text-decoration: none;">
+					<h3>InputTest Example</h3>
+				</a>
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testInputDevice, InputTest } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+
+<span class="hljs-keyword">const</span> outputDeviceTest = testInputDevice({
+  deviceId: ...,
+});
+
+inputDeviceTest.on(InputTest.Events.Volume, <span class="hljs-function">(<span class="hljs-params">volume</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(volume);
+});
+
+inputDeviceTest.on(InputTest.Events.Error, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.error(error);
+});
+
+inputDeviceTest.on(InputTest.Events.End, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(report);
+});
+
+setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  inputDeviceTest.stop();
+}, <span class="hljs-number">10000</span>);</code></pre>
+				<a href="#outputtest-example" id="outputtest-example" style="color: inherit; text-decoration: none;">
+					<h3>OutputTest Example</h3>
+				</a>
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testOutputDevice, OutputTest } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+
+<span class="hljs-keyword">const</span> outputDeviceTest = testOutputDevice({
+  deviceId: ...,
+});
+
+outputDeviceTest.on(InputTest.Events.Volume, <span class="hljs-function">(<span class="hljs-params">volume</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(volume);
+});
+
+outputDeviceTest.on(InputTest.Events.Error, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.error(error);
+});
+
+outputDeviceTest.on(InputTest.Events.End, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(report);
+});
+
+setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  outputDeviceTest.stop();
+}, <span class="hljs-number">10000</span>);</code></pre>
+				<a href="#related" id="related" style="color: inherit; text-decoration: none;">
+					<h2>Related</h2>
+				</a>
+				<ul>
+					<li><a href="https://github.com/twilio/twilio-client.js">Twilio Voice Client JS SDK</a></li>
+					<li><a href="https://github.com/TwilioDevEd/client-quickstart-js">Twilio Voice Client JS Quickstart</a></li>
+					<li><a href="https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements">Twilio Client connectivity requirements</a></li>
+				</ul>
 				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
 					<h2>License</h2>
 				</a>
@@ -160,16 +232,10 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 						<a href="classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class">
 						<a href="classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-private tsd-is-external">
-						<a href="classes/testcall.html" class="tsd-kind-icon">Test<wbr>Call</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
@@ -214,6 +280,9 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 						<a href="globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -227,9 +296,6 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>

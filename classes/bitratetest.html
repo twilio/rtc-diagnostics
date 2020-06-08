@@ -57,8 +57,11 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Runs bitrate related tests while connected to a TURN server.
-						The events defined in the enum <a href="../enums/bitratetest.events.html">Events</a> are emitted as the test runs.</p>
+						<p>BitrateTest uses two <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection">RTCPeerConnections</a>
+							connected via a <a href="https://www.twilio.com/docs/stun-turn">Twilio Network Traversal Service</a>.
+							Using <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel">RTCDataChannel</a>, one RTCPeerConnection will saturate the data channel buffer and will
+							constantly send data packets to the other RTCPeerConnection. The receiving peer will measure the bitrate base on the amount of packets received every second.
+						See <a href="../interfaces/bitratetest.options.html#iceservers">BitrateTest.Options.iceServers</a> for information how to use Twilio NTS.</p>
 					</div>
 				</div>
 			</section>
@@ -83,6 +86,7 @@
 							<h3>Enumerations</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-enum tsd-parent-kind-class tsd-is-static"><a href="../enums/bitratetest.events.html" class="tsd-kind-icon">Events</a></li>
+								<li class="tsd-kind-enum tsd-parent-kind-class tsd-is-static"><a href="../enums/bitratetest.warnings.html" class="tsd-kind-icon">Warnings</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -132,6 +136,12 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static"><a href="bitratetest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a></li>
 							</ul>
 						</section>
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Object literals</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-object-literal tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="bitratetest.html#warningthresholds" class="tsd-kind-icon">Warning<wbr>Thresholds</a></li>
+							</ul>
+						</section>
 					</div>
 				</section>
 			</section>
@@ -147,12 +157,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L117">lib/BitrateTest.ts:117</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L141">lib/BitrateTest.ts:141</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Construct a <a href="bitratetest.html">BitrateTest</a> instance.</p>
+									<p>Construct a <a href="bitratetest.html">BitrateTest</a> instance. The test will start immediately.
+									Test should be allowed to run for a minimum of 8 seconds. To stop the test, call <a href="bitratetest.html#stop">BitrateTest.stop</a>.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -179,18 +190,21 @@
 						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../enums/bitratetest.events.html#bitrate" class="tsd-signature-type">Bitrate</a>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../enums/bitratetest.events.html#error" class="tsd-signature-type">Error</a>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../enums/bitratetest.events.html#end" class="tsd-signature-type">End</a>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../enums/bitratetest.events.html#warning" class="tsd-signature-type">Warning</a>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L14">lib/BitrateTest.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L16">lib/BitrateTest.ts:16</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Raised every second with a <code>bitrate</code> parameter in kbps which represents the connection&#39;s bitrate since the last time this event was raised.</p>
+									<p>Raised every second with a <code>bitrate</code> parameter in kbps which represents the connection&#39;s bitrate since the last time this event was raised.
+										The bitrate value is limited by either your downlink or uplink, whichever is lower.
+									For example, if your downlink and uplink is 50mbps and 10mbps respectively, bitrate value will not exceed 10mbps.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -233,12 +247,13 @@
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L26">lib/BitrateTest.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L29">lib/BitrateTest.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Raised when the test encounters an error.</p>
+									<p>Raised when the test encounters an error.
+									When this happens, the test will immediately stop and emit <a href="../enums/bitratetest.events.html#end">BitrateTest.Events.End</a>.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -281,7 +296,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.on</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L38">lib/BitrateTest.ts:38</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L41">lib/BitrateTest.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -325,6 +340,55 @@
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
 							<p>This <a href="bitratetest.html">BitrateTest</a> instance.</p>
 						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides EventEmitter.on</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L54">lib/BitrateTest.ts:54</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Raised when the test encounters a warning such as HighFirstPacketDuration.
+									See <a href="../enums/bitratetest.warnings.html">BitrateTest.Warnings</a> for more information.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../enums/bitratetest.events.html#warning" class="tsd-signature-type">Warning</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p><a href="../enums/bitratetest.events.html#warning">BitrateTest.Events.Warning</a>.</p>
+									</div>
+								</li>
+								<li>
+									<h5>listener: <span class="tsd-signature-type">function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A callback with a <a href="../enums/bitratetest.warnings.html">BitrateTest.Warnings</a> parameter.</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>warning<span class="tsd-signature-symbol">: </span><a href="../enums/bitratetest.warnings.html" class="tsd-signature-type">Warnings</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>warning: <a href="../enums/bitratetest.warnings.html" class="tsd-signature-type">Warnings</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+							<p>This <a href="bitratetest.html">BitrateTest</a> instance.</p>
+						</li>
 					</ul>
 				</section>
 			</section>
@@ -346,7 +410,7 @@
 					<div class="tsd-signature tsd-kind-icon">test<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;bitrate-test&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L52">lib/BitrateTest.ts:52</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L71">lib/BitrateTest.ts:71</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -821,7 +885,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L149">lib/BitrateTest.ts:149</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L174">lib/BitrateTest.ts:174</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -867,6 +931,36 @@
 					</ul>
 				</section>
 			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Object literals</h2>
+				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="warningthresholds" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> Warning<wbr>Thresholds</h3>
+					<div class="tsd-signature tsd-kind-icon">Warning<wbr>Thresholds<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L437">lib/BitrateTest.ts:437</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Thresholds used for determining when to raise a warning. See <a href="../enums/bitratetest.warnings.html">BitrateTest.Warnings</a></p>
+						</div>
+					</div>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="warningthresholds.__computed" class="tsd-anchor"></a>
+						<h3>__computed</h3>
+						<div class="tsd-signature tsd-kind-icon">__computed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1000</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L438">lib/BitrateTest.ts:438</a></li>
+								<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L439">lib/BitrateTest.ts:439</a></li>
+								<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L440">lib/BitrateTest.ts:440</a></li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
@@ -891,6 +985,9 @@
 						<ul>
 							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
 								<a href="../enums/bitratetest.events.html" class="tsd-kind-icon">Events</a>
+							</li>
+							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
+								<a href="../enums/bitratetest.warnings.html" class="tsd-kind-icon">Warnings</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-class">
 								<a href="../interfaces/bitratetest.options.html" class="tsd-kind-icon">Options</a>
@@ -958,6 +1055,9 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="bitratetest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
 							</li>
+							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="bitratetest.html#warningthresholds" class="tsd-kind-icon">Warning<wbr>Thresholds</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
@@ -978,16 +1078,10 @@
 						<a href="invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class">
 						<a href="outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-private tsd-is-external">
-						<a href="testcall.html" class="tsd-kind-icon">Test<wbr>Call</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
@@ -1032,6 +1126,9 @@
 						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -1045,9 +1142,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>

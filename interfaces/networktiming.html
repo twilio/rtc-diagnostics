@@ -89,12 +89,13 @@
 					<div class="tsd-signature tsd-kind-icon">first<wbr>Packet<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/timing.ts#L30">lib/timing.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/timing.ts#L31">lib/timing.ts:31</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>A millisecond timestamp for when the first packet was received.</p>
+							<p>A millisecond timestamp for when the first packet was received by the remote RTCPeerConnection.
+							See <a href="../classes/bitratetest.html">BitrateTest</a> for more information on how data packets are transmitted between RTCPeerConnections.</p>
 						</div>
 					</div>
 				</section>
@@ -104,7 +105,7 @@
 					<div class="tsd-signature tsd-kind-icon">ice<span class="tsd-signature-symbol">:</span> <a href="timemeasurement.html" class="tsd-signature-type">TimeMeasurement</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/timing.ts#L37">lib/timing.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/timing.ts#L38">lib/timing.ts:38</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -121,7 +122,7 @@
 					<div class="tsd-signature tsd-kind-icon">peer<wbr>Connection<span class="tsd-signature-symbol">:</span> <a href="timemeasurement.html" class="tsd-signature-type">TimeMeasurement</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/timing.ts#L44">lib/timing.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/timing.ts#L45">lib/timing.ts:45</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -169,16 +170,10 @@
 						<a href="../classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class">
 						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-private tsd-is-external">
-						<a href="../classes/testcall.html" class="tsd-kind-icon">Test<wbr>Call</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
@@ -238,6 +233,9 @@
 						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -251,9 +249,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>

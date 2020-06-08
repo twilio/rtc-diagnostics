@@ -93,7 +93,7 @@
 					<div class="tsd-signature tsd-kind-icon">ice<wbr>Servers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RTCIceServer</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L375">lib/BitrateTest.ts:375</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L481">lib/BitrateTest.ts:481</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -102,6 +102,31 @@
 								You need to provide TURN server configurations to ensure that your network bitrate is tested.
 							You you can use <a href="https://www.twilio.com/stun-turn">Twilio&#39;s Network Traversal Service</a> to get TURN credentials.</p>
 						</div>
+						<p>The following example demonstrates how to use the <a href="https://www.npmjs.com/package/twilio">twilio npm module</a> to generate
+							credentials with a ttl of 120 seconds, using UDP protocol, and specifying ashburn as the
+						<a href="https://www.twilio.com/docs/global-infrastructure/edge-locations">edge location</a>.</p>
+						<pre><code class="language-ts"><span class="hljs-keyword">import</span> Client <span class="hljs-keyword">from</span> <span class="hljs-string">'twilio'</span>;
+<span class="hljs-keyword">import</span> { testBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+
+<span class="hljs-comment">// Generate the STUN and TURN server credentials with a ttl of 120 seconds</span>
+<span class="hljs-keyword">const</span> client = Client(twilioAccountSid, authToken);
+<span class="hljs-keyword">const</span> token = <span class="hljs-keyword">await</span> client.tokens.create({ ttl: <span class="hljs-number">120</span> });
+
+<span class="hljs-comment">// Filter for TURN servers.</span>
+<span class="hljs-comment">// Use the following filters if you want to use UDP, TCP, or TLS</span>
+<span class="hljs-comment">// UDP: turn:global.turn.twilio.com:3478?transport=udp</span>
+<span class="hljs-comment">// TCP: turn:global.turn.twilio.com:3478?transport=tcp</span>
+<span class="hljs-comment">// TLS: turn:global.turn.twilio.com:443?transport=tcp</span>
+<span class="hljs-keyword">let</span> { urls, username, credential } = token.iceServers
+  .find(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item.url === <span class="hljs-string">'turn:global.turn.twilio.com:3478?transport=udp'</span>);
+
+<span class="hljs-comment">// By default, global will be used as the default edge location.</span>
+<span class="hljs-comment">// You can replace global with a specific edge name.</span>
+urls = urls.replace(<span class="hljs-string">'global'</span>, <span class="hljs-string">'ashburn'</span>);
+
+<span class="hljs-comment">// Use the TURN credentials using the iceServers parameter</span>
+<span class="hljs-keyword">const</span> bitrateTest = testBitrate({ iceServers: [{ urls, username, credential }] });</code></pre>
+						<p>Note, for production code, the above code should not be executed client side as it requires the authToken which must be treated like a private key.</p>
 					</div>
 				</section>
 			</section>
@@ -129,6 +154,9 @@
 						<ul>
 							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
 								<a href="../enums/bitratetest.events.html" class="tsd-kind-icon">Events</a>
+							</li>
+							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
+								<a href="../enums/bitratetest.warnings.html" class="tsd-kind-icon">Warnings</a>
 							</li>
 							<li class="current tsd-kind-interface tsd-parent-kind-class">
 								<a href="bitratetest.options.html" class="tsd-kind-icon">Options</a>
@@ -201,6 +229,9 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/bitratetest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
 							</li>
+							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="../classes/bitratetest.html#warningthresholds" class="tsd-kind-icon">Warning<wbr>Thresholds</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
@@ -221,16 +252,10 @@
 						<a href="../classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class">
 						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-private tsd-is-external">
-						<a href="../classes/testcall.html" class="tsd-kind-icon">Test<wbr>Call</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
@@ -275,6 +300,9 @@
 						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -288,9 +316,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>

@@ -74,6 +74,7 @@
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="bitratetest.events.html#bitrate" class="tsd-kind-icon">Bitrate</a></li>
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="bitratetest.events.html#end" class="tsd-kind-icon">End</a></li>
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="bitratetest.events.html#error" class="tsd-kind-icon">Error</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="bitratetest.events.html#warning" class="tsd-kind-icon">Warning</a></li>
 							</ul>
 						</section>
 					</div>
@@ -87,7 +88,7 @@
 					<div class="tsd-signature tsd-kind-icon">Bitrate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;bitrate&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L361">lib/BitrateTest.ts:361</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L406">lib/BitrateTest.ts:406</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -97,7 +98,7 @@
 					<div class="tsd-signature tsd-kind-icon">End<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;end&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L362">lib/BitrateTest.ts:362</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L407">lib/BitrateTest.ts:407</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -107,7 +108,17 @@
 					<div class="tsd-signature tsd-kind-icon">Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;error&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/828af0f/lib/BitrateTest.ts#L363">lib/BitrateTest.ts:363</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L408">lib/BitrateTest.ts:408</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="warning" class="tsd-anchor"></a>
+					<h3>Warning</h3>
+					<div class="tsd-signature tsd-kind-icon">Warning<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;warning&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/0dee096/lib/BitrateTest.ts#L409">lib/BitrateTest.ts:409</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -146,7 +157,13 @@
 									<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
 										<a href="bitratetest.events.html#error" class="tsd-kind-icon">Error</a>
 									</li>
+									<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+										<a href="bitratetest.events.html#warning" class="tsd-kind-icon">Warning</a>
+									</li>
 								</ul>
+							</li>
+							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
+								<a href="bitratetest.warnings.html" class="tsd-kind-icon">Warnings</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-class">
 								<a href="../interfaces/bitratetest.options.html" class="tsd-kind-icon">Options</a>
@@ -214,6 +231,9 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/bitratetest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
 							</li>
+							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="../classes/bitratetest.html#warningthresholds" class="tsd-kind-icon">Warning<wbr>Thresholds</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
@@ -234,16 +254,10 @@
 						<a href="../classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/networktest.html" class="tsd-kind-icon">Network<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class">
 						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-private tsd-is-external">
-						<a href="../classes/testcall.html" class="tsd-kind-icon">Test<wbr>Call</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="../classes/unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
@@ -288,6 +302,9 @@
 						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -301,9 +318,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testnetwork" class="tsd-kind-icon">test<wbr>Network</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>
