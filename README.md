@@ -4,8 +4,8 @@ The Voice Diagnostics SDK provides functions to test input and output audio devi
 This SDK requires the use of Twilio NTS to perform the network tests. Using NTS will incur charges as per [NTS pricing](https://www.twilio.com/stun-turn/pricing).
 
 ## Features
-* Input audio device tests include volume calculation and silence detection
-* Output audio device tests by playing a sound file to the selected device
+* Input audio device tests include volume calculation
+* Output audio device tests are done by playing a sound file to the selected device
 * Bandwidth requirements tests
 
 ## Prerequisites
@@ -87,6 +87,7 @@ setTimeout(() => {
  bitrateTest.stop();
 }, 10000);
 ```
+See `BitrateTest.Options` for more information for how to obtain the `urls values`
 
 ### InputTest Example
 ```ts
@@ -139,7 +140,6 @@ setTimeout(() => {
 ```
 
 ## Related
-* [Twilio Diagnostics React App](https://github.com/twilio/rtc-diagnostics-react-app)
 * [Twilio Voice Client JS SDK](https://github.com/twilio/twilio-client.js)
 * [Twilio Voice Client JS Quickstart](https://github.com/TwilioDevEd/client-quickstart-js)
 * [Twilio Client connectivity requirements](https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements)
