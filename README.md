@@ -5,7 +5,7 @@ This SDK requires the use of Twilio NTS to perform the network tests. Using NTS 
 
 ## Features
 * Input audio device tests include volume calculation and silence detection
-* Output audio device tests by playing a sound file to the selected device
+* Output audio device tests are done by playing a sound file to the selected device
 * Bandwidth requirements tests
 
 ## Prerequisites
@@ -87,6 +87,7 @@ setTimeout(() => {
  bitrateTest.stop();
 }, 10000);
 ```
+See `BitrateTest.Options` for more information for how to obtain the `urls values`
 
 ### InputTest Example
 ```ts
