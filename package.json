@@ -35,10 +35,11 @@
   ],
   "dependencies": {
     "@types/events": "3.0.0",
-    "@types/node": "12.12.11",
+    "@types/node": "14.0.13",
     "events": "3.0.0"
   },
   "devDependencies": {
+    "@types/dom-mediacapture-record": "1.0.6",
     "@types/mocha": "5.2.7",
     "@types/sinon": "9.0.4",
     "browserify": "16.5.0",
