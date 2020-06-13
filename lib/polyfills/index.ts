@@ -7,6 +7,14 @@ export {
   AudioContextUnsupportedError,
 } from './AudioContext';
 export {
+  BlobPolyfill as Blob,
+  BlobUnsupportedError,
+} from './Blob';
+export {
+  createObjectURLPolyfill as createObjectURL,
+  createObjectURLUnsupportedError,
+} from './createObjectURL';
+export {
   enumerateDevicesPolyfill as enumerateDevices,
   enumerateDevicesUnsupportedMessage,
   EnumerateDevicesUnsupportedError,
@@ -16,3 +24,7 @@ export {
   getUserMediaPolyfill as getUserMedia,
   GetUserMediaUnsupportedError,
 } from './getUserMedia';
+export {
+  MediaRecorderPolyfill as MediaRecorder,
+  MediaRecorderUnsupportedError,
+} from './MediaRecorder';

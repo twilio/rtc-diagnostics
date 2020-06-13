@@ -9,8 +9,10 @@ import {
   testInputDevice,
 } from '../../lib/InputTest';
 import { mockAudioContextFactory } from '../mocks/MockAudioContext';
+import { mockBlobFactory } from '../mocks/MockBlob';
 import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
 import { mockGetUserMediaFactory } from '../mocks/mockGetUserMedia';
+import { mockMediaRecorderFactory } from '../mocks/MockMediaRecorder';
 import { MockMediaStream } from '../mocks/MockMediaStream';
 import { MockTrack } from '../mocks/MockTrack';
 
@@ -19,6 +21,8 @@ function createTestOptions(
 ): InputTest.Options {
   return {
     audioContextFactory: mockAudioContextFactory() as any,
+    blobFactory: mockBlobFactory() as any,
+    createObjectURL: sinon.stub().returns('foo'),
     duration: 1000,
     enumerateDevices: mockEnumerateDevicesFactory({
       devices: [{ deviceId: 'default', kind: 'audioinput' } as any],
@@ -28,6 +32,7 @@ function createTestOptions(
         tracks: [new MockTrack()],
       }),
     }) as any,
+    mediaRecorderFactory: mockMediaRecorderFactory() as any,
     volumeEventIntervalMs: 100,
     ...overrides,
   };
@@ -137,7 +142,7 @@ describe('testInputDevice', function() {
       before(async function() {
         const options = createTestOptions({
           audioContextFactory: mockAudioContextFactory({
-            analyserNodeOptions: { volumeValues: 0 },
+            analyserNodeOptions: { volumeValues: 100 },
           }) as any,
         });
         const { handlers } = createBasicTest(options);
