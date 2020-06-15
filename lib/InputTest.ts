@@ -24,6 +24,7 @@ import { SubsetRequired, TimeMeasurement, VolumeStats } from './types';
 import { detectSilence } from './utils';
 import {
   InvalidityRecord,
+  validateBoolean,
   validateDeviceId,
   validateOptions,
   validateTime,
@@ -177,6 +178,7 @@ export class InputTest extends EventEmitter {
     enumerateDevices,
     getUserMedia,
     mediaRecorderFactory: MediaRecorder,
+    recordAudio: false,
     volumeEventIntervalMs: 100,
   };
 
@@ -431,6 +433,7 @@ export class InputTest extends EventEmitter {
         await validateOptions<InputTest.Options>(this._options, {
           deviceId: validateDeviceId,
           duration: validateTime,
+          recordAudio: validateBoolean,
           volumeEventIntervalMs: validateTime,
         });
       if (invalidReasons) {
@@ -683,7 +686,10 @@ export namespace InputTest {
    * Option typing after initialization, so we can have type guarantees.
    * @private
    */
-  export type InternalOptions = SubsetRequired<Options, 'duration' | 'volumeEventIntervalMs'>;
+  export type InternalOptions = SubsetRequired<
+    Options,
+    'duration' | 'volumeEventIntervalMs' | 'recordAudio'
+  >;
 }
 
 /**
