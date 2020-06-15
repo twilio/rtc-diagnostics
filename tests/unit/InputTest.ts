@@ -248,6 +248,8 @@ describe('testInputDevice', function() {
       volumeEventIntervalMs: -10,
     }, {
       volumeEventIntervalMs: {},
+    }, {
+      recordAudio: {},
     }] as any;
 
     for (const overrides of invalidOptions) {
