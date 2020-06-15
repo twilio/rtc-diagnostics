@@ -10,7 +10,7 @@ New Features
 
   After the `low-audio-level` warning has been raised, it will not be raised again until it has been cleared.
 
-  Example usage:
+  #### Example
   ```ts
   import { InputTest, testInputDevice, WarningName } from '@twilio/rtc-diagnostics';
 
@@ -34,6 +34,24 @@ New Features
 
     // ...or access all active warnings.
     inputDeviceTest.activeWarnings.values().forEach(...);
+  });
+  ```
+
+* ### Audio Recordings
+
+  Added the ability to record audio during `InputTest`. This recording is processed _only_ locally and returned as an object URL within the report emitted by the `InputTest.Events.End` event.
+
+  #### Example
+
+  The following example shows playback of the recorded audio as soon as the test ends.
+
+  ```ts
+  const options: InputTest.Options = { ... };
+  const inputTest: InputTest = testInputDevice(options);
+  inputTest.on(InputTest.Events.End, (report: InputTest.Report) => {
+    const audioEl = new Audio();
+    audioEl.src = report.recordingUrl;
+    audioEl.play();
   });
   ```
 
