@@ -1,0 +1,12 @@
+.DS_STORE
+.github
+.idea
+.nyc_output
+.vscode
+coverage
+credentials.json
+dist
+docs
+node_modules
+scripts
+tests

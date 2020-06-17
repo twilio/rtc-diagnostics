@@ -1,6 +1,6 @@
 {
   "type": "JavaScript",
-  "travis": "pro",
+  "ci": "travis-pro",
   "slug": "twilio/rtc-diagnostics",
   "env": {
     "GH_REF": "github.com/twilio/rtc-diagnostics.git"

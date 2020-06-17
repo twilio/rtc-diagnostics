@@ -1,4 +1,5 @@
-# 1.0.0-alpha1
+1.0.0-preview3 (June 17, 2020)
+==============================
 
 Inital release and open source of project RTC Diagnostics SDK. This SDK provides developers with tools to diagnose potential problems before utilizing other Twilio SDKs such as Voice SDK.
 
