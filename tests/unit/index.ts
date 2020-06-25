@@ -10,6 +10,5 @@ import './mock.ts';
 import './InputTest';
 import './OutputTest';
 import './utils';
-import './utils/optionValidation';
 
 import './BitrateTest';
