@@ -22,6 +22,7 @@ import {
 } from './polyfills';
 import { SubsetRequired, TimeMeasurement, VolumeStats } from './types';
 import { detectSilence } from './utils';
+import { createMediaStreamRecorderFactory } from './utils/MediaStreamRecorder';
 import {
   InvalidityRecord,
   validateBoolean,
@@ -29,6 +30,7 @@ import {
   validateOptions,
   validateTime,
 } from './utils/optionValidation';
+
 
 export declare interface InputTest {
   /**
@@ -220,6 +222,10 @@ export class InputTest extends EventEmitter {
    */
   private _mediaRecorder: MediaRecorder | null = null;
   /**
+   * A `MediaStreamRecorder` instance that is used in place of `MediaRecorder` in unsupported environments.
+   */
+  private _mediaRecorderPolyfill: any = null;
+  /**
    * A `MediaStream` that is created from the input device.
    */
   private _mediaStream: MediaStream | null = null;
@@ -273,15 +279,18 @@ export class InputTest extends EventEmitter {
     // Perform cleanup
     this._cleanup();
 
+    const blob: Blob = this._mediaRecorderPolyfill
+      ? this._mediaRecorderPolyfill.exportWavBlob()
+      : this._audioBlobs.length && this._options.blobFactory
+        ? new this._options.blobFactory(this._audioBlobs, {
+            type: this._audioBlobs[0].type,
+          })
+        : undefined;
+
     const recordingUrl: string | undefined =
-      this._audioBlobs.length &&
-      this._options.createObjectURL &&
-      this._options.blobFactory
-        ? this._options.createObjectURL(new this._options.blobFactory(
-            this._audioBlobs, {
-              type: this._audioBlobs[0].type,
-            }),
-          )
+      blob &&
+      this._options.createObjectURL
+        ? this._options.createObjectURL(blob)
         : undefined;
 
     this._endTime = Date.now();
@@ -454,35 +463,42 @@ export class InputTest extends EventEmitter {
         await this._options.enumerateDevices(),
       );
 
-      if (this._options.recordAudio) {
-        if (!this._options.mediaRecorderFactory) {
-          throw MediaRecorderUnsupportedError;
-        }
-        if (!this._options.createObjectURL) {
-          throw createObjectURLUnsupportedError;
-        }
-        if (!this._options.blobFactory) {
-          throw BlobUnsupportedError;
-        }
-        this._mediaRecorder =
-          new this._options.mediaRecorderFactory(this._mediaStream);
-        const recordData = ({ data }: BlobEvent) => {
-          this._audioBlobs.push(data);
-        };
-        this._mediaRecorder.addEventListener('dataavailable', recordData);
-        this._mediaRecorder.addEventListener('stop', () => {
-          this._mediaRecorder?.removeEventListener('dataavailable', recordData);
-        });
-        this._mediaRecorder.start(this._options.volumeEventIntervalMs);
-      }
-
-      // Only starts the timer after successfully getting devices
-      this._startTime = Date.now();
-
       if (!this._options.audioContextFactory) {
         throw AudioContextUnsupportedError;
       }
       this._audioContext = new this._options.audioContextFactory();
+
+      if (this._options.recordAudio) {
+        // if (!this._options.mediaRecorderFactory) {
+        //   throw MediaRecorderUnsupportedError;
+        // }
+        // if (!this._options.createObjectURL) {
+        //   throw createObjectURLUnsupportedError;
+        // }
+        // if (!this._options.blobFactory) {
+        //   throw BlobUnsupportedError;
+        // }
+        // this._mediaRecorder =
+        //   new this._options.mediaRecorderFactory(this._mediaStream);
+        // const recordData = ({ data }: BlobEvent) => {
+        //   this._audioBlobs.push(data);
+        // };
+        // this._mediaRecorder.addEventListener('dataavailable', recordData);
+        // this._mediaRecorder.addEventListener('stop', () => {
+        //   this._mediaRecorder?.removeEventListener('dataavailable', recordData);
+        // });
+        // this._mediaRecorder.start(this._options.volumeEventIntervalMs);
+        const mediaRecorderFactory = createMediaStreamRecorderFactory(this._audioContext);
+        this._mediaRecorderPolyfill = new mediaRecorderFactory(this._mediaStream);
+        // mediaRecorder.addEventListener('dataavailable', (data: Blob) => {
+        //   console.log('blob');
+        //   this._audioBlobs.push(data);
+        // });
+        // console.log(mediaRecorder);
+      }
+
+      // Only starts the timer after successfully getting devices
+      this._startTime = Date.now();
 
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
