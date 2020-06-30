@@ -131,7 +131,7 @@ export function createAudioDeviceValidator(
  * otherwise `undefined`.
  */
 export function validateDeviceId(option: any): Validity {
-  if (option && typeof option !== 'string') {
+  if (!['undefined', 'string'].includes(typeof option)) {
     return 'If "deviceId" is defined, it must be a "string".';
   }
 }
@@ -182,6 +182,19 @@ export function validateTime(option: any): Validity {
 export function validateExists(option: any): Validity {
   if (option === undefined || option === null) {
     return `Option cannot be "${String(option)}".`;
+  }
+}
+
+/**
+ * @internalapi
+ * Validate that an option is a `boolean`.
+ * @param option The option to check.
+ * @returns A possibly undefined string, if the option is valid it will return
+ * `undefined`, otherwise a string representing why the option is invalid
+ */
+export function validateBoolean(option: any): Validity {
+  if (typeof option !== 'boolean') {
+    return `Option must be "boolean".`;
   }
 }
 

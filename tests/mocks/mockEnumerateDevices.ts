@@ -1,12 +1,12 @@
 export function mockEnumerateDevicesFactory(options: {
   devices: MediaDeviceInfo[],
-  doThrow?: any;
+  throw?: any;
 } = {
   devices: [],
 }) {
   return async (): Promise<MediaDeviceInfo[]> => {
-    if (options.doThrow) {
-      throw options.doThrow;
+    if (options.throw) {
+      throw options.throw;
     }
     return options.devices;
   };

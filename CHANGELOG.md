@@ -1,5 +1,30 @@
-1.0.0-preview3 (June 17, 2020)
-==============================
+# 1.0.0-preview4 (Ongoing)
+
+## New Features
+
+* ### `LowAudioLevel` detection and warning in `InputTest`.
+
+  During the runtime of the test, if low audio levels are detected from the captured input device, the test will emit a `warning` event. The test will emit a `warning-clear` event when nominal audio levels are detected only after the `low-audio-level` `warning` has been fired.
+
+  After the `low-audio-level` warning has been raised, it will not be raised again until it has been cleared.
+
+  Example usage:
+  ```ts
+  import { InputTest, testInputDevice } from '@twilio/rtc-diagnostics';
+  const inputAudioDeviceTest = testInputDevice();
+  inputAudioDeviceTest.on(InputTest.Events.Warning, (warning: DiagnosticWarning) => {
+    if (warning.type === LowAudioLevelWarning.type) {
+      // update the ui to show the input device may not be working
+    }
+  });
+  inputAudioDeviceTest.on(InputTest.Events.WarningCleared, (warningType: string) => {
+    if (warningType === LowAudioLevelWarning.type) {
+      // update the ui to show that the input device may be working again
+    }
+  });
+  ```
+
+# 1.0.0-preview3 (June 17, 2020)
 
 Inital release and open source of project RTC Diagnostics SDK. This SDK provides developers with tools to diagnose potential problems before utilizing other Twilio SDKs such as Voice SDK.
 

@@ -3,7 +3,9 @@ import { TestNames } from './constants';
 import {
   AlreadyStoppedError,
   DiagnosticError,
+  DiagnosticWarning,
   InvalidOptionsError,
+  LowAudioLevelWarning,
 } from './errors';
 import {
   AudioContext,
@@ -57,6 +59,26 @@ export declare interface InputTest {
     event: InputTest.Events.Volume,
     value: number,
   ): boolean;
+  /**
+   * This event is emitted when the test encounters a non-fatal warning during
+   * its run-time.
+   * @param event [[InputTest.Events.Warning]]
+   * @param warning The warning that the test encountered.
+   */
+  emit(
+    event: InputTest.Events.Warning,
+    warning: DiagnosticWarning,
+  ): boolean;
+  /**
+   * This event is emitted when the test clears a previously encountered
+   * non-fatal warning during its run-time.
+   * @param event [[InputTest.Events.WarninCleared]]
+   * @param warning The warning that the test encountered that should be cleared.
+   */
+  emit(
+    event: InputTest.Events.WarningCleared,
+    warningName: string,
+  ): boolean;
 
   /**
    * Raised upon completion of the test.
@@ -97,6 +119,32 @@ export declare interface InputTest {
     event: InputTest.Events.Volume,
     listener: (value: number) => any,
   ): this;
+  /**
+   * Raised by the test when the test encounters a non-fatal warning during
+   * its run-time.
+   * @param event [[InputTest.Events.Warning]]
+   * @param listener A callback that expects the following parameters:
+   *  A [[DiagnosticWarning]].
+   * @returns This [[InputTest]] instance.
+   * @event
+   */
+  on(
+    event: InputTest.Events.Warning,
+    listener: (warning: DiagnosticWarning) => any,
+  ): this;
+  /**
+   * Raised by the test when the test clears a previously encountered non-fatal
+   * warning during its run-time.
+   * @param event [[InputTest.Events.WarningCleared]]
+   * @param listener A callback that expects the following parameters:
+   *  A [[DiagnosticWarning]] name.
+   * @returns This [[InputTest]] instance.
+   * @event
+   */
+  on(
+    event: InputTest.Events.WarningCleared,
+    listener: (warningName: string) => any,
+  ): this;
 }
 
 /**
@@ -124,6 +172,10 @@ export class InputTest extends EventEmitter {
   };
 
   /**
+   * Active warnings to keep track of.
+   */
+  private _activeWarnings: Set<DiagnosticWarning['type']> = new Set();
+  /**
    * An `AudioContext` to use for generating volume levels.
    */
   private _audioContext: AudioContext | null = null;
@@ -148,10 +200,6 @@ export class InputTest extends EventEmitter {
    */
   private readonly _errors: DiagnosticError[] = [];
   /**
-   * The maximum volume level from the audio source.
-   */
-  private _maxValue: number = 0;
-  /**
    * A `MediaStream` that is created from the input device.
    */
   private _mediaStream: MediaStream | null = null;
@@ -168,7 +216,15 @@ export class InputTest extends EventEmitter {
    * Volume levels generated from the audio source during the run time of the
    * test.
    */
-  private readonly _values: number[] = [];
+  private readonly _volumeStatistcs: {
+    max?: number,
+    min?: number, // The smallest non-zero volume value encountered.
+    timestamps: number[],
+    values: number[],
+  } = {
+    timestamps: [],
+    values: [],
+  };
   /**
    * The timeout that causes the volume event to loop; created by `setTimeout`.
    */
@@ -194,7 +250,7 @@ export class InputTest extends EventEmitter {
    * override the result from determining whether audio is silent from the collected volume levels.
    */
   stop(pass: boolean = true): InputTest.Report | undefined {
-    if (this._endTime) {
+    if (typeof this._endTime === 'number') {
       this._onWarning(new AlreadyStoppedError());
       return;
     }
@@ -203,7 +259,7 @@ export class InputTest extends EventEmitter {
     this._cleanup();
 
     this._endTime = Date.now();
-    const didPass: boolean = pass && !detectSilence(this._values);
+    const didPass: boolean = pass && !detectSilence(this._volumeStatistcs.values);
     const report: InputTest.Report = {
       deviceId: this._options.deviceId || (
         this._defaultDevices.audioinput &&
@@ -212,7 +268,7 @@ export class InputTest extends EventEmitter {
       didPass,
       errors: this._errors,
       testName: InputTest.testName,
-      values: this._values,
+      values: this._volumeStatistcs.values,
     };
 
     if (this._startTime) {
@@ -266,11 +322,57 @@ export class InputTest extends EventEmitter {
    * @param value the volume
    */
   private _onVolume(value: number): void {
-    if (value > this._maxValue) {
-      this._maxValue = value;
+    const now = Date.now();
+
+    if (!this._volumeStatistcs.max || value > this._volumeStatistcs.max) {
+      this._volumeStatistcs.max = value;
     }
-    this._values.push(value);
+    this._volumeStatistcs.values.push(value);
+    this._volumeStatistcs.timestamps.push(now);
     this.emit(InputTest.Events.Volume, value);
+
+    // Find the last 3 seconds worth of volume values.
+    const startIdx = this._volumeStatistcs.timestamps.findIndex(
+      (timestamp: number) => now - timestamp <= 3000,
+    );
+
+    // We want to do nothing at 1 and not 0 here because this guarantees that
+    // there is at least one timestamp before the sample set. This means that
+    // there are at least three seconds of samples.
+    if (startIdx < 1) {
+      return;
+    }
+
+    const samples = this._volumeStatistcs.values.slice(
+      startIdx > 0
+        ? startIdx
+        : 0,
+    );
+
+    // Calculate the standard deviation of the sample set.
+    const sampleAverage = samples.reduce(
+      (sample: number, partialSum: number) => sample + partialSum,
+      0,
+    ) / samples.length;
+    const diffSquared = samples.map(
+      (sample: number) => Math.pow(sample - sampleAverage, 2),
+    );
+    const stdDev = Math.sqrt(diffSquared.reduce(
+      (sample: number, partialSum: number) => sample + partialSum,
+      0,
+    ) / samples.length);
+
+    // 255 is max volume value; 2.55 is 1% of max
+    const isConstantAudio = stdDev <= 2.55;
+    if (isConstantAudio && sampleAverage <= 2.55) {
+      if (!this._activeWarnings.has(LowAudioLevelWarning.type)) {
+        this._activeWarnings.add(LowAudioLevelWarning.type);
+        this.emit(InputTest.Events.Warning, new LowAudioLevelWarning());
+      }
+    } else if (this._activeWarnings.has(LowAudioLevelWarning.type)) {
+      this._activeWarnings.delete(LowAudioLevelWarning.type);
+      this.emit(InputTest.Events.WarningCleared, LowAudioLevelWarning.type);
+    }
   }
 
   /**
@@ -414,6 +516,8 @@ export namespace InputTest {
     End = 'end',
     Error = 'error',
     Volume = 'volume',
+    Warning = 'warning',
+    WarningCleared = 'warning-cleared',
   }
 
   /**
