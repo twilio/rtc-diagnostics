@@ -1,3 +1,11 @@
+1.0.0-preview4 (In progress)
+=============================
+
+Bug Fixes
+---------
+
+* Fixed an issue where output device test doesn't fail after providing a deviceId on browsers that doesn't support [setSinkId](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/setSinkId);
+
 1.0.0-preview3 (June 17, 2020)
 ==============================
 
