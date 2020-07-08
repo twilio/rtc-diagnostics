@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, MIN_BITRATE_THRESHOLD, TEST_PACKET } from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { NetworkTiming, TimeMeasurement } from './timing';
+import { getRTCIceCandidates, RTCIceCandidateStats, RTCSelectedIceCandidatePair } from './utils/candidate';
 
 export declare interface BitrateTest {
   /**
@@ -175,13 +176,14 @@ export class BitrateTest extends EventEmitter {
     clearInterval(this._sendDataIntervalId!);
     clearInterval(this._checkBitrateIntervalId!);
 
-    this._pcSender.close();
-    this._pcReceiver.close();
+    this._getReport().then((report: BitrateTest.Report) => {
+      this._pcSender.close();
+      this._pcReceiver.close();
 
-    this._testTiming.end = Date.now();
-    this._testTiming.duration = this._testTiming.end - this._testTiming.start;
-
-    this.emit(BitrateTest.Events.End, this._getReport());
+      this._testTiming.end = Date.now();
+      this._testTiming.duration = this._testTiming.end - this._testTiming.start;
+      this.emit(BitrateTest.Events.End, report);
+    });
   }
 
   /**
@@ -208,21 +210,29 @@ export class BitrateTest extends EventEmitter {
   /**
    * Generate and returns the report for this test
    */
-  private _getReport(): BitrateTest.Report {
+  private async _getReport(): Promise<BitrateTest.Report> {
     let averageBitrate = this._values
       .reduce((total: number, value: number) => total += value, 0) / this._values.length;
     averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
 
-    return {
+    const { iceCandidates, selectedIceCandidatePair } = await getRTCIceCandidates(this._pcSender);
+    const report: BitrateTest.Report = {
       averageBitrate,
       didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
+      iceCandidates,
       networkTiming: this._networkTiming,
       testName: BitrateTest.testName,
       testTiming: this._testTiming,
       values: this._values,
       warnings: this._warnings,
     };
+
+    if (selectedIceCandidatePair) {
+      report.selectedIceCandidatePair = selectedIceCandidatePair;
+    }
+
+    return report;
   }
 
   /**
@@ -503,9 +513,19 @@ export namespace BitrateTest {
     errors: DiagnosticError[];
 
     /**
+     * An array of ICE candidates gathered when connecting to media.
+     */
+    iceCandidates: RTCIceCandidateStats[];
+
+    /**
      * Network related time measurements.
      */
     networkTiming: NetworkTiming;
+
+    /**
+     * The ICE candidate pair used to connect to media, if candidates were selected.
+     */
+    selectedIceCandidatePair?: RTCSelectedIceCandidatePair;
 
     /**
      * The name of the test.
