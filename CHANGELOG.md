@@ -1,6 +1,32 @@
 1.0.0-preview4 (In progress)
 =============================
 
+Additions
+---------
+
+* Added ICE Candidate related statistics in the [BitrateTest.Report](https://twilio.github.io/rtc-diagnostics/interfaces/bitratetest.report.html) object.
+
+  **Example Usage**
+  ```ts
+  bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+    console.log(report);
+  });
+  ```
+
+  **Example Report Data**
+  ```js
+  {
+    "iceCandidateStats": [...],
+
+    "selectedIceCandidatePairStats": {
+      "localCandidate": {...},
+      "remoteCandidate": {...}
+    },
+
+    // Other report properties...
+  }
+  ```
+
 Bug Fixes
 ---------
 
