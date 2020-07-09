@@ -2,7 +2,12 @@ import { EventEmitter } from 'events';
 import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, MIN_BITRATE_THRESHOLD, TEST_PACKET } from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { NetworkTiming, TimeMeasurement } from './timing';
-import { getRTCIceCandidates, RTCIceCandidateStats, RTCSelectedIceCandidatePair } from './utils/candidate';
+import {
+  getRTCIceCandidates,
+  RTCIceCandidates,
+  RTCIceCandidateStats,
+  RTCSelectedIceCandidatePair,
+} from './utils/candidate';
 
 export declare interface BitrateTest {
   /**
@@ -97,6 +102,11 @@ export class BitrateTest extends EventEmitter {
   private _networkTiming: NetworkTiming = {};
 
   /**
+   * The options passed to [[BitrateTest]] constructor.
+   */
+  private _options: BitrateTest.ExtendedOptions;
+
+  /**
    * The RTCPeerConnection that will receive data
    */
   private _pcReceiver: RTCPeerConnection;
@@ -147,11 +157,11 @@ export class BitrateTest extends EventEmitter {
    * @constructor
    * @param options
    */
-  constructor(options: BitrateTest.Options) {
+  constructor(options: BitrateTest.ExtendedOptions) {
     super();
 
-    options = options || {};
-    this._rtcConfiguration.iceServers = options.iceServers;
+    this._options = { ...options };
+    this._rtcConfiguration.iceServers = this._options.iceServers;
 
     this._pcReceiver = new RTCPeerConnection(this._rtcConfiguration);
     this._pcSender = new RTCPeerConnection(this._rtcConfiguration);
@@ -215,7 +225,8 @@ export class BitrateTest extends EventEmitter {
       .reduce((total: number, value: number) => total += value, 0) / this._values.length;
     averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
 
-    const { iceCandidates, selectedIceCandidatePair } = await getRTCIceCandidates(this._pcSender);
+    const { iceCandidates, selectedIceCandidatePair } =
+      await (this._options.getRTCIceCandidates || getRTCIceCandidates)(this._pcSender);
     const report: BitrateTest.Report = {
       averageBitrate,
       didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
@@ -449,6 +460,18 @@ export namespace BitrateTest {
     [Warnings.HighIceConnectDuration]: 300,
     [Warnings.HighPcConnectDuration]: 1000,
   };
+
+  /**
+   * Options that may be passed to [[BitrateTest]] constructor for internal testing.
+   * @internalapi
+   */
+  export interface ExtendedOptions extends Options {
+    /**
+     * A function that generates a WebRTC stats report containing relevant information about ICE candidates for
+     * the given [PeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
+     */
+    getRTCIceCandidates?: (peerConnection: RTCPeerConnection) => Promise<RTCIceCandidates>;
+  }
 
   /**
    * Options passed to [[BitrateTest]] constructor.
