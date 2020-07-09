@@ -503,6 +503,94 @@ describe('BitrateTest', () => {
           clock.tick(1200);
         });
 
+        describe('ICE Candidate Stats', () => {
+          const runBitrateTest = (shoulStop: boolean) => {
+            ['new', 'checking', 'connected', 'completed', 'disconnected', 'closed'].forEach(state => {
+              pcSenderContext.iceConnectionState = state;
+              pcSenderContext.oniceconnectionstatechange();
+              clock.tick(1000);
+            });
+
+            sendMessage(message);
+            clock.tick(1200);
+            sendMessage(message);
+
+            if (shoulStop) {
+              bitrateTest.stop();
+            }
+          };
+
+          it('should include ICE Candidate stats in the report', (done) => {
+            bitrateTest = new BitrateTest({
+              ...options,
+              getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
+                cb({
+                  iceCandidateStats: ['foo', 'bar'],
+                  selectedIceCandidatePairStats: {
+                    localCandidate: 'foo',
+                    remoteCandidate: 'bar',
+                  },
+                });
+                return {catch: () => {}};
+              }}),
+            });
+
+            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+              assert.deepStrictEqual(report.iceCandidateStats, ['foo', 'bar']);
+              assert.deepStrictEqual(report.selectedIceCandidatePairStats, {
+                localCandidate: 'foo',
+                remoteCandidate: 'bar',
+              });
+              done();
+            });
+
+            runBitrateTest(true);
+          });
+
+          it('should not include selected ICE Candidate stats in the report if no candidates were selected', (done) => {
+            bitrateTest = new BitrateTest({
+              ...options,
+              getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
+                cb({
+                  iceCandidateStats: ['foo', 'bar'],
+                });
+                return {catch: () => {}};
+              }}),
+            });
+
+            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+              assert.deepStrictEqual(report.iceCandidateStats, ['foo', 'bar']);
+              assert(!report.selectedIceCandidatePairStats);
+              done();
+            });
+
+            runBitrateTest(true);
+          });
+
+          it('should fail the test if stats are not available', (done) => {
+            bitrateTest = new BitrateTest({
+              ...options,
+              getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
+                return {catch: (cb: Function) => {
+                  cb('Foo error');
+                }};
+              }}),
+            });
+
+            const onError = sinon.stub();
+            bitrateTest.on(BitrateTest.Events.Error, onError);
+
+            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+              sinon.assert.calledOnce(onError);
+              assert(!report.didPass);
+              assert.equal(report.errors[0].domError, 'Foo error')
+              done();
+            });
+
+            runBitrateTest(false);
+          });
+        });
+
         describe('connection timing', () => {
           it('should include PeerConnection timing', (done) => {
             bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
