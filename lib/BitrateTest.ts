@@ -87,6 +87,11 @@ export class BitrateTest extends EventEmitter {
   private _errors: DiagnosticError[] = [];
 
   /**
+   * An array of ICE candidates gathered when connecting to media.
+   */
+  private _iceCandidateStats: RTCIceCandidateStats[] = [];
+
+  /**
    * Number of bytes received the last time it was checked
    */
   private _lastBytesChecked: number = 0;
@@ -125,6 +130,11 @@ export class BitrateTest extends EventEmitter {
    * RTCDataChannel to use for sending data
    */
   private _rtcDataChannel: RTCDataChannel | undefined;
+
+  /**
+   * The ICE candidate pair used to connect to media, if candidates were selected.
+   */
+  private _selectedIceCandidatePairStats: RTCSelectedIceCandidatePairStats | undefined;
 
   /**
    * Interval id for sending data
@@ -186,14 +196,13 @@ export class BitrateTest extends EventEmitter {
     clearInterval(this._sendDataIntervalId!);
     clearInterval(this._checkBitrateIntervalId!);
 
-    this._getReport().then((report: BitrateTest.Report) => {
-      this._pcSender.close();
-      this._pcReceiver.close();
+    this._pcSender.close();
+    this._pcReceiver.close();
 
-      this._testTiming.end = Date.now();
-      this._testTiming.duration = this._testTiming.end - this._testTiming.start;
-      this.emit(BitrateTest.Events.End, report);
-    });
+    this._testTiming.end = Date.now();
+    this._testTiming.duration = this._testTiming.end - this._testTiming.start;
+
+    this.emit(BitrateTest.Events.End, this._getReport());
   }
 
   /**
@@ -220,18 +229,16 @@ export class BitrateTest extends EventEmitter {
   /**
    * Generate and returns the report for this test
    */
-  private async _getReport(): Promise<BitrateTest.Report> {
+  private _getReport(): BitrateTest.Report {
     let averageBitrate = this._values
       .reduce((total: number, value: number) => total += value, 0) / this._values.length;
     averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
 
-    const { iceCandidateStats, selectedIceCandidatePairStats } =
-      await (this._options.getRTCIceCandidateStatsReport || getRTCIceCandidateStatsReport)(this._pcSender);
     const report: BitrateTest.Report = {
       averageBitrate,
       didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
-      iceCandidateStats,
+      iceCandidateStats: this._iceCandidateStats,
       networkTiming: this._networkTiming,
       testName: BitrateTest.testName,
       testTiming: this._testTiming,
@@ -239,8 +246,8 @@ export class BitrateTest extends EventEmitter {
       warnings: this._warnings,
     };
 
-    if (selectedIceCandidatePairStats) {
-      report.selectedIceCandidatePairStats = selectedIceCandidatePairStats;
+    if (this._selectedIceCandidatePairStats) {
+      report.selectedIceCandidatePairStats = this._selectedIceCandidatePairStats;
     }
 
     return report;
@@ -395,6 +402,15 @@ export class BitrateTest extends EventEmitter {
         const duration = end - start;
         this._networkTiming.ice.duration = duration;
         this._maybeEmitWarning(BitrateTest.Warnings.HighIceConnectDuration, duration);
+
+        (this._options.getRTCIceCandidateStatsReport || getRTCIceCandidateStatsReport)(this._pcSender)
+          .then((statsReport: RTCIceCandidateStatsReport) => {
+            this._iceCandidateStats = statsReport.iceCandidateStats;
+            this._selectedIceCandidatePairStats = statsReport.selectedIceCandidatePairStats;
+          })
+          .catch((error: DOMError) => {
+            this._onError('Unable to generate WebRTC stats report', error);
+          });
       }
     };
   }
