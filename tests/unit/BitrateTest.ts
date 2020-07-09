@@ -16,6 +16,7 @@ describe('BitrateTest', () => {
 
   let bitrateTest: BitrateTest;
   let originalRTCPeerConnection: any;
+  let options: any;
   let pcReceiverContext: any;
   let pcSenderContext: any;
   let rtcDataChannel: any;
@@ -50,6 +51,14 @@ describe('BitrateTest', () => {
   };
 
   beforeEach(() => {
+    options = {
+      iceServers,
+      getRTCIceCandidateStatsReport: sinon.stub()
+        .returns(Promise.resolve({
+          iceCandidateStats: [],
+        })),
+    };
+
     rtcDataChannel = {
       send: sinon.stub(),
     };
@@ -57,7 +66,7 @@ describe('BitrateTest', () => {
     originalRTCPeerConnection = root.RTCPeerConnection;
     root.RTCPeerConnection = getPeerConnectionFactory();
 
-    bitrateTest = new BitrateTest({ iceServers });
+    bitrateTest = new BitrateTest(options);
   });
 
   afterEach(() => {
@@ -68,14 +77,14 @@ describe('BitrateTest', () => {
 
   describe('testBitrate', () => {
     it('should return BitrateTest instance', () => {
-      bitrateTest = testBitrate({ iceServers });
+      bitrateTest = testBitrate(options);
       assert(!!bitrateTest);
     });
   });
 
   describe('constructor', () => {
     it('should use iceServers option', () => {
-      bitrateTest = new BitrateTest({ iceServers });
+      bitrateTest = new BitrateTest(options);
       assert.deepEqual(pcReceiverContext.rtcConfiguration.iceServers, iceServers);
       assert.deepEqual(pcSenderContext.rtcConfiguration.iceServers, iceServers);
     });
@@ -164,7 +173,7 @@ describe('BitrateTest', () => {
     const wait = () => new Promise(r => setTimeout(r, 1));
 
     beforeEach(() => {
-      bitrateTest = new BitrateTest({ iceServers });
+      bitrateTest = new BitrateTest(options);
       bitrateTest.stop = sinon.stub();
     });
 
@@ -246,7 +255,7 @@ describe('BitrateTest', () => {
 
     beforeEach(() => {
       clock = sinon.useFakeTimers(0);
-      bitrateTest = new BitrateTest({ iceServers });
+      bitrateTest = new BitrateTest(options);
       bitrateTest.stop = sinon.stub();
     });
 
@@ -312,7 +321,7 @@ describe('BitrateTest', () => {
 
         beforeEach(() => {
           clock = sinon.useFakeTimers(0);
-          bitrateTest = new BitrateTest({ iceServers });
+          bitrateTest = new BitrateTest(options);
           clock.tick(1);
           dataChannelEvent = {
             channel: {
@@ -392,6 +401,7 @@ describe('BitrateTest', () => {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
               didPass: false,
               errors: [],
+              iceCandidateStats: [],
               networkTiming: {
                 firstPacket: 1,
               },
