@@ -1,6 +1,6 @@
 # Voice Diagnostics SDK
 The Voice Diagnostics SDK provides functions to test input and output audio devices, and the functionality to test network bandwidth requirements towards Twilio’s servers.
-
+test hook
 This SDK requires the use of Twilio NTS to perform the network tests. Using NTS will incur charges as per [NTS pricing](https://www.twilio.com/stun-turn/pricing).
 
 ## Features
