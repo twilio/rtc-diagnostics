@@ -55,7 +55,7 @@ export interface RTCStats {
    * Indicates the type of statistics the object contains,
    * taken from the enum type [RTCStatsType](https://developer.mozilla.org/en-US/docs/Web/API/RTCStatsType).
    */
-  type: string,
+  type: string;
 }
 
 /**
@@ -65,25 +65,25 @@ export interface RTCStats {
  */
 export async function getRTCIceCandidates(peerConnection: RTCPeerConnection): Promise<RTCIceCandidates> {
   const report = await peerConnection.getStats() as Map<string, RTCStats>;
-  const statsArrays = Array.from(report.values()).reduce((statsArrays, stat) => {
+  const statsArrays = Array.from(report.values()).reduce((result, stat) => {
     switch (stat.type) {
       case 'candidate-pair':
-        statsArrays.candidatePairs.push(stat);
+        result.candidatePairs.push(stat);
         break;
       case 'local-candidate':
-        statsArrays.localCandidates.push(stat);
+        result.localCandidates.push(stat);
         break;
       case 'remote-candidate':
-        statsArrays.remoteCandidates.push(stat);
+        result.remoteCandidates.push(stat);
         break;
       case 'transport':
         // This transport is the one being used if selectedCandidatePairId is populated
         if (stat.selectedCandidatePairId) {
-          statsArrays.transport = stat;
+          result.transport = stat;
         }
         break;
     }
-    return statsArrays;
+    return result;
   }, { candidatePairs: [], localCandidates: [], remoteCandidates: [] } as Record<string, RTCStats[] | RTCStats>);
 
   const candidatePairs = statsArrays.candidatePairs as RTCStats[];
@@ -97,7 +97,7 @@ export async function getRTCIceCandidates(peerConnection: RTCPeerConnection): Pr
     // Firefox
     pair.selected ||
     // Spec-compliant way
-    (transport && pair.id === transport.selectedCandidatePairId)
+    (transport && pair.id === transport.selectedCandidatePairId),
   );
 
   let selectedIceCandidatePair;
