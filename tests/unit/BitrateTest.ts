@@ -52,11 +52,11 @@ describe('BitrateTest', () => {
 
   beforeEach(() => {
     options = {
-      iceServers,
       getRTCIceCandidateStatsReport: sinon.stub()
         .returns(Promise.resolve({
           iceCandidateStats: [],
         })),
+      iceServers,
     };
 
     rtcDataChannel = {
@@ -531,7 +531,7 @@ describe('BitrateTest', () => {
                     remoteCandidate: 'bar',
                   },
                 });
-                return {catch: () => {}};
+                return {catch: sinon.stub()};
               }}),
             });
 
@@ -554,7 +554,7 @@ describe('BitrateTest', () => {
                 cb({
                   iceCandidateStats: ['foo', 'bar'],
                 });
-                return {catch: () => {}};
+                return {catch: sinon.stub()};
               }}),
             });
 
@@ -570,7 +570,7 @@ describe('BitrateTest', () => {
           it('should fail the test if stats are not available', (done) => {
             bitrateTest = new BitrateTest({
               ...options,
-              getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
+              getRTCIceCandidateStatsReport: () => ({then: () => {
                 return {catch: (cb: Function) => {
                   cb('Foo error');
                 }};
@@ -583,7 +583,7 @@ describe('BitrateTest', () => {
             bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
               sinon.assert.calledOnce(onError);
               assert(!report.didPass);
-              assert.equal(report.errors[0].domError, 'Foo error')
+              assert.equal(report.errors[0].domError, 'Foo error');
               done();
             });
 
