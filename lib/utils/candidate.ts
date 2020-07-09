@@ -7,7 +7,7 @@ export interface RTCIceCandidateStats {
 }
 
 /**
- * Represents the ICE candidate pair used to connect to media.
+ * Represents the WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
  */
 export interface RTCSelectedIceCandidatePairStats {
   /**
@@ -24,16 +24,16 @@ export interface RTCSelectedIceCandidatePairStats {
 }
 
 /**
- * A WebRTC stats report containing relevant information about selected and gathered ICE candidates
+ * A WebRTC stats report containing relevant information about selected and gathered ICE candidates.
  */
 export interface RTCIceCandidateStatsReport {
   /**
-   * An array of ICE candidates gathered when connecting to media.
+   * An array of WebRTC stats for the ICE candidates gathered when connecting to media.
    */
   iceCandidateStats: RTCIceCandidateStats[];
 
   /**
-   * The ICE candidate pair used to connect to media, if candidates were selected.
+   * A WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
    */
   selectedIceCandidatePairStats?: RTCSelectedIceCandidatePairStats;
 }

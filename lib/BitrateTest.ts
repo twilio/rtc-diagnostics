@@ -87,7 +87,7 @@ export class BitrateTest extends EventEmitter {
   private _errors: DiagnosticError[] = [];
 
   /**
-   * An array of ICE candidates gathered when connecting to media.
+   * An array of WebRTC stats for the ICE candidates gathered when connecting to media.
    */
   private _iceCandidateStats: RTCIceCandidateStats[] = [];
 
@@ -132,7 +132,7 @@ export class BitrateTest extends EventEmitter {
   private _rtcDataChannel: RTCDataChannel | undefined;
 
   /**
-   * The ICE candidate pair used to connect to media, if candidates were selected.
+   * A WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
    */
   private _selectedIceCandidatePairStats: RTCSelectedIceCandidatePairStats | undefined;
 
@@ -552,7 +552,7 @@ export namespace BitrateTest {
     errors: DiagnosticError[];
 
     /**
-     * An array of ICE candidates gathered when connecting to media.
+     * An array of WebRTC stats for the ICE candidates gathered when connecting to media.
      */
     iceCandidateStats: RTCIceCandidateStats[];
 
@@ -562,7 +562,7 @@ export namespace BitrateTest {
     networkTiming: NetworkTiming;
 
     /**
-     * The ICE candidate pair used to connect to media, if candidates were selected.
+     * A WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
      */
     selectedIceCandidatePairStats?: RTCSelectedIceCandidatePairStats;
 
