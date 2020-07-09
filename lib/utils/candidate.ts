@@ -9,7 +9,7 @@ export interface RTCIceCandidateStats {
 /**
  * Represents the ICE candidate pair used to connect to media.
  */
-export interface RTCSelectedIceCandidatePair {
+export interface RTCSelectedIceCandidatePairStats {
   /**
    * An [RTCIceCandidateStats](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidateStats)
    * object which provides information related to the selected local ICE candidate.
@@ -26,16 +26,16 @@ export interface RTCSelectedIceCandidatePair {
 /**
  * A WebRTC stats report containing relevant information about selected and gathered ICE candidates
  */
-export interface RTCIceCandidates {
+export interface RTCIceCandidateStatsReport {
   /**
    * An array of ICE candidates gathered when connecting to media.
    */
-  iceCandidates: RTCIceCandidateStats[];
+  iceCandidateStats: RTCIceCandidateStats[];
 
   /**
    * The ICE candidate pair used to connect to media, if candidates were selected.
    */
-  selectedIceCandidatePair?: RTCSelectedIceCandidatePair;
+  selectedIceCandidatePairStats?: RTCSelectedIceCandidatePairStats;
 }
 
 /**
@@ -63,7 +63,7 @@ export interface RTCStats {
  * the given [PeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
  * @param peerConnection
  */
-export async function getRTCIceCandidates(peerConnection: RTCPeerConnection): Promise<RTCIceCandidates> {
+export async function getRTCIceCandidateStatsReport(peerConnection: RTCPeerConnection): Promise<RTCIceCandidateStatsReport> {
   const report = await peerConnection.getStats() as Map<string, RTCStats>;
   const statsArrays = Array.from(report.values()).reduce((result, stat) => {
     switch (stat.type) {
@@ -100,16 +100,16 @@ export async function getRTCIceCandidates(peerConnection: RTCPeerConnection): Pr
     (transport && pair.id === transport.selectedCandidatePairId),
   );
 
-  let selectedIceCandidatePair;
+  let selectedIceCandidatePairStats;
   if (selectedCandidatePairReport) {
-    selectedIceCandidatePair = {
+    selectedIceCandidatePairStats = {
       localCandidate: localCandidates.find(candidate => candidate.id === selectedCandidatePairReport.localCandidateId),
       remoteCandidate: remoteCandidates.find(candidate => candidate.id === selectedCandidatePairReport.remoteCandidateId),
     };
   }
 
   return {
-    iceCandidates: [...localCandidates, ...remoteCandidates],
-    selectedIceCandidatePair,
-  } as RTCIceCandidates;
+    iceCandidateStats: [...localCandidates, ...remoteCandidates],
+    selectedIceCandidatePairStats,
+  } as RTCIceCandidateStatsReport;
 }

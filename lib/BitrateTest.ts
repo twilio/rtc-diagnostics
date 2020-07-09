@@ -3,10 +3,10 @@ import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, MIN_BITRATE_THRESHOLD, TEST_PA
 import { DiagnosticError } from './errors/DiagnosticError';
 import { NetworkTiming, TimeMeasurement } from './timing';
 import {
-  getRTCIceCandidates,
-  RTCIceCandidates,
+  getRTCIceCandidateStatsReport,
   RTCIceCandidateStats,
-  RTCSelectedIceCandidatePair,
+  RTCIceCandidateStatsReport,
+  RTCSelectedIceCandidatePairStats,
 } from './utils/candidate';
 
 export declare interface BitrateTest {
@@ -225,13 +225,13 @@ export class BitrateTest extends EventEmitter {
       .reduce((total: number, value: number) => total += value, 0) / this._values.length;
     averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
 
-    const { iceCandidates, selectedIceCandidatePair } =
-      await (this._options.getRTCIceCandidates || getRTCIceCandidates)(this._pcSender);
+    const { iceCandidateStats, selectedIceCandidatePairStats } =
+      await (this._options.getRTCIceCandidateStatsReport || getRTCIceCandidateStatsReport)(this._pcSender);
     const report: BitrateTest.Report = {
       averageBitrate,
       didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
-      iceCandidates,
+      iceCandidateStats,
       networkTiming: this._networkTiming,
       testName: BitrateTest.testName,
       testTiming: this._testTiming,
@@ -239,8 +239,8 @@ export class BitrateTest extends EventEmitter {
       warnings: this._warnings,
     };
 
-    if (selectedIceCandidatePair) {
-      report.selectedIceCandidatePair = selectedIceCandidatePair;
+    if (selectedIceCandidatePairStats) {
+      report.selectedIceCandidatePairStats = selectedIceCandidatePairStats;
     }
 
     return report;
@@ -470,7 +470,7 @@ export namespace BitrateTest {
      * A function that generates a WebRTC stats report containing relevant information about ICE candidates for
      * the given [PeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
      */
-    getRTCIceCandidates?: (peerConnection: RTCPeerConnection) => Promise<RTCIceCandidates>;
+    getRTCIceCandidateStatsReport?: (peerConnection: RTCPeerConnection) => Promise<RTCIceCandidateStatsReport>;
   }
 
   /**
@@ -538,7 +538,7 @@ export namespace BitrateTest {
     /**
      * An array of ICE candidates gathered when connecting to media.
      */
-    iceCandidates: RTCIceCandidateStats[];
+    iceCandidateStats: RTCIceCandidateStats[];
 
     /**
      * Network related time measurements.
@@ -548,7 +548,7 @@ export namespace BitrateTest {
     /**
      * The ICE candidate pair used to connect to media, if candidates were selected.
      */
-    selectedIceCandidatePair?: RTCSelectedIceCandidatePair;
+    selectedIceCandidatePairStats?: RTCSelectedIceCandidatePairStats;
 
     /**
      * The name of the test.
