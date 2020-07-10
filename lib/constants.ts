@@ -36,7 +36,28 @@ export const INCOMING_SOUND_URL: string =
  * @private
  * Test names.
  */
-export enum TestNames {
+export enum TestName {
   InputAudioDevice = 'input-volume',
   OutputAudioDevice = 'output-volume',
+}
+
+/**
+ * All of the expected error names to be thrown by the diagnostics tests.
+ * These names are set in the error objects as the `.name` member.
+ */
+export enum ErrorName {
+  AlreadyStoppedError = 'already-stopped',
+  DiagnosticError = 'diagnostic',
+  InvalidOptionError = 'invalid-option',
+  InvalidOptionsError = 'invalid-options',
+  InvalidStateError = 'invalid-state',
+  PromiseTimedOutError = 'promise-timed-out',
+  UnsupportedError = 'unsupported',
+}
+
+/**
+ * All of the expected warnings to be thrown by the diagnostics tests.
+ */
+export enum WarningName {
+  LowAudioLevel = 'low-audio-level',
 }

@@ -2,7 +2,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { DiagnosticError, LowAudioLevelWarning } from '../../lib/errors';
+import { WarningName } from '../../lib/constants';
+import { DiagnosticError } from '../../lib/errors/DiagnosticError';
 import {
   InputTest,
   testInputDevice,
@@ -92,7 +93,7 @@ describe('testInputDevice', function() {
       assert(handlers.volume.args.every(([v]) => v === 0));
       assert(handlers.end.notCalled);
       assert(handlers.warning.calledOnce);
-      assert(handlers.warning.args[0][0].type === LowAudioLevelWarning.type);
+      assert(handlers.warning.args[0][0] === WarningName.LowAudioLevel);
 
       resetHandlers();
 
@@ -108,7 +109,7 @@ describe('testInputDevice', function() {
       assert(handlers.end.notCalled);
       assert(handlers.warning.notCalled);
       assert(handlers['warning-cleared'].calledOnce);
-      assert(handlers['warning-cleared'].args[0][0] === LowAudioLevelWarning.type);
+      assert(handlers['warning-cleared'].args[0][0] === WarningName.LowAudioLevel);
 
       resetHandlers();
 

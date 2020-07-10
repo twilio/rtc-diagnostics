@@ -1,4 +1,5 @@
 import { BitrateTest, testBitrate } from './BitrateTest';
+import { ErrorName, WarningName } from './constants';
 import { InputTest, testInputDevice } from './InputTest';
 import { OutputTest, testOutputDevice } from './OutputTest';
 
@@ -32,9 +33,11 @@ window.Twilio.Diagnostics = {
  */
 export {
   BitrateTest,
+  ErrorName,
   InputTest,
   OutputTest,
   testBitrate,
   testInputDevice,
   testOutputDevice,
+  WarningName,
 };

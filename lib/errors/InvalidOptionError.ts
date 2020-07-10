@@ -1,7 +1,9 @@
+import { ErrorName } from '../constants';
 import { DiagnosticError } from './DiagnosticError';
 
 /**
  * @internalapi
+ * Error that can be thrown when a single option passed to a test is invalid.
  */
 export class InvalidOptionError extends DiagnosticError {
   error: DiagnosticError | DOMError | DOMException | undefined;
@@ -28,6 +30,6 @@ export class InvalidOptionError extends DiagnosticError {
     this.reason = reason;
     this.error = error;
 
-    this.name = 'InvalidOptionError';
+    this.name = ErrorName.InvalidOptionError;
   }
 }

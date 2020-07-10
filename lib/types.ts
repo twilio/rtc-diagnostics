@@ -23,3 +23,14 @@ export interface TimeMeasurement {
  * @internalapi
  */
 export type SubsetRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+/**
+ * @internalapi
+ * Volume statistics to track in the audio device tests.
+ */
+export interface VolumeStatistics {
+  max?: number;
+  min?: number; // The smallest non-zero volume value encountered.
+  timestamps: number[];
+  values: number[];
+}

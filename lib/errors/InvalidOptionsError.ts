@@ -1,3 +1,4 @@
+import { ErrorName } from '../constants';
 import { DiagnosticError } from './DiagnosticError';
 
 /**
@@ -16,6 +17,6 @@ export class InvalidOptionsError<
     );
 
     this.reasons = reasons;
-    this.name = 'InvalidOptionsError';
+    this.name = ErrorName.InvalidOptionsError;
   }
 }

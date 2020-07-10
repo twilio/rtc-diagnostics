@@ -1,26 +1,37 @@
-# 1.0.0-preview4 (Ongoing)
+# 1.0.0-preview4 (In Progress)
 
 ## New Features
 
 * ### `LowAudioLevel` detection and warning in `InputTest`.
 
-  During the runtime of the test, if low audio levels are detected from the captured input device, the test will emit a `warning` event. The test will emit a `warning-clear` event when nominal audio levels are detected only after the `low-audio-level` `warning` has been fired.
+  During the runtime of the test, if low audio levels are detected from the captured input device, the test will emit a `warning` event. The test will emit a `warning-cleared` event when nominal audio levels are detected only after the `low-audio-level` `warning` has been fired.
 
   After the `low-audio-level` warning has been raised, it will not be raised again until it has been cleared.
 
   Example usage:
   ```ts
-  import { InputTest, testInputDevice } from '@twilio/rtc-diagnostics';
-  const inputAudioDeviceTest = testInputDevice();
-  inputAudioDeviceTest.on(InputTest.Events.Warning, (warning: DiagnosticWarning) => {
-    if (warning.type === LowAudioLevelWarning.type) {
+  import { InputTest, testInputDevice, WarningName } from '@twilio/rtc-diagnostics';
+
+  const inputDeviceTest = testInputDevice();
+
+  inputDeviceTest.on(InputTest.Events.Warning, (warning: WarningName) => {
+    // The application can listen for specific warnings...
+    if (warning === Warning.LowAudioLevel) {
       // update the ui to show the input device may not be working
     }
+
+    // ...or access all active warnings.
+    inputDeviceTest.activeWarnings.values().forEach(...);
   });
-  inputAudioDeviceTest.on(InputTest.Events.WarningCleared, (warningType: string) => {
-    if (warningType === LowAudioLevelWarning.type) {
+
+  inputDeviceTest.on(InputTest.Events.WarningCleared, (warningType: WarningName) => {
+    // The application can listen for specific warnings...
+    if (warning === Warning.LowAudioLevel) {
       // update the ui to show that the input device may be working again
     }
+
+    // ...or access all active warnings.
+    inputDeviceTest.activeWarnings.values().forEach(...);
   });
   ```
 
