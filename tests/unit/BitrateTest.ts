@@ -53,9 +53,9 @@ describe('BitrateTest', () => {
   beforeEach(() => {
     options = {
       getRTCIceCandidateStatsReport: sinon.stub()
-        .returns(Promise.resolve({
+        .resolves({
           iceCandidateStats: [],
-        })),
+        }),
       iceServers,
     };
 
@@ -504,7 +504,7 @@ describe('BitrateTest', () => {
         });
 
         describe('ICE Candidate Stats', () => {
-          const runBitrateTest = (shoulStop: boolean) => {
+          const runBitrateTest = (shouldStop: boolean) => {
             ['new', 'checking', 'connected', 'completed', 'disconnected', 'closed'].forEach(state => {
               pcSenderContext.iceConnectionState = state;
               pcSenderContext.oniceconnectionstatechange();
@@ -515,7 +515,7 @@ describe('BitrateTest', () => {
             clock.tick(1200);
             sendMessage(message);
 
-            if (shoulStop) {
+            if (shouldStop) {
               bitrateTest.stop();
             }
           };
