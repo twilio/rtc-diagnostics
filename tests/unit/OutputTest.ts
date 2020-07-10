@@ -367,17 +367,26 @@ describe('testOutputDevice', function() {
   });
 
   it('should not allow `deviceId` if `setSinkId` is unsupported', async function() {
-    await assert.rejects(() => new Promise((_, reject) => {
-      const test = testOutputDevice({
-        audioContextFactory: mockAudioContextFactory() as any,
-        audioElementFactory: mockAudioElementFactory({ supportSetSinkId: false }) as any,
-        deviceId: 'foobar',
-        enumerateDevices: mockEnumerateDevicesFactory({
-          devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
-        }),
-      });
-      test.on(OutputTest.Events.Error, err => reject(err));
-    }));
+    const test = testOutputDevice({
+      audioContextFactory: mockAudioContextFactory() as any,
+      audioElementFactory: mockAudioElementFactory({ supportSetSinkId: false }) as any,
+      deviceId: 'foobar',
+      enumerateDevices: mockEnumerateDevicesFactory({
+        devices: [{ deviceId: 'foobar', kind: 'audiooutput' } as any],
+      }),
+    });
+
+    const results = await Promise.all([
+      new Promise(resolve => test.on(OutputTest.Events.Error, resolve)),
+      new Promise(resolve => test.on(OutputTest.Events.End, resolve)),
+    ]);
+
+    const error = results[0] as DiagnosticError;
+    const report = results[1] as OutputTest.Report;
+
+    assert(error);
+    assert(report);
+    assert(!report.didPass);
   });
 
   it('should throw during setup when `enumerateDevices` is not supported', async function() {

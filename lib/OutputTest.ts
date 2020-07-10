@@ -390,11 +390,10 @@ export class OutputTest extends EventEmitter {
         this._audio.push(destinationAudio);
       } else {
         if (this._options.deviceId && !setSinkIdSupported) {
-          // Non-fatal error
-          this._onError(new UnsupportedError(
+          throw new UnsupportedError(
             'A `deviceId` was passed to the `OutputTest` but `setSinkId` is ' +
             'not supported in this browser.',
-          ));
+          );
         }
         analyser.connect(this._audioContext.destination);
       }
