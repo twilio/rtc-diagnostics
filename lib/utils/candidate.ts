@@ -59,6 +59,7 @@ export interface RTCStats {
 }
 
 /**
+ * @internalapi
  * Generate a WebRTC stats report containing relevant information about ICE candidates for
  * the given [PeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
  * @param peerConnection

@@ -1,8 +1,8 @@
 1.0.0-preview4 (In progress)
 =============================
 
-Additions
----------
+Changes
+-------
 
 * Added ICE Candidate related statistics in the [BitrateTest.Report](https://twilio.github.io/rtc-diagnostics/interfaces/bitratetest.report.html) object.
 
@@ -26,6 +26,11 @@ Additions
     // Other report properties...
   }
   ```
+
+* Removed network related timings and warnings. It is recommended to use `twilio-client.js` [preflight timing APIs](https://github.com/twilio/twilio-client.js/blob/preflight/PREFLIGHT.md) instead for a more accurate timing information. With this change, the following are no longer available:
+  - `bitrateTest.on('warning', handler(warning))`
+  - `BitrateTest.Report.warnings`
+  - `BitrateTest.Report.networkTiming`
 
 Bug Fixes
 ---------
