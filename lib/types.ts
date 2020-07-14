@@ -10,10 +10,22 @@ export interface AudioElement extends HTMLAudioElement {
 
 /**
  * @internalapi
+ * Timing measurements that provides operational milestones.
  */
 export interface TimeMeasurement {
-  duration: number;
-  end: number;
+  /**
+   * Number in milliseconds elapsed for this measurement.
+   */
+  duration?: number;
+
+  /**
+   * A millisecond timestamp that represents the end of a process.
+   */
+  end?: number;
+
+  /**
+   * A millisecond timestamp that represents the start of a process.
+   */
   start: number;
 }
 
