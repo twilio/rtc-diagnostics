@@ -24,6 +24,9 @@ export const mockRTCPeerConnectionFactory = (
         throw new Error();
       }
     }
+    getStats: (...args: any[]) => Promise<any> = () => {
+      return new Promise((...args: any[]) => {});
+    }
     ondatachannel: (...args: any[]) => void = () => {};
     onicecandidate: (...args: any[]) => void = () => {};
     async setLocalDescription() {}

@@ -79,6 +79,11 @@ export class BitrateTest extends EventEmitter {
   private _errors: DiagnosticError[] = [];
 
   /**
+   * Counter for getStats query
+   */
+  private _getStatsCounter: number = 0;
+
+  /**
    * An array of WebRTC stats for the ICE candidates gathered when connecting to media.
    */
   private _iceCandidateStats: RTCIceCandidateStats[] = [];
@@ -117,6 +122,11 @@ export class BitrateTest extends EventEmitter {
    * RTCDataChannel to use for sending data
    */
   private _rtcDataChannel: RTCDataChannel | undefined;
+
+  /**
+   * RTT values collected during the test
+   */
+  private _rttValues: number[] = [];
 
   /**
    * A WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
@@ -189,6 +199,13 @@ export class BitrateTest extends EventEmitter {
   }
 
   /**
+   * Averages the values of a numeric array
+   */
+  private _avg(values: number[]): number {
+    return values.reduce((total: number, value: number) => total += value, 0) / this._values.length;
+  }
+
+  /**
    * Calculate bitrate by comparing bytes received between current time and the last time it was checked
    */
   private _checkBitrate(): void {
@@ -213,9 +230,10 @@ export class BitrateTest extends EventEmitter {
    * Generate and returns the report for this test
    */
   private _getReport(): BitrateTest.Report {
-    let averageBitrate = this._values
-      .reduce((total: number, value: number) => total += value, 0) / this._values.length;
+    let averageBitrate = this._avg(this._values);
     averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
+
+    const averageRtt = this._avg(this._rttValues);
 
     const testTiming: TimeMeasurement = { start: this._startTime };
     if (this._endTime) {
@@ -225,6 +243,7 @@ export class BitrateTest extends EventEmitter {
 
     const report: BitrateTest.Report = {
       averageBitrate,
+      averageRtt,
       didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
       iceCandidateStats: this._iceCandidateStats,
@@ -238,6 +257,20 @@ export class BitrateTest extends EventEmitter {
     }
 
     return report;
+  }
+
+  /**
+   * Calls getStats on the RTCPeerConnection instance if at least
+   * one second has passed since the last call
+   * @param secondsPassed
+   */
+  private _maybeGetStats(secondsPassed: number) {
+    if (secondsPassed > this._getStatsCounter) {
+      this._pcSender.getStats(null).then((res: RTCStatsReport) => {
+        this._onStatsSender(res);
+      });
+      this._getStatsCounter = secondsPassed;
+    }
   }
 
   /**
@@ -273,6 +306,12 @@ export class BitrateTest extends EventEmitter {
    */
   private _onMessageReceived(event: MessageEvent) {
     this._totalBytesReceived += event.data.length;
+
+    if (this._lastCheckedTimestamp) {
+      this._maybeGetStats(
+        Math.floor((this._lastCheckedTimestamp - this._startTime) / 1000),
+      );
+    }
   }
 
   /**
@@ -297,6 +336,19 @@ export class BitrateTest extends EventEmitter {
       this._pcReceiver.setRemoteDescription(offer),
     ]).catch((error: DOMError) =>
       this._onError('Unable to set local or remote description from createOffer', error));
+  }
+
+  /**
+   * Handles sender getStats report
+   */
+  private _onStatsSender(res: any): any {
+    const report: any | undefined = Array.from(res.values()).find((v: any) => v.type === 'candidate-pair' && v.nominated);
+    if (!!report) {
+      if (!isNaN(report.totalRoundTripTime)) {
+        this._rttValues.push(report.totalRoundTripTime);
+      }
+    }
+    return report;
   }
 
   /**
@@ -443,6 +495,11 @@ export namespace BitrateTest {
      * Average bitrate calculated during the test.
      */
     averageBitrate: number;
+
+    /**
+     * Average round trip time calculated during the test.
+     */
+    averageRtt: number;
 
     /**
      * Whether or not the test passed.

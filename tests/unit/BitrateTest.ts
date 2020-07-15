@@ -37,6 +37,7 @@ describe('BitrateTest', () => {
       this.createOffer = sinon.stub().returns(Promise.resolve());
       this.addIceCandidate = sinon.stub().returns({catch: sinon.stub()});
       this.createDataChannel = sinon.stub().returns(rtcDataChannel);
+      this.getStats = sinon.stub().returns(Promise.resolve());
 
       // The tests always uses 2 PeerConnections
       // The first one is always the receiver
@@ -399,6 +400,7 @@ describe('BitrateTest', () => {
           bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
             assert.deepStrictEqual(report, {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
+              averageRtt: 0,
               didPass: false,
               errors: [],
               iceCandidateStats: [],
