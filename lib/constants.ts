@@ -59,5 +59,21 @@ export enum ErrorName {
  * All of the expected warnings to be thrown by the diagnostics tests.
  */
 export enum WarningName {
+  /**
+   * The `low-audio-level` warning is raised when the volume events recorded
+   * by the input audio device test [[InputTest]] are both low and constant.
+   *
+   * The warning criteria is when the following are all true:
+   * - If there are at least three seconds worth of audio samples.
+   * - The standard deviation of those samples is less than 1% of the max
+   *   possible volume value (255).
+   * - The average of those samples is less than 1% of the max possible volume
+   *   value (255).
+   *
+   * When any of the previous criteria are no longer met, the `warning-cleared`
+   * event for `low-audio-level` is raised if `low-audio-level` has been raised.
+   * Only one `low-audio-level` warning will be raised until the
+   * `warning-cleared` event has been raised.
+   */
   LowAudioLevel = 'low-audio-level',
 }

@@ -14,7 +14,7 @@ import {
   getUserMedia,
   GetUserMediaUnsupportedError,
 } from './polyfills';
-import { SubsetRequired, TimeMeasurement, VolumeStatistics } from './types';
+import { SubsetRequired, TimeMeasurement, VolumeStats } from './types';
 import { detectSilence } from './utils';
 import {
   InvalidityRecord,
@@ -62,6 +62,7 @@ export declare interface InputTest {
    * its run-time.
    * @param event [[InputTest.Events.Warning]]
    * @param warning The warning that the test encountered.
+   * @private
    */
   emit(
     event: InputTest.Events.Warning,
@@ -72,6 +73,7 @@ export declare interface InputTest {
    * non-fatal warning during its run-time.
    * @param event [[InputTest.Events.WarningCleared]]
    * @param warning The warning that the test encountered that should be cleared.
+   * @private
    */
   emit(
     event: InputTest.Events.WarningCleared,
@@ -215,7 +217,7 @@ export class InputTest extends EventEmitter {
    * Volume levels generated from the audio source during the run time of the
    * test.
    */
-  private readonly _volumeStatistics: VolumeStatistics = {
+  private readonly _volumeStats: VolumeStats = {
     timestamps: [],
     values: [],
   };
@@ -253,7 +255,7 @@ export class InputTest extends EventEmitter {
     this._cleanup();
 
     this._endTime = Date.now();
-    const didPass: boolean = pass && !detectSilence(this._volumeStatistics.values);
+    const didPass: boolean = pass && !detectSilence(this._volumeStats.values);
     const report: InputTest.Report = {
       deviceId: this._options.deviceId || (
         this._defaultDevices.audioinput &&
@@ -262,7 +264,7 @@ export class InputTest extends EventEmitter {
       didPass,
       errors: this._errors,
       testName: InputTest.testName,
-      values: this._volumeStatistics.values,
+      values: this._volumeStats.values,
     };
 
     if (this._startTime) {
@@ -318,28 +320,28 @@ export class InputTest extends EventEmitter {
   private _onVolume(value: number): void {
     const now = Date.now();
 
-    if (!this._volumeStatistics.max || value > this._volumeStatistics.max) {
-      this._volumeStatistics.max = value;
+    if (!this._volumeStats.max || value > this._volumeStats.max) {
+      this._volumeStats.max = value;
     }
-    this._volumeStatistics.values.push(value);
-    this._volumeStatistics.timestamps.push(now);
+    this._volumeStats.values.push(value);
+    this._volumeStats.timestamps.push(now);
     this.emit(InputTest.Events.Volume, value);
 
     // Find the last 3 seconds worth of volume values.
-    const startIdx = this._volumeStatistics.timestamps.findIndex(
+    const startIndex = this._volumeStats.timestamps.findIndex(
       (timestamp: number) => now - timestamp <= 3000,
     );
 
     // We want to do nothing at 1 and not 0 here because this guarantees that
     // there is at least one timestamp before the sample set. This means that
     // there are at least three seconds of samples.
-    if (startIdx < 1) {
+    if (startIndex < 1) {
       return;
     }
 
-    const samples = this._volumeStatistics.values.slice(
-      startIdx > 0
-        ? startIdx
+    const samples = this._volumeStats.values.slice(
+      startIndex > 0
+        ? startIndex
         : 0,
     );
 

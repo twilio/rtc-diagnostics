@@ -16,7 +16,7 @@
 
   inputDeviceTest.on(InputTest.Events.Warning, (warning: WarningName) => {
     // The application can listen for specific warnings...
-    if (warning === Warning.LowAudioLevel) {
+    if (warning === WarningName.LowAudioLevel) {
       // update the ui to show the input device may not be working
     }
 
@@ -26,7 +26,7 @@
 
   inputDeviceTest.on(InputTest.Events.WarningCleared, (warningType: WarningName) => {
     // The application can listen for specific warnings...
-    if (warning === Warning.LowAudioLevel) {
+    if (warning === WarningName.LowAudioLevel) {
       // update the ui to show that the input device may be working again
     }
 
