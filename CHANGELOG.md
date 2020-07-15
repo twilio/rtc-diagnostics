@@ -4,6 +4,8 @@
 Changes
 -------
 
+* Added a new DiagnosticError, `TimeoutError`, which is emitted when a BitrateTest times out (15 seconds).
+
 * Added ICE Candidate related statistics in the [BitrateTest.Report](https://twilio.github.io/rtc-diagnostics/interfaces/bitratetest.report.html) object.
 
   **Example Usage**

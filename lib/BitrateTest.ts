@@ -1,5 +1,11 @@
 import { EventEmitter } from 'events';
-import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, MIN_BITRATE_THRESHOLD, TEST_PACKET } from './constants';
+import {
+  BITRATE_TEST_TIMEOUT_MS,
+  BYTES_KEEP_BUFFERED,
+  MAX_NUMBER_PACKETS,
+  MIN_BITRATE_THRESHOLD,
+  TEST_PACKET,
+} from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { TimeMeasurement } from './types';
 import {
@@ -135,6 +141,12 @@ export class BitrateTest extends EventEmitter {
   private _startTime: number;
 
   /**
+   * Timeout reference that should be cleared when we receive any data. If this
+   * times out, it means something has timed out our BitrateTest.
+   */
+  private _timeout: NodeJS.Timer;
+
+  /**
    * Total number of bytes received by the receiver RTCPeerConnection
    */
   private _totalBytesReceived: number = 0;
@@ -172,20 +184,27 @@ export class BitrateTest extends EventEmitter {
       this._setupDataChannel();
       this._startTest();
     });
+
+    this._timeout = setTimeout(() => {
+      this._onError(`Network timeout; exceeded limit of ${BITRATE_TEST_TIMEOUT_MS}ms`);
+    }, BITRATE_TEST_TIMEOUT_MS);
   }
 
   /**
    * Stops the current test.
    */
   stop(): void {
+    clearTimeout(this._timeout!);
     clearInterval(this._sendDataIntervalId!);
     clearInterval(this._checkBitrateIntervalId!);
 
-    this._pcSender.close();
-    this._pcReceiver.close();
-    this._endTime = Date.now();
+    if (typeof this._endTime !== 'number' || this._endTime === 0) {
+      this._pcSender.close();
+      this._pcReceiver.close();
+      this._endTime = Date.now();
 
-    this.emit(BitrateTest.Events.End, this._getReport());
+      this.emit(BitrateTest.Events.End, this._getReport());
+    }
   }
 
   /**
@@ -202,6 +221,10 @@ export class BitrateTest extends EventEmitter {
     // Calculate bitrate in kbps
     const now = Date.now();
     const bitrate = 8 * (this._totalBytesReceived - this._lastBytesChecked) / (now - this._lastCheckedTimestamp);
+
+    if (bitrate > 0) {
+      clearTimeout(this._timeout!);
+    }
 
     this._lastCheckedTimestamp = now;
     this._lastBytesChecked = this._totalBytesReceived;
