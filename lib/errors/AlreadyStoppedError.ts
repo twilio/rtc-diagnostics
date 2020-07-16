@@ -1,3 +1,4 @@
+import { ErrorName } from '../constants';
 import { InvalidStateError } from './InvalidStateError';
 
 /**
@@ -12,6 +13,6 @@ export class AlreadyStoppedError extends InvalidStateError {
       'Tests should not be run multiple times, instead start a new one.',
     );
 
-    this.name = 'AlreadyStoppedError';
+    this.name = ErrorName.AlreadyStoppedError;
   }
 }

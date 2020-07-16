@@ -1,7 +1,7 @@
 // tslint:disable only-arrow-functions
 
 import * as assert from 'assert';
-import { DiagnosticError } from '../../../lib/errors';
+import { DiagnosticError } from '../../../lib/errors/DiagnosticError';
 import {
   createAudioDeviceValidator,
   validateOptions,

@@ -2,7 +2,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { DiagnosticError } from '../../lib/errors';
+import { ErrorName } from '../../lib/constants';
+import { DiagnosticError } from '../../lib/errors/DiagnosticError';
 import {
   OutputTest,
   testOutputDevice,
@@ -244,7 +245,7 @@ describe('testOutputDevice', function() {
       assert.equal(report.errors.length, 1);
       const [error] = report.errors;
       assert(error instanceof DiagnosticError);
-      assert.equal(error.name, 'UnsupportedError');
+      assert.equal(error.name, ErrorName.UnsupportedError);
     });
     it('when Audio is not supported', async function() {
       const report: OutputTest.Report = await new Promise(resolve => {
@@ -264,7 +265,7 @@ describe('testOutputDevice', function() {
       assert.equal(report.errors.length, 1);
       const [error] = report.errors;
       assert(error instanceof DiagnosticError);
-      assert.equal(error.name, 'UnsupportedError');
+      assert.equal(error.name, ErrorName.UnsupportedError);
     });
     it('when neither AudioContext or Audio is supported', async function() {
       const report: OutputTest.Report = await new Promise(resolve => {
@@ -283,7 +284,7 @@ describe('testOutputDevice', function() {
       assert.equal(report.errors.length, 1);
       const [error] = report.errors;
       assert(error instanceof DiagnosticError);
-      assert.equal(error.name, 'UnsupportedError');
+      assert.equal(error.name, ErrorName.UnsupportedError);
     });
   });
 
@@ -434,6 +435,6 @@ describe('testOutputDevice', function() {
     });
     assert.equal(report.errors.length, 1);
     assert(report.errors[0] instanceof DiagnosticError);
-    assert.equal(report.errors[0].name, 'InvalidOptionsError');
+    assert.equal(report.errors[0].name, ErrorName.InvalidOptionsError);
   });
 });

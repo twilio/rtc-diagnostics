@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { INCOMING_SOUND_URL, TestNames } from './constants';
+import { INCOMING_SOUND_URL, TestName } from './constants';
 import {
   AlreadyStoppedError,
   DiagnosticError,
@@ -117,7 +117,7 @@ export class OutputTest extends EventEmitter {
   /**
    * The name of the test.
    */
-  static testName: TestNames.OutputAudioDevice = TestNames.OutputAudioDevice;
+  static testName: TestName.OutputAudioDevice = TestName.OutputAudioDevice;
   /**
    * Default options for the [[OutputTest]]. Overwritten by any option passed
    * during the construction of the test.

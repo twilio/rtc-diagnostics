@@ -1,3 +1,4 @@
+import { ErrorName } from '../constants';
 import { DiagnosticError } from './DiagnosticError';
 
 /**
@@ -13,6 +14,6 @@ export class InvalidStateError extends DiagnosticError {
   constructor(message?: string) {
     super(undefined, message);
 
-    this.name = 'InvalidStateError';
+    this.name = ErrorName.InvalidStateError;
   }
 }
