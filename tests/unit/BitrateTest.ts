@@ -65,14 +65,15 @@ describe('BitrateTest', () => {
 
     originalRTCPeerConnection = root.RTCPeerConnection;
     root.RTCPeerConnection = getPeerConnectionFactory();
-
-    bitrateTest = new BitrateTest(options);
   });
 
   afterEach(() => {
     pcReceiverContext = null;
     pcSenderContext = null;
     root.RTCPeerConnection = originalRTCPeerConnection;
+    if (bitrateTest) {
+      bitrateTest.stop();
+    }
   });
 
   describe('testBitrate', () => {
@@ -102,6 +103,7 @@ describe('BitrateTest', () => {
           candidate: candidateRelay,
         },
       };
+      bitrateTest = new BitrateTest(options);
     });
 
     context('receiver pc', () => {
@@ -174,7 +176,7 @@ describe('BitrateTest', () => {
 
     beforeEach(() => {
       bitrateTest = new BitrateTest(options);
-      bitrateTest.stop = sinon.stub();
+      bitrateTest.stop = sinon.spy(bitrateTest.stop);
     });
 
     it('should throw error on createOffer failure', () => {
@@ -256,7 +258,7 @@ describe('BitrateTest', () => {
     beforeEach(() => {
       clock = sinon.useFakeTimers(0);
       bitrateTest = new BitrateTest(options);
-      bitrateTest.stop = sinon.stub();
+      bitrateTest.stop = sinon.spy(bitrateTest.stop);
     });
 
     afterEach(() => {
@@ -271,6 +273,22 @@ describe('BitrateTest', () => {
         done();
       });
       clock.tick(1);
+    });
+
+    describe('when the test times out', () => {
+      it('should emit an error and call stop', () => {
+        rtcDataChannel.readyState = 'open';
+
+        let errorName: string = '';
+        bitrateTest.on(BitrateTest.Events.Error, (error: DiagnosticError) => {
+          errorName = error.name;
+        });
+
+        clock.tick(15100);
+
+        sinon.assert.calledOnce(bitrateTest.stop as any);
+        assert.equal(errorName, 'DiagnosticError');
+      });
     });
 
     describe('after creating successfully', () => {
