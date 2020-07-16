@@ -34,6 +34,12 @@ export const INCOMING_SOUND_URL: string =
 
 /**
  * @private
+ * The number of milliseconds to wait to receive data in bitrate test before timing out.
+ */
+export const BITRATE_TEST_TIMEOUT_MS: number = 15000;
+
+/**
+ * @private
  * Test names.
  */
 export enum TestName {

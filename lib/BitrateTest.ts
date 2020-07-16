@@ -1,7 +1,19 @@
 import { EventEmitter } from 'events';
-import { BYTES_KEEP_BUFFERED, MAX_NUMBER_PACKETS, MIN_BITRATE_THRESHOLD, TEST_PACKET } from './constants';
+import {
+  BITRATE_TEST_TIMEOUT_MS,
+  BYTES_KEEP_BUFFERED,
+  MAX_NUMBER_PACKETS,
+  MIN_BITRATE_THRESHOLD,
+  TEST_PACKET,
+} from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
-import { NetworkTiming, TimeMeasurement } from './timing';
+import { TimeMeasurement } from './types';
+import {
+  getRTCIceCandidateStatsReport,
+  RTCIceCandidateStats,
+  RTCIceCandidateStatsReport,
+  RTCSelectedIceCandidatePairStats,
+} from './utils/candidate';
 
 export declare interface BitrateTest {
   /**
@@ -42,19 +54,6 @@ export declare interface BitrateTest {
     event: BitrateTest.Events.End,
     listener: (report: BitrateTest.Report) => any,
   ): this;
-
-  /**
-   * Raised when the test encounters a warning such as HighFirstPacketDuration.
-   * See [[BitrateTest.Warnings]] for more information.
-   * @param event [[BitrateTest.Events.Warning]].
-   * @param listener A callback with a [[BitrateTest.Warnings]] parameter.
-   * @returns This [[BitrateTest]] instance.
-   * @event
-   */
-  on(
-    event: BitrateTest.Events.Warning,
-    listener: (warning: BitrateTest.Warnings) => any,
-  ): this;
 }
 
 /**
@@ -76,9 +75,19 @@ export class BitrateTest extends EventEmitter {
   private _checkBitrateIntervalId: NodeJS.Timer | undefined;
 
   /**
+   * A timestamp of when the test ends.
+   */
+  private _endTime: number | null = null;
+
+  /**
    * Errors detected during the test
    */
   private _errors: DiagnosticError[] = [];
+
+  /**
+   * An array of WebRTC stats for the ICE candidates gathered when connecting to media.
+   */
+  private _iceCandidateStats: RTCIceCandidateStats[] = [];
 
   /**
    * Number of bytes received the last time it was checked
@@ -91,9 +100,9 @@ export class BitrateTest extends EventEmitter {
   private _lastCheckedTimestamp: number = 0;
 
   /**
-   * Network related timing for this test
+   * The options passed to [[BitrateTest]] constructor.
    */
-  private _networkTiming: NetworkTiming = {};
+  private _options: BitrateTest.ExtendedOptions;
 
   /**
    * The RTCPeerConnection that will receive data
@@ -116,14 +125,26 @@ export class BitrateTest extends EventEmitter {
   private _rtcDataChannel: RTCDataChannel | undefined;
 
   /**
+   * A WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
+   */
+  private _selectedIceCandidatePairStats: RTCSelectedIceCandidatePairStats | undefined;
+
+  /**
    * Interval id for sending data
    */
   private _sendDataIntervalId: NodeJS.Timer | undefined;
 
   /**
-   * Timing measurements for this test
+   * A timestamp of when the test starts. This is set during initialization of the test
+   * and not when the test succesfully starts.
    */
-  private _testTiming: TimeMeasurement = { start: 0 };
+  private _startTime: number;
+
+  /**
+   * Timeout reference that should be cleared when we receive any data. If this
+   * times out, it means something has timed out our BitrateTest.
+   */
+  private _timeout: NodeJS.Timer;
 
   /**
    * Total number of bytes received by the receiver RTCPeerConnection
@@ -136,21 +157,16 @@ export class BitrateTest extends EventEmitter {
   private _values: number[] = [];
 
   /**
-   * Warnings detected during the test
-   */
-  private _warnings: BitrateTest.Warnings[] = [];
-
-  /**
    * Construct a [[BitrateTest]] instance. The test will start immediately.
    * Test should be allowed to run for a minimum of 8 seconds. To stop the test, call [[BitrateTest.stop]].
    * @constructor
    * @param options
    */
-  constructor(options: BitrateTest.Options) {
+  constructor(options: BitrateTest.ExtendedOptions) {
     super();
 
-    options = options || {};
-    this._rtcConfiguration.iceServers = options.iceServers;
+    this._options = { ...options };
+    this._rtcConfiguration.iceServers = this._options.iceServers;
 
     this._pcReceiver = new RTCPeerConnection(this._rtcConfiguration);
     this._pcSender = new RTCPeerConnection(this._rtcConfiguration);
@@ -160,28 +176,35 @@ export class BitrateTest extends EventEmitter {
 
     this._setupNetworkListeners(this._pcSender);
 
+    this._startTime = Date.now();
+
     // Return before starting the test to allow consumer
     // to listen and capture errors
     setTimeout(() => {
       this._setupDataChannel();
       this._startTest();
     });
+
+    this._timeout = setTimeout(() => {
+      this._onError(`Network timeout; exceeded limit of ${BITRATE_TEST_TIMEOUT_MS}ms`);
+    }, BITRATE_TEST_TIMEOUT_MS);
   }
 
   /**
    * Stops the current test.
    */
   stop(): void {
+    clearTimeout(this._timeout!);
     clearInterval(this._sendDataIntervalId!);
     clearInterval(this._checkBitrateIntervalId!);
 
-    this._pcSender.close();
-    this._pcReceiver.close();
+    if (typeof this._endTime !== 'number' || this._endTime === 0) {
+      this._pcSender.close();
+      this._pcReceiver.close();
+      this._endTime = Date.now();
 
-    this._testTiming.end = Date.now();
-    this._testTiming.duration = this._testTiming.end - this._testTiming.start;
-
-    this.emit(BitrateTest.Events.End, this._getReport());
+      this.emit(BitrateTest.Events.End, this._getReport());
+    }
   }
 
   /**
@@ -199,6 +222,10 @@ export class BitrateTest extends EventEmitter {
     const now = Date.now();
     const bitrate = 8 * (this._totalBytesReceived - this._lastBytesChecked) / (now - this._lastCheckedTimestamp);
 
+    if (bitrate > 0) {
+      clearTimeout(this._timeout!);
+    }
+
     this._lastCheckedTimestamp = now;
     this._lastBytesChecked = this._totalBytesReceived;
     this._values.push(bitrate);
@@ -213,28 +240,27 @@ export class BitrateTest extends EventEmitter {
       .reduce((total: number, value: number) => total += value, 0) / this._values.length;
     averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
 
-    return {
+    const testTiming: TimeMeasurement = { start: this._startTime };
+    if (this._endTime) {
+      testTiming.end = this._endTime;
+      testTiming.duration = this._endTime - this._startTime;
+    }
+
+    const report: BitrateTest.Report = {
       averageBitrate,
       didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
-      networkTiming: this._networkTiming,
+      iceCandidateStats: this._iceCandidateStats,
       testName: BitrateTest.testName,
-      testTiming: this._testTiming,
+      testTiming,
       values: this._values,
-      warnings: this._warnings,
     };
-  }
 
-  /**
-   * Emit a warning if currentStatValue exceeds threshold value
-   * @param name
-   * @param currentStatValue
-   */
-  private _maybeEmitWarning(name: BitrateTest.Warnings, currentStatValue: Number): void {
-    if (currentStatValue > BitrateTest.WarningThresholds[name]) {
-      this._warnings.push(name);
-      this.emit(BitrateTest.Events.Warning, name);
+    if (this._selectedIceCandidatePairStats) {
+      report.selectedIceCandidatePairStats = this._selectedIceCandidatePairStats;
     }
+
+    return report;
   }
 
   /**
@@ -270,14 +296,6 @@ export class BitrateTest extends EventEmitter {
    */
   private _onMessageReceived(event: MessageEvent) {
     this._totalBytesReceived += event.data.length;
-
-    if (!this._networkTiming.firstPacket) {
-      this._networkTiming.firstPacket = Date.now();
-      this._maybeEmitWarning(
-        BitrateTest.Warnings.HighFirstPacketDuration,
-        this._networkTiming.firstPacket - this._testTiming.start,
-      );
-    }
   }
 
   /**
@@ -345,35 +363,16 @@ export class BitrateTest extends EventEmitter {
    * @param pc
    */
   private _setupNetworkListeners(pc: RTCPeerConnection) {
-    // PeerConnection state
-    pc.onconnectionstatechange = () => {
-      this._networkTiming.peerConnection = this._networkTiming.peerConnection || { start: 0 };
-
-      if (pc.connectionState === 'connecting') {
-        this._networkTiming.peerConnection.start = Date.now();
-      } else if (pc.connectionState === 'connected') {
-        this._networkTiming.peerConnection.end = Date.now();
-
-        const { start, end } = this._networkTiming.peerConnection;
-        const duration = end - start;
-        this._networkTiming.peerConnection.duration = duration;
-        this._maybeEmitWarning(BitrateTest.Warnings.HighPcConnectDuration, duration);
-      }
-    };
-
-    // ICE Connection state
     pc.oniceconnectionstatechange = () => {
-      this._networkTiming.ice = this._networkTiming.ice || { start: 0 };
-
-      if (pc.iceConnectionState === 'checking') {
-        this._networkTiming.ice.start = Date.now();
-      } else if (pc.iceConnectionState === 'connected') {
-        this._networkTiming.ice.end = Date.now();
-
-        const { start, end } = this._networkTiming.ice;
-        const duration = end - start;
-        this._networkTiming.ice.duration = duration;
-        this._maybeEmitWarning(BitrateTest.Warnings.HighIceConnectDuration, duration);
+      if (pc.iceConnectionState === 'connected') {
+        (this._options.getRTCIceCandidateStatsReport || getRTCIceCandidateStatsReport)(this._pcSender)
+          .then((statsReport: RTCIceCandidateStatsReport) => {
+            this._iceCandidateStats = statsReport.iceCandidateStats;
+            this._selectedIceCandidatePairStats = statsReport.selectedIceCandidatePairStats;
+          })
+          .catch((error: DOMError) => {
+            this._onError('Unable to generate WebRTC stats report', error);
+          });
       }
     };
   }
@@ -382,8 +381,6 @@ export class BitrateTest extends EventEmitter {
    * Starts the test.
    */
   private _startTest(): void {
-    this._testTiming.start = Date.now();
-
     if (!this._rtcConfiguration.iceServers) {
       return this._onError('No iceServers found', undefined);
     }
@@ -406,39 +403,19 @@ export namespace BitrateTest {
     Bitrate = 'bitrate',
     End = 'end',
     Error = 'error',
-    Warning = 'warning',
   }
 
   /**
-   * Possible warnings that a [[BitrateTest]] might emit. See [[BitrateTest.on]].
-   */
-  export enum Warnings {
-    /**
-     * Raised when [[NetworkTiming.firstPacket]] took more than 1400ms to arrive to the remote RTCPeerConnection.
-     * The duration is measured from the [[BitrateTest.Report]]'s testTiming.start up to [[NetworkTiming.firstPacket]]
-     */
-    HighFirstPacketDuration = 'high-first-packet-duration',
-
-    /**
-     * Raised when [[NetworkTiming.ice]] connection took more than 300ms to establish
-     */
-    HighIceConnectDuration = 'high-ice-connect-duration',
-
-    /**
-     * Raised when [[NetworkTiming.peerConnection]] took more than 1000ms to establish
-     */
-    HighPcConnectDuration = 'high-pc-connect-duration',
-  }
-
-  /**
-   * Thresholds used for determining when to raise a warning. See [[BitrateTest.Warnings]]
+   * Options that may be passed to [[BitrateTest]] constructor for internal testing.
    * @internalapi
    */
-  export const WarningThresholds: Record<Warnings, Number> = {
-    [Warnings.HighFirstPacketDuration]: 1400,
-    [Warnings.HighIceConnectDuration]: 300,
-    [Warnings.HighPcConnectDuration]: 1000,
-  };
+  export interface ExtendedOptions extends Options {
+    /**
+     * A function that generates a WebRTC stats report containing relevant information about ICE candidates for
+     * the given [PeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
+     */
+    getRTCIceCandidateStatsReport?: (peerConnection: RTCPeerConnection) => Promise<RTCIceCandidateStatsReport>;
+  }
 
   /**
    * Options passed to [[BitrateTest]] constructor.
@@ -503,9 +480,14 @@ export namespace BitrateTest {
     errors: DiagnosticError[];
 
     /**
-     * Network related time measurements.
+     * An array of WebRTC stats for the ICE candidates gathered when connecting to media.
      */
-    networkTiming: NetworkTiming;
+    iceCandidateStats: RTCIceCandidateStats[];
+
+    /**
+     * A WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
+     */
+    selectedIceCandidatePairStats?: RTCSelectedIceCandidatePairStats;
 
     /**
      * The name of the test.
@@ -521,11 +503,6 @@ export namespace BitrateTest {
      * Bitrate values collected during the test.
      */
     values: number[];
-
-    /**
-     * Any warnings that occurred during the test.
-     */
-    warnings: Warnings[];
   }
 }
 

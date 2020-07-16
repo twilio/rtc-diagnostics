@@ -16,6 +16,7 @@ describe('BitrateTest', () => {
 
   let bitrateTest: BitrateTest;
   let originalRTCPeerConnection: any;
+  let options: any;
   let pcReceiverContext: any;
   let pcSenderContext: any;
   let rtcDataChannel: any;
@@ -50,32 +51,41 @@ describe('BitrateTest', () => {
   };
 
   beforeEach(() => {
+    options = {
+      getRTCIceCandidateStatsReport: sinon.stub()
+        .resolves({
+          iceCandidateStats: [],
+        }),
+      iceServers,
+    };
+
     rtcDataChannel = {
       send: sinon.stub(),
     };
 
     originalRTCPeerConnection = root.RTCPeerConnection;
     root.RTCPeerConnection = getPeerConnectionFactory();
-
-    bitrateTest = new BitrateTest({ iceServers });
   });
 
   afterEach(() => {
     pcReceiverContext = null;
     pcSenderContext = null;
     root.RTCPeerConnection = originalRTCPeerConnection;
+    if (bitrateTest) {
+      bitrateTest.stop();
+    }
   });
 
   describe('testBitrate', () => {
     it('should return BitrateTest instance', () => {
-      bitrateTest = testBitrate({ iceServers });
+      bitrateTest = testBitrate(options);
       assert(!!bitrateTest);
     });
   });
 
   describe('constructor', () => {
     it('should use iceServers option', () => {
-      bitrateTest = new BitrateTest({ iceServers });
+      bitrateTest = new BitrateTest(options);
       assert.deepEqual(pcReceiverContext.rtcConfiguration.iceServers, iceServers);
       assert.deepEqual(pcSenderContext.rtcConfiguration.iceServers, iceServers);
     });
@@ -93,6 +103,7 @@ describe('BitrateTest', () => {
           candidate: candidateRelay,
         },
       };
+      bitrateTest = new BitrateTest(options);
     });
 
     context('receiver pc', () => {
@@ -164,8 +175,8 @@ describe('BitrateTest', () => {
     const wait = () => new Promise(r => setTimeout(r, 1));
 
     beforeEach(() => {
-      bitrateTest = new BitrateTest({ iceServers });
-      bitrateTest.stop = sinon.stub();
+      bitrateTest = new BitrateTest(options);
+      bitrateTest.stop = sinon.spy(bitrateTest.stop);
     });
 
     it('should throw error on createOffer failure', () => {
@@ -246,8 +257,8 @@ describe('BitrateTest', () => {
 
     beforeEach(() => {
       clock = sinon.useFakeTimers(0);
-      bitrateTest = new BitrateTest({ iceServers });
-      bitrateTest.stop = sinon.stub();
+      bitrateTest = new BitrateTest(options);
+      bitrateTest.stop = sinon.spy(bitrateTest.stop);
     });
 
     afterEach(() => {
@@ -262,6 +273,22 @@ describe('BitrateTest', () => {
         done();
       });
       clock.tick(1);
+    });
+
+    describe('when the test times out', () => {
+      it('should emit an error and call stop', () => {
+        rtcDataChannel.readyState = 'open';
+
+        let errorName: string = '';
+        bitrateTest.on(BitrateTest.Events.Error, (error: DiagnosticError) => {
+          errorName = error.name;
+        });
+
+        clock.tick(15100);
+
+        sinon.assert.calledOnce(bitrateTest.stop as any);
+        assert.equal(errorName, 'DiagnosticError');
+      });
     });
 
     describe('after creating successfully', () => {
@@ -312,7 +339,7 @@ describe('BitrateTest', () => {
 
         beforeEach(() => {
           clock = sinon.useFakeTimers(0);
-          bitrateTest = new BitrateTest({ iceServers });
+          bitrateTest = new BitrateTest(options);
           clock.tick(1);
           dataChannelEvent = {
             channel: {
@@ -392,9 +419,7 @@ describe('BitrateTest', () => {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
               didPass: false,
               errors: [],
-              networkTiming: {
-                firstPacket: 1,
-              },
+              iceCandidateStats: [],
               testName: 'bitrate-test',
               testTiming: {
                 duration: 3601,
@@ -402,7 +427,6 @@ describe('BitrateTest', () => {
                 start: 0,
               },
               values,
-              warnings: [],
             });
             done();
           });
@@ -493,36 +517,8 @@ describe('BitrateTest', () => {
           clock.tick(1200);
         });
 
-        describe('connection timing', () => {
-          it('should include PeerConnection timing', (done) => {
-            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
-              const { start, end, duration } = report.networkTiming.peerConnection!;
-              assert.equal(start, 1001);
-              assert.equal(end, 2001);
-              assert.equal(duration, 1000);
-              done();
-            });
-
-            ['new', 'connecting', 'connected', 'disconnected', 'closed'].forEach(state => {
-              pcSenderContext.connectionState = state;
-              pcSenderContext.onconnectionstatechange();
-              clock.tick(1000);
-            });
-
-            sendMessage(message);
-            clock.tick(1200);
-            bitrateTest.stop();
-          });
-
-          it('should include IceConnection timing', (done) => {
-            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
-              const { start, end, duration } = report.networkTiming.ice!;
-              assert.equal(start, 1001);
-              assert.equal(end, 2001);
-              assert.equal(duration, 1000);
-              done();
-            });
-
+        describe('ICE Candidate Stats', () => {
+          const runBitrateTest = (shouldStop: boolean) => {
             ['new', 'checking', 'connected', 'completed', 'disconnected', 'closed'].forEach(state => {
               pcSenderContext.iceConnectionState = state;
               pcSenderContext.oniceconnectionstatechange();
@@ -531,145 +527,81 @@ describe('BitrateTest', () => {
 
             sendMessage(message);
             clock.tick(1200);
-            bitrateTest.stop();
-          });
-
-          it('should not raise HighFirstPacketDuration warning', (done) => {
-            const callback = sinon.stub();
-            bitrateTest.on(BitrateTest.Events.Warning, callback);
-
-            bitrateTest.on(BitrateTest.Events.End, () => {
-              sinon.assert.notCalled(callback);
-              done();
-            });
-
-            clock.tick(1399);
             sendMessage(message);
-            bitrateTest.stop();
-          });
 
-          it('should raise HighFirstPacketDuration warning', (done) => {
-            const callback = sinon.stub();
-            bitrateTest.on(BitrateTest.Events.Warning, callback);
+            if (shouldStop) {
+              bitrateTest.stop();
+            }
+          };
 
-            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
-              sinon.assert.calledWithExactly(callback, BitrateTest.Warnings.HighFirstPacketDuration);
-              assert.deepEqual(report.warnings, [BitrateTest.Warnings.HighFirstPacketDuration]);
-              done();
-            });
-
-            clock.tick(1400);
-            sendMessage(message);
-            bitrateTest.stop();
-          });
-
-          it('should not raise HighPcConnectDuration warning', (done) => {
-            const callback = sinon.stub();
-            bitrateTest.on(BitrateTest.Events.Warning, (name: BitrateTest.Warnings) => {
-              if (name !== BitrateTest.Warnings.HighFirstPacketDuration) {
-                callback(name);
-              }
-            });
-
-            bitrateTest.on(BitrateTest.Events.End, () => {
-              sinon.assert.notCalled(callback);
-              done();
-            });
-
-            pcSenderContext.connectionState = 'connecting';
-            pcSenderContext.onconnectionstatechange();
-            clock.tick(1000);
-
-            pcSenderContext.connectionState = 'connected';
-            pcSenderContext.onconnectionstatechange();
-            clock.tick(1000);
-
-            sendMessage(message);
-            clock.tick(1000);
-            bitrateTest.stop();
-          });
-
-          it('should raise HighPcConnectDuration warning', (done) => {
-            const callback = sinon.stub();
-            bitrateTest.on(BitrateTest.Events.Warning, (name: BitrateTest.Warnings) => {
-              if (name !== BitrateTest.Warnings.HighFirstPacketDuration) {
-                callback(name);
-              }
+          it('should include ICE Candidate stats in the report', (done) => {
+            bitrateTest = new BitrateTest({
+              ...options,
+              getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
+                cb({
+                  iceCandidateStats: ['foo', 'bar'],
+                  selectedIceCandidatePairStats: {
+                    localCandidate: 'foo',
+                    remoteCandidate: 'bar',
+                  },
+                });
+                return {catch: sinon.stub()};
+              }}),
             });
 
             bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
-              sinon.assert.calledWithExactly(callback, BitrateTest.Warnings.HighPcConnectDuration);
-              assert.deepEqual(report.warnings, [
-                BitrateTest.Warnings.HighPcConnectDuration,
-                BitrateTest.Warnings.HighFirstPacketDuration,
-              ]);
+              assert.deepStrictEqual(report.iceCandidateStats, ['foo', 'bar']);
+              assert.deepStrictEqual(report.selectedIceCandidatePairStats, {
+                localCandidate: 'foo',
+                remoteCandidate: 'bar',
+              });
               done();
             });
 
-            pcSenderContext.connectionState = 'connecting';
-            pcSenderContext.onconnectionstatechange();
-            clock.tick(1001);
-
-            pcSenderContext.connectionState = 'connected';
-            pcSenderContext.onconnectionstatechange();
-            clock.tick(1000);
-
-            sendMessage(message);
-            clock.tick(1000);
-            bitrateTest.stop();
+            runBitrateTest(true);
           });
 
-          it('should not raise HighIceConnectDuration warning', (done) => {
-            const callback = sinon.stub();
-            bitrateTest.on(BitrateTest.Events.Warning, (name: BitrateTest.Warnings) => {
-              if (name !== BitrateTest.Warnings.HighFirstPacketDuration) {
-                callback(name);
-              }
-            });
-
-            bitrateTest.on(BitrateTest.Events.End, () => {
-              sinon.assert.notCalled(callback);
-              done();
-            });
-
-            pcSenderContext.iceConnectionState = 'checking';
-            pcSenderContext.oniceconnectionstatechange();
-            clock.tick(300);
-
-            pcSenderContext.iceConnectionState = 'connected';
-            pcSenderContext.oniceconnectionstatechange();
-            clock.tick(1000);
-
-            sendMessage(message);
-            clock.tick(1000);
-            bitrateTest.stop();
-          });
-
-          it('should raise HighIceConnectDuration warning', (done) => {
-            const callback = sinon.stub();
-            bitrateTest.on(BitrateTest.Events.Warning, (name: BitrateTest.Warnings) => {
-              if (name !== BitrateTest.Warnings.HighFirstPacketDuration) {
-                callback(name);
-              }
+          it('should not include selected ICE Candidate stats in the report if no candidates were selected', (done) => {
+            bitrateTest = new BitrateTest({
+              ...options,
+              getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
+                cb({
+                  iceCandidateStats: ['foo', 'bar'],
+                });
+                return {catch: sinon.stub()};
+              }}),
             });
 
             bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
-              sinon.assert.calledWithExactly(callback, BitrateTest.Warnings.HighIceConnectDuration);
-              assert.deepEqual(report.warnings, [BitrateTest.Warnings.HighIceConnectDuration]);
+              assert.deepStrictEqual(report.iceCandidateStats, ['foo', 'bar']);
+              assert(!report.selectedIceCandidatePairStats);
               done();
             });
 
-            pcSenderContext.iceConnectionState = 'checking';
-            pcSenderContext.oniceconnectionstatechange();
-            clock.tick(301);
+            runBitrateTest(true);
+          });
 
-            pcSenderContext.iceConnectionState = 'connected';
-            pcSenderContext.oniceconnectionstatechange();
-            clock.tick(1000);
+          it('should fail the test if stats are not available', (done) => {
+            bitrateTest = new BitrateTest({
+              ...options,
+              getRTCIceCandidateStatsReport: () => ({then: () => {
+                return {catch: (cb: Function) => {
+                  cb('Foo error');
+                }};
+              }}),
+            });
 
-            sendMessage(message);
-            clock.tick(1000);
-            bitrateTest.stop();
+            const onError = sinon.stub();
+            bitrateTest.on(BitrateTest.Events.Error, onError);
+
+            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+              sinon.assert.calledOnce(onError);
+              assert(!report.didPass);
+              assert.equal(report.errors[0].domError, 'Foo error');
+              done();
+            });
+
+            runBitrateTest(false);
           });
         });
       });

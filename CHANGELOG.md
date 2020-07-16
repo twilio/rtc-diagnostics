@@ -14,9 +14,9 @@
 
   const inputDeviceTest = testInputDevice();
 
-  inputDeviceTest.on(InputTest.Events.Warning, (warning: WarningName) => {
+  inputDeviceTest.on(InputTest.Events.Warning, (warningName: WarningName) => {
     // The application can listen for specific warnings...
-    if (warning === WarningName.LowAudioLevel) {
+    if (warningName === WarningName.LowAudioLevel) {
       // update the ui to show the input device may not be working
     }
 
@@ -24,9 +24,9 @@
     inputDeviceTest.activeWarnings.values().forEach(...);
   });
 
-  inputDeviceTest.on(InputTest.Events.WarningCleared, (warningType: WarningName) => {
+  inputDeviceTest.on(InputTest.Events.WarningCleared, (warningName: WarningName) => {
     // The application can listen for specific warnings...
-    if (warning === WarningName.LowAudioLevel) {
+    if (warningName === WarningName.LowAudioLevel) {
       // update the ui to show that the input device may be working again
     }
 
@@ -34,6 +34,38 @@
     inputDeviceTest.activeWarnings.values().forEach(...);
   });
   ```
+
+## Changes
+
+* Added a new DiagnosticError, `TimeoutError`, which is emitted when a BitrateTest times out (15 seconds).
+
+* Added ICE Candidate related statistics in the [BitrateTest.Report](https://twilio.github.io/rtc-diagnostics/interfaces/bitratetest.report.html) object.
+
+  **Example Usage**
+  ```ts
+  bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+    console.log(report);
+  });
+  ```
+
+  **Example Report Data**
+  ```js
+  {
+    "iceCandidateStats": [...],
+
+    "selectedIceCandidatePairStats": {
+      "localCandidate": {...},
+      "remoteCandidate": {...}
+    },
+
+    // Other report properties...
+  }
+  ```
+
+* Removed network related timings and warnings. It is recommended to use `twilio-client.js` [preflight timing APIs](https://github.com/twilio/twilio-client.js/blob/preflight/PREFLIGHT.md) instead for more accurate timing information. With this change, the following are no longer available:
+  - `bitrateTest.on('warning', handler(warning))`
+  - `BitrateTest.Report.warnings`
+  - `BitrateTest.Report.networkTiming`
 
 ## Bug Fixes
 
