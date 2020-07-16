@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { SinonFakeTimers } from 'sinon';
 import { BitrateTest, testBitrate } from '../../lib/BitrateTest';
+import { ErrorName } from '../../lib/constants';
 import { DiagnosticError } from '../../lib/errors/DiagnosticError';
 
 describe('BitrateTest', () => {
@@ -287,7 +288,7 @@ describe('BitrateTest', () => {
         clock.tick(15100);
 
         sinon.assert.calledOnce(bitrateTest.stop as any);
-        assert.equal(errorName, 'DiagnosticError');
+        assert.equal(errorName, ErrorName.DiagnosticError);
       });
     });
 
