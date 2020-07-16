@@ -1,6 +1,8 @@
-# 1.0.0-preview4 (In Progress)
+1.0.0-preview4 (In Progress)
+============================
 
-## New Features
+New Features
+-------------
 
 * ### `LowAudioLevel` detection and warning in `InputTest`.
 
@@ -35,7 +37,8 @@
   });
   ```
 
-## Changes
+Changes
+-------
 
 * Added a new DiagnosticError, `TimeoutError`, which is emitted when a BitrateTest times out (15 seconds).
 
@@ -67,11 +70,13 @@
   - `BitrateTest.Report.warnings`
   - `BitrateTest.Report.networkTiming`
 
-## Bug Fixes
+Bug Fixes
+---------
 
 * Fixed an issue where output device test doesn't fail after providing a deviceId on browsers that doesn't support [setSinkId](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/setSinkId);
 
-# 1.0.0-preview3 (June 17, 2020)
+1.0.0-preview3 (June 17, 2020)
+==============================
 
 Inital release and open source of project RTC Diagnostics SDK. This SDK provides developers with tools to diagnose potential problems before utilizing other Twilio SDKs such as Voice SDK.
 
