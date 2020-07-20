@@ -198,7 +198,7 @@ export class OutputTest extends EventEmitter {
    * @param pass whether or not the test should pass. If set to false, will
    * override the result from determining whether audio is silent from the collected volume values.
    */
-  stop(pass: boolean = true): OutputTest.Report | undefined {
+  stop(pass: boolean = true): void {
     if (this._endTime) {
       this._onWarning(new AlreadyStoppedError());
       return;
@@ -225,8 +225,6 @@ export class OutputTest extends EventEmitter {
       values: this._values,
     };
     this.emit(OutputTest.Events.End, report);
-
-    return report;
   }
 
   /**

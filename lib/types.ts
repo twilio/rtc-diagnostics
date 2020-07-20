@@ -59,3 +59,20 @@ export interface VolumeStats {
    */
   values: number[];
 }
+
+/**
+ * Native MediaStream Recording APIs definitions
+ * @internalapi
+ */
+export namespace MediaStreamRecorder {
+  export type AudioData = any;
+  export interface DataEvent {
+    data: AudioData;
+  }
+  export interface MediaRecorder {
+    ondataavailable: Function;
+    onstop: Function;
+    start: Function;
+    stop: Function;
+  }
+}

@@ -2,6 +2,13 @@ import * as pack from '../package.json';
 
 /**
  * @private
+ * Parameters passed to our audio encoder
+ * buffer size, input channels, output channes
+ */
+export const ENCODER_PARAMS = [2048, 1, 1];
+
+/**
+ * @private
  * Max number of packets to send to data channel for bitrate test
  */
 export const MAX_NUMBER_PACKETS = 100;

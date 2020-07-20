@@ -14,6 +14,7 @@ import {
   getUserMedia,
   GetUserMediaUnsupportedError,
 } from './polyfills';
+import { AudioRecorder } from './recorder/audio';
 import { SubsetRequired, TimeMeasurement, VolumeStats } from './types';
 import { detectSilence } from './utils';
 import {
@@ -166,6 +167,7 @@ export class InputTest extends EventEmitter {
     audioContextFactory: AudioContext,
     debug: false,
     duration: Infinity,
+    enableRecording: false,
     enumerateDevices,
     getUserMedia,
     volumeEventIntervalMs: 100,
@@ -180,6 +182,10 @@ export class InputTest extends EventEmitter {
    * An `AudioContext` to use for generating volume levels.
    */
   private _audioContext: AudioContext | null = null;
+  /**
+   * An AudioRecorder object used to capture audio input during the test
+   */
+  private _audioRecorder: AudioRecorder | null = null;
   /**
    * A function that will be assigned in `_startTest` that when run will clean
    * up the audio nodes created in the same function.
@@ -245,14 +251,11 @@ export class InputTest extends EventEmitter {
    * @param pass whether or not the test should pass. If set to false, will
    * override the result from determining whether audio is silent from the collected volume levels.
    */
-  stop(pass: boolean = true): InputTest.Report | undefined {
+  stop(pass: boolean = true): void {
     if (typeof this._endTime === 'number') {
       this._onWarning(new AlreadyStoppedError());
       return;
     }
-
-    // Perform cleanup
-    this._cleanup();
 
     this._endTime = Date.now();
     const didPass: boolean = pass && !detectSilence(this._volumeStats.values);
@@ -275,9 +278,21 @@ export class InputTest extends EventEmitter {
       };
     }
 
-    this.emit(InputTest.Events.End, report);
+    const onEnd = () => {
+      this._cleanup();
+      this.emit(InputTest.Events.End, report);
+    };
 
-    return report;
+    if (this._options.enableRecording && this._audioRecorder) {
+      this._audioRecorder.stop().then(() => {
+        report.recordingUrl = this._audioRecorder!.url;
+      }).catch((ex: DiagnosticError) => {
+        this._onError(ex);
+        report.didPass = false;
+      }).finally(onEnd);
+    } else {
+      onEnd();
+    }
   }
 
   /**
@@ -414,6 +429,21 @@ export class InputTest extends EventEmitter {
         audio: { deviceId: this._options.deviceId },
       });
 
+      if (!this._options.audioContextFactory) {
+        throw AudioContextUnsupportedError;
+      }
+
+      // We need to initialize AudioContext and MediaRecorder right after calling gUM
+      // and before enumerateDevices. Certain browsers and headsets (Safari, AirPods)
+      // loses the "user action" after enumerating devices.
+      this._audioContext = new this._options.audioContextFactory();
+      if (this._options.enableRecording) {
+        this._audioRecorder = new AudioRecorder({
+          audioContext: this._audioContext,
+          stream: this._mediaStream,
+        });
+      }
+
       if (!this._options.enumerateDevices) {
         throw EnumerateDevicesUnsupportedError;
       }
@@ -423,11 +453,6 @@ export class InputTest extends EventEmitter {
 
       // Only starts the timer after successfully getting devices
       this._startTime = Date.now();
-
-      if (!this._options.audioContextFactory) {
-        throw AudioContextUnsupportedError;
-      }
-      this._audioContext = new this._options.audioContextFactory();
 
       const analyser: AnalyserNode = this._audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
@@ -536,6 +561,27 @@ export namespace InputTest {
     errors: DiagnosticError[];
 
     /**
+     * If [[InputTest.Options.enableRecording]] is set to true,
+     * `recordingUrl` will be available in the report which can be used to playback captured audio from the microphone.
+     * Your application should revoke this URL if it is no longer needed.
+     *
+     * Example:
+     *
+     * ```ts
+     * const inputTest: InputTest = testInputDevice({ enableRecording: true });
+     * inputTest.on(InputTest.Events.End, (report: InputTest.Report) => {
+     *   const audioEl = new Audio();
+     *   audioEl.src = report.recordingUrl;
+     *   audioEl.play();
+     *
+     *   // Revoke the url if no longer needed
+     *   URL.revokeObjectURL(report.recordingUrl);
+     * });
+     * ```
+     */
+    recordingUrl?: string;
+
+    /**
      * The name of the test.
      */
     testName: typeof InputTest.testName;
@@ -577,6 +623,28 @@ export namespace InputTest {
      * @default Infinity
      */
     duration?: number;
+
+    /**
+     * Whether the test should record the audio input or not.
+     * If set to true, [[InputTest.Report.recordingUrl]] will be available for audio playback.
+     * Your application should revoke this URL if it is no longer needed.
+     *
+     * Example:
+     *
+     * ```ts
+     * const inputTest: InputTest = testInputDevice({ enableRecording: true });
+     * inputTest.on(InputTest.Events.End, (report: InputTest.Report) => {
+     *   const audioEl = new Audio();
+     *   audioEl.src = report.recordingUrl;
+     *   audioEl.play();
+     *
+     *   // Revoke the url if no longer needed
+     *   URL.revokeObjectURL(report.recordingUrl);
+     * });
+     * ```
+     * @default false
+     */
+    enableRecording?: boolean;
 
     /**
      * Used to mock the call to `enumerateDevices`.

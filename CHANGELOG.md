@@ -4,38 +4,55 @@
 New Features
 -------------
 
-* ### `LowAudioLevel` detection and warning in `InputTest`.
+### Audio recording feature in `InputTest`.
 
-  During the runtime of the test, if low audio levels are detected from the captured input device, the test will emit a `warning` event. The test will emit a `warning-cleared` event when nominal audio levels are detected only after the `low-audio-level` `warning` has been fired.
+`InputTest` now supports the ability to record the audio captured from the input device, and provides a recording URL which can be used to play back audio. This feature is disabled by default and can be enabled by setting [InputTest.Options.enableRecording](https://twilio.github.io/rtc-diagnostics/interfaces/inputtest.options.html#enablerecording) to `true`. When enabled, the recording URL is available via [InputTest.Report.recordingUrl](https://twilio.github.io/rtc-diagnostics/interfaces/inputtest.report.html#recordingurl) property.
 
-  After the `low-audio-level` warning has been raised, it will not be raised again until it has been cleared.
+Example usage:
+```ts
+const inputTest: InputTest = testInputDevice({ enableRecording: true });
+inputTest.on(InputTest.Events.End, (report: InputTest.Report) => {
+  const audioEl = new Audio();
+  audioEl.src = report.recordingUrl;
+  audioEl.play();
 
-  Example usage:
-  ```ts
-  import { InputTest, testInputDevice, WarningName } from '@twilio/rtc-diagnostics';
+  // Revoke the url if no longer needed
+  URL.revokeObjectURL(report.recordingUrl);
+});
+```
 
-  const inputDeviceTest = testInputDevice();
+### `LowAudioLevel` detection and warning in `InputTest`.
 
-  inputDeviceTest.on(InputTest.Events.Warning, (warningName: WarningName) => {
-    // The application can listen for specific warnings...
-    if (warningName === WarningName.LowAudioLevel) {
-      // update the ui to show the input device may not be working
-    }
+During the runtime of the test, if low audio levels are detected from the captured input device, the test will emit a `warning` event. The test will emit a `warning-cleared` event when nominal audio levels are detected only after the `low-audio-level` `warning` has been fired.
 
-    // ...or access all active warnings.
-    inputDeviceTest.activeWarnings.values().forEach(...);
-  });
+After the `low-audio-level` warning has been raised, it will not be raised again until it has been cleared.
 
-  inputDeviceTest.on(InputTest.Events.WarningCleared, (warningName: WarningName) => {
-    // The application can listen for specific warnings...
-    if (warningName === WarningName.LowAudioLevel) {
-      // update the ui to show that the input device may be working again
-    }
+Example usage:
+```ts
+import { InputTest, testInputDevice, WarningName } from '@twilio/rtc-diagnostics';
 
-    // ...or access all active warnings.
-    inputDeviceTest.activeWarnings.values().forEach(...);
-  });
-  ```
+const inputDeviceTest = testInputDevice();
+
+inputDeviceTest.on(InputTest.Events.Warning, (warningName: WarningName) => {
+  // The application can listen for specific warnings...
+  if (warningName === WarningName.LowAudioLevel) {
+    // update the ui to show the input device may not be working
+  }
+
+  // ...or access all active warnings.
+  inputDeviceTest.activeWarnings.values().forEach(...);
+});
+
+inputDeviceTest.on(InputTest.Events.WarningCleared, (warningName: WarningName) => {
+  // The application can listen for specific warnings...
+  if (warningName === WarningName.LowAudioLevel) {
+    // update the ui to show that the input device may be working again
+  }
+
+  // ...or access all active warnings.
+  inputDeviceTest.activeWarnings.values().forEach(...);
+});
+```
 
 Changes
 -------
