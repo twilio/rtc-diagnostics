@@ -28,8 +28,8 @@ export class Encoder {
    * @param stream - The input MediaStream to record
    * @param audioContext - The AudioContext instance to use for processing audio data
    */
-  constructor(stream: MediaStream, audioContext: AudioContext) {
-    this._encoder = createWorker(waveEncoder);
+  constructor(stream: MediaStream, audioContext: AudioContext, audioEncoder: any = waveEncoder) {
+    this._encoder = createWorker(audioEncoder);
     this._audioContext = audioContext;
     this._stream = stream;
   }

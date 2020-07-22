@@ -165,6 +165,7 @@ export class InputTest extends EventEmitter {
    */
   private static defaultOptions: InputTest.InternalOptions = {
     audioContextFactory: AudioContext,
+    audioRecorderFactory: AudioRecorder,
     debug: false,
     duration: Infinity,
     enableRecording: false,
@@ -438,7 +439,7 @@ export class InputTest extends EventEmitter {
       // loses the "user action" after enumerating devices.
       this._audioContext = new this._options.audioContextFactory();
       if (this._options.enableRecording) {
-        this._audioRecorder = new AudioRecorder({
+        this._audioRecorder = new this._options.audioRecorderFactory!({
           audioContext: this._audioContext,
           stream: this._mediaStream,
         });
@@ -606,6 +607,12 @@ export namespace InputTest {
      * @private
      */
     audioContextFactory?: typeof window.AudioContext;
+
+    /**
+     * AudioRecorder mock to be used during the test.
+     * @private
+     */
+    audioRecorderFactory?: typeof AudioRecorder;
 
     /**
      * Whether or not to log debug statements to the console.

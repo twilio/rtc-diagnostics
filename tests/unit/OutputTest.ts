@@ -300,10 +300,8 @@ describe('testOutputDevice', function() {
         devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
       }),
     });
-    const report = test.stop(false);
-    assert(report);
-    const shouldBeUndefined = test.stop(false);
-    assert.equal(shouldBeUndefined, undefined);
+    test.stop(false);
+    test.stop(false);
     assert(stub.callCount);
     stub.restore();
   });
