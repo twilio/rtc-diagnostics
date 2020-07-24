@@ -72,6 +72,46 @@ describe('testInputDevice', function() {
     };
   }
 
+  it('should throw if passed invalid options', async function() {
+    const invalidOptions = [{
+      deviceId: 0,
+    }, {
+      deviceId: {},
+    }, {
+      duration: -10,
+    }, {
+      duration: {},
+    }, {
+      volumeEventIntervalMs: -10,
+    }, {
+      volumeEventIntervalMs: {},
+    }] as any;
+
+    for (const overrides of invalidOptions) {
+      const options = createTestOptions(overrides);
+      const { handlers } = createBasicTest(options);
+      await clock.runAllAsync();
+      assert(handlers.end.calledOnce);
+      assert(handlers.error.calledOnce);
+      assert(handlers.end.calledAfter(handlers.error));
+      assert(handlers.volume.notCalled);
+    }
+  });
+
+  it('should warn if stopped multiple times', async function() {
+    const consoleStub = sinon.stub(console, 'warn');
+    try {
+      const options = createTestOptions({ debug: true });
+      const test = testInputDevice(options);
+      test.stop();
+      test.stop();
+      assert(consoleStub.calledOnce);
+    } finally {
+      await clock.runAllAsync();
+      consoleStub.restore();
+    }
+  });
+
   describe('in a supported environment', function() {
     it('should properly warn the user when low audio levels should be detected', async function() {
       const testOptions = createTestOptions({
@@ -230,48 +270,6 @@ describe('testInputDevice', function() {
     });
   });
 
-  it('should throw if passed invalid options', async function() {
-    const invalidOptions = [{
-      deviceId: 0,
-    }, {
-      deviceId: {},
-    }, {
-      duration: -10,
-    }, {
-      duration: {},
-    }, {
-      volumeEventIntervalMs: -10,
-    }, {
-      volumeEventIntervalMs: {},
-    }] as any;
-
-    for (const overrides of invalidOptions) {
-      const options = createTestOptions(overrides);
-      const { handlers } = createBasicTest(options);
-      await clock.runAllAsync();
-      assert(handlers.end.calledOnce);
-      assert(handlers.error.calledOnce);
-      assert(handlers.end.calledAfter(handlers.error));
-      assert(handlers.volume.notCalled);
-    }
-  });
-
-  it('should warn if stopped multiple times', async function() {
-    const consoleStub = sinon.stub(console, 'warn');
-    try {
-      const options = createTestOptions({ debug: true });
-      const test = testInputDevice(options);
-      const report = test.stop();
-      assert(report);
-      const shouldBeUndefined = test.stop();
-      assert.equal(shouldBeUndefined, undefined);
-      assert(consoleStub.calledOnce);
-    } finally {
-      await clock.runAllAsync();
-      consoleStub.restore();
-    }
-  });
-
   describe('should handle when an error is thrown during the test', function() {
     ([ [
       'AudioContext', createTestOptions({
@@ -333,6 +331,96 @@ describe('testInputDevice', function() {
         assert(!report.didPass);
         assert.equal(report.errors.length, 1);
         assert.equal(handledError, report.errors[0]);
+      });
+    });
+  });
+
+  describe('audio recording', () => {
+    let initCallback: any;
+    let audioRecorderFactory: any;
+
+    beforeEach(() => {
+      initCallback = sinon.stub();
+      audioRecorderFactory = function(this: any) {
+        initCallback();
+        this.stop = () => Promise.resolve();
+        this.url = 'foo';
+      };
+    });
+
+    describe('when enableRecording is false', () => {
+      it('should not initialize AudioRecorder by default', async () => {
+        const options = createTestOptions({
+          audioRecorderFactory,
+        });
+        createBasicTest(options);
+        await clock.runAllAsync();
+        sinon.assert.notCalled(initCallback);
+      });
+
+      it('should not initialize AudioRecorder if enableRecording is explicitly set to false', async () => {
+        const options = createTestOptions({
+          audioRecorderFactory,
+          enableRecording: false,
+        });
+        createBasicTest(options);
+        await clock.runAllAsync();
+        sinon.assert.notCalled(initCallback);
+      });
+
+      it('should not include recording url in the report', async () => {
+        const options = createTestOptions({
+          audioRecorderFactory,
+          enableRecording: false,
+        });
+        const { handlers } = createBasicTest(options);
+        await clock.runAllAsync();
+        const report: InputTest.Report = handlers.end.args[0][0];
+
+        assert(!report.recordingUrl);
+      });
+    });
+
+    describe('when enableRecording is true', () => {
+      let report: InputTest.Report;
+
+      beforeEach(async () => {
+        const options = createTestOptions({
+          audioRecorderFactory,
+          enableRecording: true,
+        });
+        const { handlers } = createBasicTest(options);
+        await clock.runAllAsync();
+        report = handlers.end.args[0][0];
+      });
+
+      it('should initialize AudioRecorder', () => {
+        sinon.assert.calledOnce(initCallback);
+      });
+
+      it('should set report.recordingUrl', () => {
+        assert.equal(report.recordingUrl, 'foo');
+      });
+
+      it('should fail if audio recorder fails', async () => {
+        audioRecorderFactory = function(this: any) {
+          initCallback();
+          this.stop = () => Promise.reject('foo-error');
+          this.url = 'foo';
+        };
+        const options = createTestOptions({
+          audioRecorderFactory,
+          enableRecording: true,
+        });
+        const { handlers } = createBasicTest(options);
+        await clock.runAllAsync();
+        report = handlers.end.args[0][0];
+
+        sinon.assert.calledOnce(handlers.error);
+        assert(!report.recordingUrl);
+        assert(!report.didPass);
+        assert.equal(report.errors.length, 1);
+        assert.equal(report.errors[0], 'foo-error');
       });
     });
   });

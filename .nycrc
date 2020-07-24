@@ -7,7 +7,8 @@
     "lib/**/*"
   ],
   "exclude": [
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "lib/recorder/encoder/worker.ts"
   ],
   "reporter": [
     "html",
