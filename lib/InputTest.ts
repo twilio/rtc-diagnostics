@@ -764,7 +764,12 @@ export namespace InputTest {
  * browser "Remember this selection" within the prompt, the device that was
  * selected will be captured by every future `getUserMedia()` call as well.
  * This selection will persist even through changes in the system OS, i.e. when
- * default devices are changed.
+ * default devices are changed. In order to change the device, the user has to
+ * revoke the webpage's microphone-access permissions for the prompt to show
+ * again.
+ *
+ * Please see this link for more information on microphone access in Firefox:
+ * https://support.mozilla.org/en-US/kb/how-manage-your-camera-and-microphone-permissions
  *
  * ---
  *
