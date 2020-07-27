@@ -749,11 +749,22 @@ export namespace InputTest {
  *
  * ---
  *
- * Note: Firefox will ignore the option `deviceId` if it is passed to the test
- * and will instead prompt the user for a device via a Firefox specific GUI.
- * This is due to the Firefox implemenation of the
- * `navigator.mediaDevices.getUserMedia` function, which is used to capture
- * media devices.
+ * Note: In Firefox, `deviceId` will be ignored, and instead the user will get a
+ * browser pop-up where they can select the device they want to use. This is
+ * unavoidable as it is Firefox's implementation of `getUserMedia()`.
+ *
+ * In most browsers, such as Chrome and Safari, when `getUserMedia()` is called,
+ * a prompt will ask the user for broad microphone-access permissions. Then, the
+ * parameters passed to `getUserMedia()` will determine the device that is
+ * captured.
+ *
+ * Firefox differs in that the prompt will ask for a specific input device.
+ * Regardless of the parameters passed to `getUserMedia()`, the device
+ * selected in that prompt will be captured. If the user opts to have the
+ * browser "Remember this selection" within the prompt, the device that was
+ * selected will be captured by every future `getUserMedia()` call as well.
+ * This selection will persist even through changes in the system OS, i.e. when
+ * default devices are changed.
  *
  * ---
  *
