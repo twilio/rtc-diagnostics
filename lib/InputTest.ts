@@ -749,6 +749,14 @@ export namespace InputTest {
  *
  * ---
  *
+ * Note: Firefox will ignore the option `deviceId` if it is passed to the test
+ * and will instead prompt the user for a device via a Firefox specific GUI.
+ * This is due to the Firefox implemenation of the
+ * `navigator.mediaDevices.getUserMedia` function, which is used to capture
+ * media devices.
+ *
+ * ---
+ *
  * The function [[testInputDevice]] serves as a factory function that accepts
  * [[InputTest.Options]] as its only parameter and will instantiate an
  * [[InputTest]] object with those options.
