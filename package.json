@@ -1,6 +1,6 @@
 {
   "name": "@twilio/rtc-diagnostics",
-  "version": "1.0.1-dev",
+  "version": "1.0.0-rc3",
   "description": "Various diagnostics functions to help analyze connections to Twilio",
   "main": "./es5/lib/diagnostics.js",
   "types": "./es5/lib/diagnostics.d.ts",
