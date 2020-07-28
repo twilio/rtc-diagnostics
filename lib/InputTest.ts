@@ -749,6 +749,30 @@ export namespace InputTest {
  *
  * ---
  *
+ * Note: In Firefox, `deviceId` will be ignored, and instead the user will get a
+ * browser pop-up where they can select the device they want to use. This is
+ * unavoidable as it is Firefox's implementation of `getUserMedia()`.
+ *
+ * In most browsers, such as Chrome and Safari, when `getUserMedia()` is called,
+ * a prompt will ask the user for broad microphone-access permissions. Then, the
+ * parameters passed to `getUserMedia()` will determine the device that is
+ * captured.
+ *
+ * Firefox differs in that the prompt will ask for a specific input device.
+ * Regardless of the parameters passed to `getUserMedia()`, the device
+ * selected in that prompt will be captured. If the user opts to have the
+ * browser "Remember this selection" within the prompt, the device that was
+ * selected will be captured by every future `getUserMedia()` call as well.
+ * This selection will persist even through changes in the system OS, i.e. when
+ * default devices are changed. In order to change the device, the user has to
+ * revoke the webpage's microphone-access permissions for the prompt to show
+ * again.
+ *
+ * Please see this link for more information on microphone access in Firefox:
+ * https://support.mozilla.org/en-US/kb/how-manage-your-camera-and-microphone-permissions
+ *
+ * ---
+ *
  * The function [[testInputDevice]] serves as a factory function that accepts
  * [[InputTest.Options]] as its only parameter and will instantiate an
  * [[InputTest]] object with those options.
