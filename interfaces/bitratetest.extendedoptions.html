@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Warnings | @twilio/rtc-diagnostics</title>
+	<title>ExtendedOptions | @twilio/rtc-diagnostics</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -47,10 +47,10 @@
 					<a href="../classes/bitratetest.html">BitrateTest</a>
 				</li>
 				<li>
-					<a href="bitratetest.warnings.html">Warnings</a>
+					<a href="bitratetest.extendedoptions.html">ExtendedOptions</a>
 				</li>
 			</ul>
-			<h1>Enumeration Warnings</h1>
+			<h1>Interface ExtendedOptions</h1>
 		</div>
 	</div>
 </header>
@@ -60,71 +60,96 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Possible warnings that a <a href="../classes/bitratetest.html">BitrateTest</a> might emit. See <a href="../classes/bitratetest.html#on">BitrateTest.on</a>.</p>
+						<p>Options that may be passed to <a href="../classes/bitratetest.html">BitrateTest</a> constructor for internal testing.</p>
 					</div>
 				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<a href="bitratetest.options.html" class="tsd-signature-type">Options</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">ExtendedOptions</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Enumeration members</h3>
+							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="bitratetest.warnings.html#highfirstpacketduration" class="tsd-kind-icon">High<wbr>First<wbr>Packet<wbr>Duration</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="bitratetest.warnings.html#highiceconnectduration" class="tsd-kind-icon">High<wbr>Ice<wbr>Connect<wbr>Duration</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="bitratetest.warnings.html#highpcconnectduration" class="tsd-kind-icon">High<wbr>PcConnect<wbr>Duration</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="bitratetest.extendedoptions.html#getrtcicecandidatestatsreport" class="tsd-kind-icon">getRTCIce<wbr>Candidate<wbr>Stats<wbr>Report</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="bitratetest.extendedoptions.html#iceservers" class="tsd-kind-icon">ice<wbr>Servers</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Enumeration members</h2>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="highfirstpacketduration" class="tsd-anchor"></a>
-					<h3>High<wbr>First<wbr>Packet<wbr>Duration</h3>
-					<div class="tsd-signature tsd-kind-icon">High<wbr>First<wbr>Packet<wbr>Duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;high-first-packet-duration&quot;</span></div>
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="getrtcicecandidatestatsreport" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> getRTCIce<wbr>Candidate<wbr>Stats<wbr>Report</h3>
+					<div class="tsd-signature tsd-kind-icon">getRTCIce<wbr>Candidate<wbr>Stats<wbr>Report<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/BitrateTest.ts#L420">lib/BitrateTest.ts:420</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/BitrateTest.ts#L417">lib/BitrateTest.ts:417</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Raised when <a href="../interfaces/networktiming.html#firstpacket">NetworkTiming.firstPacket</a> took more than 1400ms to arrive to the remote RTCPeerConnection.
-							The duration is measured from the <a href="../interfaces/bitratetest.report.html">BitrateTest.Report</a>&#39;s testTiming.start up to <a href="../interfaces/networktiming.html#firstpacket">NetworkTiming.firstPacket</a></p>
+							<p>A function that generates a WebRTC stats report containing relevant information about ICE candidates for
+							the given <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection">PeerConnection</a></p>
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="highiceconnectduration" class="tsd-anchor"></a>
-					<h3>High<wbr>Ice<wbr>Connect<wbr>Duration</h3>
-					<div class="tsd-signature tsd-kind-icon">High<wbr>Ice<wbr>Connect<wbr>Duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;high-ice-connect-duration&quot;</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="iceservers" class="tsd-anchor"></a>
+					<h3>ice<wbr>Servers</h3>
+					<div class="tsd-signature tsd-kind-icon">ice<wbr>Servers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RTCIceServer</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
+						<p>Inherited from <a href="bitratetest.extendedoptions.html">ExtendedOptions</a>.<a href="bitratetest.extendedoptions.html#iceservers">iceServers</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/BitrateTest.ts#L425">lib/BitrateTest.ts:425</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/BitrateTest.ts#L458">lib/BitrateTest.ts:458</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Raised when <a href="../interfaces/networktiming.html#ice">NetworkTiming.ice</a> connection took more than 300ms to establish</p>
+							<p>The array of <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer">RTCIceServer</a> configurations to use.
+								You need to provide TURN server configurations to ensure that your network bitrate is tested.
+							You you can use <a href="https://www.twilio.com/stun-turn">Twilio&#39;s Network Traversal Service</a> to get TURN credentials.</p>
 						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="highpcconnectduration" class="tsd-anchor"></a>
-					<h3>High<wbr>PcConnect<wbr>Duration</h3>
-					<div class="tsd-signature tsd-kind-icon">High<wbr>PcConnect<wbr>Duration<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;high-pc-connect-duration&quot;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/BitrateTest.ts#L430">lib/BitrateTest.ts:430</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Raised when <a href="../interfaces/networktiming.html#peerconnection">NetworkTiming.peerConnection</a> took more than 1000ms to establish</p>
-						</div>
+						<p>The following example demonstrates how to use the <a href="https://www.npmjs.com/package/twilio">twilio npm module</a> to generate
+							credentials with a ttl of 120 seconds, using UDP protocol, and specifying ashburn as the
+						<a href="https://www.twilio.com/docs/global-infrastructure/edge-locations">edge location</a>.</p>
+						<pre><code class="language-ts"><span class="hljs-keyword">import</span> Client <span class="hljs-keyword">from</span> <span class="hljs-string">'twilio'</span>;
+<span class="hljs-keyword">import</span> { testBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+
+<span class="hljs-comment">// Generate the STUN and TURN server credentials with a ttl of 120 seconds</span>
+<span class="hljs-keyword">const</span> client = Client(twilioAccountSid, authToken);
+<span class="hljs-keyword">const</span> token = <span class="hljs-keyword">await</span> client.tokens.create({ ttl: <span class="hljs-number">120</span> });
+
+<span class="hljs-comment">// Filter for TURN servers.</span>
+<span class="hljs-comment">// Use the following filters if you want to use UDP, TCP, or TLS</span>
+<span class="hljs-comment">// UDP: turn:global.turn.twilio.com:3478?transport=udp</span>
+<span class="hljs-comment">// TCP: turn:global.turn.twilio.com:3478?transport=tcp</span>
+<span class="hljs-comment">// TLS: turn:global.turn.twilio.com:443?transport=tcp</span>
+<span class="hljs-keyword">let</span> { urls, username, credential } = token.iceServers
+  .find(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item.url === <span class="hljs-string">'turn:global.turn.twilio.com:3478?transport=udp'</span>);
+
+<span class="hljs-comment">// By default, global will be used as the default edge location.</span>
+<span class="hljs-comment">// You can replace global with a specific edge name.</span>
+urls = urls.replace(<span class="hljs-string">'global'</span>, <span class="hljs-string">'ashburn'</span>);
+
+<span class="hljs-comment">// Use the TURN credentials using the iceServers parameter</span>
+<span class="hljs-keyword">const</span> bitrateTest = testBitrate({ iceServers: [{ urls, username, credential }] });</code></pre>
+						<p>Note, for production code, the above code should not be executed client side as it requires the authToken which must be treated like a private key.</p>
 					</div>
 				</section>
 			</section>
@@ -139,39 +164,30 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-is-private">
-						<a href="testnames.html" class="tsd-kind-icon">Test<wbr>Names</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="../classes/alreadystoppederror.html" class="tsd-kind-icon">Already<wbr>Stopped<wbr>Error</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
 						<a href="../classes/bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
 						<ul>
 							<li class=" tsd-kind-enum tsd-parent-kind-class tsd-is-static">
-								<a href="bitratetest.events.html" class="tsd-kind-icon">Events</a>
+								<a href="../enums/bitratetest.events.html" class="tsd-kind-icon">Events</a>
 							</li>
-							<li class="current tsd-kind-enum tsd-parent-kind-class tsd-is-static">
-								<a href="bitratetest.warnings.html" class="tsd-kind-icon">Warnings</a>
+							<li class="current tsd-kind-interface tsd-parent-kind-class tsd-is-external">
+								<a href="bitratetest.extendedoptions.html" class="tsd-kind-icon">Extended<wbr>Options</a>
 								<ul>
-									<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-										<a href="bitratetest.warnings.html#highfirstpacketduration" class="tsd-kind-icon">High<wbr>First<wbr>Packet<wbr>Duration</a>
+									<li class=" tsd-kind-property tsd-parent-kind-interface">
+										<a href="bitratetest.extendedoptions.html#getrtcicecandidatestatsreport" class="tsd-kind-icon">getRTCIce<wbr>Candidate<wbr>Stats<wbr>Report</a>
 									</li>
-									<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-										<a href="bitratetest.warnings.html#highiceconnectduration" class="tsd-kind-icon">High<wbr>Ice<wbr>Connect<wbr>Duration</a>
-									</li>
-									<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-										<a href="bitratetest.warnings.html#highpcconnectduration" class="tsd-kind-icon">High<wbr>PcConnect<wbr>Duration</a>
+									<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+										<a href="bitratetest.extendedoptions.html#iceservers" class="tsd-kind-icon">ice<wbr>Servers</a>
 									</li>
 								</ul>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-class">
-								<a href="../interfaces/bitratetest.options.html" class="tsd-kind-icon">Options</a>
+								<a href="bitratetest.options.html" class="tsd-kind-icon">Options</a>
 							</li>
 							<li class=" tsd-kind-interface tsd-parent-kind-class">
-								<a href="../interfaces/bitratetest.report.html" class="tsd-kind-icon">Report</a>
+								<a href="bitratetest.report.html" class="tsd-kind-icon">Report</a>
 							</li>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="../classes/bitratetest.html#constructor" class="tsd-kind-icon">constructor</a>
@@ -233,115 +249,10 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="../classes/bitratetest.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
 							</li>
-							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static tsd-is-external">
-								<a href="../classes/bitratetest.html#warningthresholds" class="tsd-kind-icon">Warning<wbr>Thresholds</a>
-							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="../classes/diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="../classes/inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="../classes/invalidoptionerror.html" class="tsd-kind-icon">Invalid<wbr>Option<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
-						<a href="../classes/invalidoptionserror.html" class="tsd-kind-icon">Invalid<wbr>Options<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="../classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="../classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="../classes/promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="../classes/unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/audiodevicevalidatoroptions.html" class="tsd-kind-icon">Audio<wbr>Device<wbr>Validator<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/audioelement.html" class="tsd-kind-icon">Audio<wbr>Element</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/networktiming.html" class="tsd-kind-icon">Network<wbr>Timing</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/timemeasurement.html" class="tsd-kind-icon">Time<wbr>Measurement</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="../globals.html#inputoptions" class="tsd-kind-icon">Input<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#invalidityrecord" class="tsd-kind-icon">Invalidity<wbr>Record</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#subsetrequired" class="tsd-kind-icon">Subset<wbr>Required</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#validatorconfig" class="tsd-kind-icon">Validator<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="../globals.html#validatorfunction" class="tsd-kind-icon">Validator<wbr>Function</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="../globals.html#validity" class="tsd-kind-icon">Validity</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#bytes_keep_buffered" class="tsd-kind-icon">BYTES_<wbr>KEEP_<wbr>BUFFERED</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#incoming_sound_url" class="tsd-kind-icon">INCOMING_<wbr>SOUND_<wbr>URL</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#createaudiodevicevalidator" class="tsd-kind-icon">create<wbr>Audio<wbr>Device<wbr>Validator</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#detectsilence" class="tsd-kind-icon">detect<wbr>Silence</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testbitrate" class="tsd-kind-icon">test<wbr>Bitrate</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validatedeviceid" class="tsd-kind-icon">validate<wbr>Device<wbr>Id</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validateexists" class="tsd-kind-icon">validate<wbr>Exists</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#validateoptions" class="tsd-kind-icon">validate<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validatestring" class="tsd-kind-icon">validate<wbr>String</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validatetime" class="tsd-kind-icon">validate<wbr>Time</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#waitforpromise" class="tsd-kind-icon">wait<wbr>For<wbr>Promise</a>
-					</li>
 				</ul>
 			</nav>
 		</div>

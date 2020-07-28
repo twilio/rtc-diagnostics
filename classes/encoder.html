@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>DiagnosticError | @twilio/rtc-diagnostics</title>
+	<title>Encoder | @twilio/rtc-diagnostics</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -44,10 +44,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="diagnosticerror.html">DiagnosticError</a>
+					<a href="encoder.html">Encoder</a>
 				</li>
 			</ul>
-			<h1>Class DiagnosticError</h1>
+			<h1>Class Encoder</h1>
 		</div>
 	</div>
 </header>
@@ -56,32 +56,17 @@
 		<div class="col-8 col-content">
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The <a href="encoder.html">Encoder</a> reads audio data via an AudioContext and encodes it to a wav data format.
+						The wav data can be then converted into a blob which can be used for playback.</p>
+					</div>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="diagnosticerror.html#error" class="tsd-signature-type">Error</a>
-						<ul class="tsd-hierarchy">
-							<li>
-								<span class="target">DiagnosticError</span>
-								<ul class="tsd-hierarchy">
-									<li>
-										<a href="invalidstateerror.html" class="tsd-signature-type">InvalidStateError</a>
-									</li>
-									<li>
-										<a href="invalidoptionerror.html" class="tsd-signature-type">InvalidOptionError</a>
-									</li>
-									<li>
-										<a href="invalidoptionserror.html" class="tsd-signature-type">InvalidOptionsError</a>
-									</li>
-									<li>
-										<a href="unsupportederror.html" class="tsd-signature-type">UnsupportedError</a>
-									</li>
-								</ul>
-							</li>
-						</ul>
+						<span class="target">Encoder</span>
 					</li>
 				</ul>
 			</section>
@@ -92,18 +77,16 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="diagnosticerror.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="encoder.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="diagnosticerror.html#domerror" class="tsd-kind-icon">dom<wbr>Error</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="diagnosticerror.html#message" class="tsd-kind-icon">message</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="diagnosticerror.html#name" class="tsd-kind-icon">name</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="diagnosticerror.html#stack" class="tsd-kind-icon">stack</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="diagnosticerror.html#timestamp" class="tsd-kind-icon">timestamp</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="diagnosticerror.html#error" class="tsd-kind-icon">Error</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="encoder.html#ondataavailable" class="tsd-kind-icon">ondataavailable</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="encoder.html#onstop" class="tsd-kind-icon">onstop</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="encoder.html#start" class="tsd-kind-icon">start</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="encoder.html#stop" class="tsd-kind-icon">stop</a></li>
 							</ul>
 						</section>
 					</div>
@@ -115,117 +98,144 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Diagnostic<wbr>Error<span class="tsd-signature-symbol">(</span>domError<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">DOMError</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMException</span>, message<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="diagnosticerror.html" class="tsd-signature-type">DiagnosticError</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Encoder<span class="tsd-signature-symbol">(</span>stream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">MediaStream</span>, audioContext<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AudioContext</span>, audioEncoder<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="encoder.html" class="tsd-signature-type">Encoder</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/DiagnosticError.ts#L22">lib/errors/DiagnosticError.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/recorder/encoder/index.ts#L23">lib/recorder/encoder/index.ts:23</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Immediately sets the timestamp and sets the name to <code>DiagnosticError</code>.</p>
+									<p>Construct an <a href="encoder.html">Encoder</a> instance and and prepares the Web Worker</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> domError: <span class="tsd-signature-type">DOMError</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMException</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> message: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<h5>stream: <span class="tsd-signature-type">MediaStream</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<div class="lead">
+											<p>The input MediaStream to record</p>
 										</div>
 									</div>
 								</li>
+								<li>
+									<h5>audioContext: <span class="tsd-signature-type">AudioContext</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The AudioContext instance to use for processing audio data</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> audioEncoder: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> = waveEncoder</span></h5>
+								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="diagnosticerror.html" class="tsd-signature-type">DiagnosticError</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="encoder.html" class="tsd-signature-type">Encoder</a></h4>
 						</li>
 					</ul>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="domerror" class="tsd-anchor"></a>
-					<h3>dom<wbr>Error</h3>
-					<div class="tsd-signature tsd-kind-icon">dom<wbr>Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DOMError</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMException</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/DiagnosticError.ts#L11">lib/errors/DiagnosticError.ts:11</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The associated <code>DOMError</code> that caused this <code>DiagnosticError</code>.</p>
-						</div>
-					</div>
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="ondataavailable" class="tsd-anchor"></a>
+					<h3>ondataavailable</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">ondataavailable<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/recorder/encoder/index.ts#L41">lib/recorder/encoder/index.ts:41</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Called when raw data is available</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>override</dt>
+									<dd></dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-					<a name="message" class="tsd-anchor"></a>
-					<h3>message</h3>
-					<div class="tsd-signature tsd-kind-icon">message<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from <a href="diagnosticerror.html">DiagnosticError</a>.<a href="diagnosticerror.html#message">message</a></p>
-						<ul>
-						</ul>
-					</aside>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="onstop" class="tsd-anchor"></a>
+					<h3>onstop</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">onstop<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/recorder/encoder/index.ts#L47">lib/recorder/encoder/index.ts:47</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Called when encoding stops</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>override</dt>
+									<dd></dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
-					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <a href="../enums/errorname.html" class="tsd-signature-type">ErrorName</a></div>
-					<aside class="tsd-sources">
-						<p>Overrides Error.name</p>
-						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/DiagnosticError.ts#L18">lib/errors/DiagnosticError.ts:18</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The name of the error.</p>
-						</div>
-						<p>This overrides the typing of the <code>Error.name</code> superclass member from
-						<code>string</code> to the specific enumeration of error names.</p>
-					</div>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="start" class="tsd-anchor"></a>
+					<h3>start</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">start<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/recorder/encoder/index.ts#L52">lib/recorder/encoder/index.ts:52</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Starts the encoding process</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-					<a name="stack" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> stack</h3>
-					<div class="tsd-signature tsd-kind-icon">stack<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from <a href="diagnosticerror.html">DiagnosticError</a>.<a href="diagnosticerror.html#stack">stack</a></p>
-						<p>Overrides <a href="diagnosticerror.html">DiagnosticError</a>.<a href="diagnosticerror.html#stack">stack</a></p>
-						<ul>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="timestamp" class="tsd-anchor"></a>
-					<h3>timestamp</h3>
-					<div class="tsd-signature tsd-kind-icon">timestamp<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/DiagnosticError.ts#L22">lib/errors/DiagnosticError.ts:22</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The timestamp of the occurrence of this error.</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
-					<a name="error" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> Error</h3>
-					<div class="tsd-signature tsd-kind-icon">Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ErrorConstructor</span></div>
-					<aside class="tsd-sources">
-						<ul>
-						</ul>
-					</aside>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="stop" class="tsd-anchor"></a>
+					<h3>stop</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">stop<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/recorder/encoder/index.ts#L65">lib/recorder/encoder/index.ts:65</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Stops the encoding process</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -242,28 +252,22 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-is-external">
-						<a href="diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
+						<a href="encoder.html" class="tsd-kind-icon">Encoder</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="diagnosticerror.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="encoder.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="diagnosticerror.html#domerror" class="tsd-kind-icon">dom<wbr>Error</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="encoder.html#ondataavailable" class="tsd-kind-icon">ondataavailable</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-								<a href="diagnosticerror.html#message" class="tsd-kind-icon">message</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="encoder.html#onstop" class="tsd-kind-icon">onstop</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
-								<a href="diagnosticerror.html#name" class="tsd-kind-icon">name</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="encoder.html#start" class="tsd-kind-icon">start</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-								<a href="diagnosticerror.html#stack" class="tsd-kind-icon">stack</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="diagnosticerror.html#timestamp" class="tsd-kind-icon">timestamp</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
-								<a href="diagnosticerror.html#error" class="tsd-kind-icon">Error</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="encoder.html#stop" class="tsd-kind-icon">stop</a>
 							</li>
 						</ul>
 					</li>

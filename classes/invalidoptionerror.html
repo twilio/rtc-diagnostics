@@ -87,7 +87,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="invalidoptionerror.html#domerror" class="tsd-kind-icon">dom<wbr>Error</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="invalidoptionerror.html#error" class="tsd-kind-icon">error</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="invalidoptionerror.html#message" class="tsd-kind-icon">message</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="invalidoptionerror.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="invalidoptionerror.html#name" class="tsd-kind-icon">name</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="invalidoptionerror.html#option" class="tsd-kind-icon">option</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="invalidoptionerror.html#reason" class="tsd-kind-icon">reason</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="invalidoptionerror.html#stack" class="tsd-kind-icon">stack</a></li>
@@ -110,7 +110,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="diagnosticerror.html">DiagnosticError</a>.<a href="diagnosticerror.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/errors/InvalidOptionError.ts#L9">lib/errors/InvalidOptionError.ts:9</a></li>
+									<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/InvalidOptionError.ts#L11">lib/errors/InvalidOptionError.ts:11</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -139,7 +139,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="diagnosticerror.html">DiagnosticError</a>.<a href="diagnosticerror.html#domerror">domError</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/errors/DiagnosticError.ts#L9">lib/errors/DiagnosticError.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/DiagnosticError.ts#L11">lib/errors/DiagnosticError.ts:11</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -154,7 +154,7 @@
 					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <a href="diagnosticerror.html" class="tsd-signature-type">DiagnosticError</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMError</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMException</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/errors/InvalidOptionError.ts#L7">lib/errors/InvalidOptionError.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/InvalidOptionError.ts#L9">lib/errors/InvalidOptionError.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -168,15 +168,24 @@
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
 					<a name="name" class="tsd-anchor"></a>
 					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <a href="../enums/errorname.html" class="tsd-signature-type">ErrorName</a></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="diagnosticerror.html">DiagnosticError</a>.<a href="diagnosticerror.html#name">name</a></p>
+						<p>Overrides Error.name</p>
 						<ul>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/DiagnosticError.ts#L18">lib/errors/DiagnosticError.ts:18</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The name of the error.</p>
+						</div>
+						<p>This overrides the typing of the <code>Error.name</code> superclass member from
+						<code>string</code> to the specific enumeration of error names.</p>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="option" class="tsd-anchor"></a>
@@ -184,7 +193,7 @@
 					<div class="tsd-signature tsd-kind-icon">option<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/errors/InvalidOptionError.ts#L8">lib/errors/InvalidOptionError.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/InvalidOptionError.ts#L10">lib/errors/InvalidOptionError.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -194,7 +203,7 @@
 					<div class="tsd-signature tsd-kind-icon">reason<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/errors/InvalidOptionError.ts#L9">lib/errors/InvalidOptionError.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/InvalidOptionError.ts#L11">lib/errors/InvalidOptionError.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -215,7 +224,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="diagnosticerror.html">DiagnosticError</a>.<a href="diagnosticerror.html#timestamp">timestamp</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/1df9c49/lib/errors/DiagnosticError.ts#L13">lib/errors/DiagnosticError.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/e034d71/lib/errors/DiagnosticError.ts#L22">lib/errors/DiagnosticError.ts:22</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -236,21 +245,6 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-is-private">
-						<a href="../enums/testnames.html" class="tsd-kind-icon">Test<wbr>Names</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="alreadystoppederror.html" class="tsd-kind-icon">Already<wbr>Stopped<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-is-external">
@@ -268,7 +262,7 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="invalidoptionerror.html#message" class="tsd-kind-icon">message</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
 								<a href="invalidoptionerror.html#name" class="tsd-kind-icon">name</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
@@ -287,99 +281,6 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
-						<a href="invalidoptionserror.html" class="tsd-kind-icon">Invalid<wbr>Options<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/audiodevicevalidatoroptions.html" class="tsd-kind-icon">Audio<wbr>Device<wbr>Validator<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/audioelement.html" class="tsd-kind-icon">Audio<wbr>Element</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/networktiming.html" class="tsd-kind-icon">Network<wbr>Timing</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="../interfaces/timemeasurement.html" class="tsd-kind-icon">Time<wbr>Measurement</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="../globals.html#inputoptions" class="tsd-kind-icon">Input<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#invalidityrecord" class="tsd-kind-icon">Invalidity<wbr>Record</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#subsetrequired" class="tsd-kind-icon">Subset<wbr>Required</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#validatorconfig" class="tsd-kind-icon">Validator<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="../globals.html#validatorfunction" class="tsd-kind-icon">Validator<wbr>Function</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="../globals.html#validity" class="tsd-kind-icon">Validity</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#bytes_keep_buffered" class="tsd-kind-icon">BYTES_<wbr>KEEP_<wbr>BUFFERED</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#incoming_sound_url" class="tsd-kind-icon">INCOMING_<wbr>SOUND_<wbr>URL</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-private">
-						<a href="../globals.html#test_packet" class="tsd-kind-icon">TEST_<wbr>PACKET</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#createaudiodevicevalidator" class="tsd-kind-icon">create<wbr>Audio<wbr>Device<wbr>Validator</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#detectsilence" class="tsd-kind-icon">detect<wbr>Silence</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testbitrate" class="tsd-kind-icon">test<wbr>Bitrate</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="../globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validatedeviceid" class="tsd-kind-icon">validate<wbr>Device<wbr>Id</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validateexists" class="tsd-kind-icon">validate<wbr>Exists</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#validateoptions" class="tsd-kind-icon">validate<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validatestring" class="tsd-kind-icon">validate<wbr>String</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="../globals.html#validatetime" class="tsd-kind-icon">validate<wbr>Time</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-						<a href="../globals.html#waitforpromise" class="tsd-kind-icon">wait<wbr>For<wbr>Promise</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
