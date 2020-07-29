@@ -1,4 +1,4 @@
-1.0.0-preview4 (In Progress)
+1.0.0-beta1 (July 29, 2020)
 ============================
 
 New Features
