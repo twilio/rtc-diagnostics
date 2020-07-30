@@ -129,7 +129,6 @@ export class OutputTest extends EventEmitter {
     doLoop: true,
     duration: Infinity,
     enumerateDevices,
-    passOnTimeout: true,
     testURI: INCOMING_SOUND_URL,
     volumeEventIntervalMs: 100,
   };
@@ -195,10 +194,8 @@ export class OutputTest extends EventEmitter {
 
   /**
    * Stops the test.
-   * @param pass whether or not the test should pass. If set to false, will
-   * override the result from determining whether audio is silent from the collected volume values.
    */
-  stop(pass: boolean = true): void {
+  stop(): void {
     if (this._endTime) {
       this._onWarning(new AlreadyStoppedError());
       return;
@@ -213,7 +210,6 @@ export class OutputTest extends EventEmitter {
         this._defaultDevices.audiooutput &&
         this._defaultDevices.audiooutput.deviceId
       ),
-      didPass: pass,
       errors: this._errors,
       testName: OutputTest.testName,
       testTiming: {
@@ -358,13 +354,7 @@ export class OutputTest extends EventEmitter {
           : sourceAudio.ended || isTimedOut;
 
         if (stop) {
-          if (this._options.passOnTimeout === false) {
-            this._onError(new DiagnosticError(
-              undefined,
-              'Test timed out.',
-            ));
-          }
-          this.stop(this._options.passOnTimeout);
+          this.stop();
         } else {
           this._volumeTimeout = setTimeout(
             volumeEvent,
@@ -427,7 +417,7 @@ export class OutputTest extends EventEmitter {
         ));
         this._onWarning(error);
       }
-      this.stop(false);
+      this.stop();
     }
   }
 }
@@ -495,13 +485,6 @@ export namespace OutputTest {
     enumerateDevices?: typeof navigator.mediaDevices.enumerateDevices;
 
     /**
-     * Set [[OutputTest.Report.didPass]] to true or not upon test timeout.
-     * See [[OutputTest]] for details on the behavior of "timing out".
-     * @default true
-     */
-    passOnTimeout?: boolean;
-
-    /**
      * The URI of the audio file to use for the test.
      */
     testURI?: string;
@@ -521,11 +504,6 @@ export namespace OutputTest {
      * The `deviceId` of the audio device used to play audio out of.
      */
     deviceId: string | undefined;
-
-    /**
-     * Whether or not the test passed. See [[OutputTest]] for determining pass or fail.
-     */
-    didPass: boolean;
 
     /**
      * Any errors that occurred during the run-time of the [[OutputTest]].
@@ -558,7 +536,7 @@ export namespace OutputTest {
    * @private
    */
   export type InternalOptions = SubsetRequired<Options,
-    'doLoop' | 'duration' | 'passOnTimeout' | 'volumeEventIntervalMs' | 'testURI'>;
+    'doLoop' | 'duration' | 'volumeEventIntervalMs' | 'testURI'>;
 }
 
 /**
@@ -594,19 +572,19 @@ export namespace OutputTest {
  * // click this button...
  * const passButton = ...;
  * passButton.on('click', () => {
- *   outputTest.stop(false);
+ *   outputTest.stop();
+ *   // display a confirmation dialog to the user
  * });
  *
  * // ...conversely, if they were not able to hear the audio, they should click
  * // this one.
  * const failButton = ...;
  * failButton.on('click', () => {
- *   outputTest.stop(end);
+ *   outputTest.stop();
+ *   // display a warning to the user
  * });
  * ```
- * Caling [[OutputTest.stop]] will immediately end the test. The value of
- * [[OutputTest.Report.didPass]] will be the value passed to
- * [[OutputTest.stop]].
+ * Caling [[OutputTest.stop]] will immediately end the test.
  *
  * ---
  *
@@ -614,9 +592,8 @@ export namespace OutputTest {
  * the [[OutputTest.Events.End]] event, regardless of the occurence of errors
  * during the runtime of the test.
  *
- * Fatal errors will immediately end the test and emit a report such that
- * the value of [[OutputTest.Report.didPass]] will be `false` and the value of
- * [[OutputTest.Report.errors]] will contain the fatal error.
+ * Fatal errors will immediately end the test and emit a report such that the
+ * value of [[OutputTest.Report.errors]] will contain the fatal error.
  *
  * Non-fatal errors will not end the test, but will be included in the value of
  * [[OutputTest.Report.errors]] upon completion of the test.
@@ -628,9 +605,6 @@ export namespace OutputTest {
  * `duration`, or the full duration of the audio file, which ever is shorter.
  * If `doLoop` is set to `true`, it will only run as long as the `duration`
  * option.
- * If the test times out (as defined by the `duration` in the `options`
- * parameter), then the test is considered passing or not by the `passOnTimeout`
- * option and ends.
  *
  * ---
  *

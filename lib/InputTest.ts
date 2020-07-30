@@ -16,7 +16,6 @@ import {
 } from './polyfills';
 import { AudioRecorder } from './recorder/audio';
 import { SubsetRequired, TimeMeasurement, VolumeStats } from './types';
-import { detectSilence } from './utils';
 import {
   InvalidityRecord,
   validateDeviceId,
@@ -26,8 +25,7 @@ import {
 
 export declare interface InputTest {
   /**
-   * This event is emitted with a boolean representing if the test passed and a
-   * test report when the test ends.
+   * This event is emitted with a test report when the test ends.
    * @param event [[InputTest.Events.End]]
    * @param report Summary of the test.
    * @private
@@ -249,23 +247,19 @@ export class InputTest extends EventEmitter {
 
   /**
    * Stop the currently running `InputTest`.
-   * @param pass whether or not the test should pass. If set to false, will
-   * override the result from determining whether audio is silent from the collected volume levels.
    */
-  stop(pass: boolean = true): void {
+  stop(): void {
     if (typeof this._endTime === 'number') {
       this._onWarning(new AlreadyStoppedError());
       return;
     }
 
     this._endTime = Date.now();
-    const didPass: boolean = pass && !detectSilence(this._volumeStats.values);
     const report: InputTest.Report = {
       deviceId: this._options.deviceId || (
         this._defaultDevices.audioinput &&
         this._defaultDevices.audioinput.deviceId
       ),
-      didPass,
       errors: this._errors,
       testName: InputTest.testName,
       values: this._volumeStats.values,
@@ -289,7 +283,6 @@ export class InputTest extends EventEmitter {
         report.recordingUrl = this._audioRecorder!.url;
       }).catch((ex: DiagnosticError) => {
         this._onError(ex);
-        report.didPass = false;
       }).finally(onEnd);
     } else {
       onEnd();
@@ -525,7 +518,7 @@ export class InputTest extends EventEmitter {
         ));
         this._onWarning(error);
       }
-      this.stop(false);
+      this.stop();
     }
   }
 }
@@ -550,11 +543,6 @@ export namespace InputTest {
      * The device ID used to get a MediaStream from using [getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia).
      */
     deviceId: MediaTrackConstraintSet['deviceId'];
-
-    /**
-     * Whether or not the test passed. This is `true` if no errors were detected or if the volumes are not silent.
-     */
-    didPass: boolean;
 
     /**
      * Any errors that occurred during the test.
@@ -705,10 +693,6 @@ export namespace InputTest {
  * The test can be normally stopped two ways: allowing the test to time out and
  * stopping the test manually.
  *
- * If the test was allowed to time out, the value of
- * [[InputTest.Report.didPass]] will be determined by the ratio of silent volume
- * values in the captured media.
- *
  * To end the test manually, the application can ask the end-user to confirm
  * that the volume levels it emits are what the end-user expects. If so, the
  * application can call the [[InputTest.stop]] method with `true`. Otherwise,
@@ -729,10 +713,7 @@ export namespace InputTest {
  *   inputTest.stop(false);
  * });
  * ```
- * Calling [[InputTest.stop]] will immediately end the test. The value of
- * [[InputTest.Report.didPass]] is determined from the ratio of silent audio
- * levels detected in the user media, but overwritten by passing `false` to
- * [[InputTest.stop]].
+ * Calling [[InputTest.stop]] will immediately end the test.
  *
  * ---
  *
@@ -741,8 +722,7 @@ export namespace InputTest {
  * the runtime of the test.
  *
  * Fatal errors will immediately end the test and emit a report such that the
- * value of [[InputTest.Report.didPass]] will be `false` and the value of
- * [[InputTest.Report.errors]] will contain the fatal error.
+ * value of [[InputTest.Report.errors]] will contain the fatal error.
  *
  * Non-fatal errors will not end the test, but will be included in the value of
  * [[InputTest.Report.errors]] upon completion of the test.

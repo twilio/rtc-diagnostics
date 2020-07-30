@@ -1,3 +1,11 @@
+1.0.0 (In Progress)
+===================
+
+Changes
+-------
+
+The audio device tests `InputTest` and `OutputTest` no longer perform any analysis on volume data and their reports do not include a `didPass` member in their reports. The member function `.stop()` for both of these classes also no longer accept a `pass` parameter due to this change.
+
 1.0.0-beta1 (July 29, 2020)
 ============================
 

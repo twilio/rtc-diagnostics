@@ -41,10 +41,6 @@ describe('testOutputDevice', function() {
       });
     });
 
-    it('should pass', function() {
-      assert(report.didPass);
-    });
-
     it('timestamps should be set', function() {
       assert(report.testTiming);
       assert(report.testTiming.duration);
@@ -78,10 +74,6 @@ describe('testOutputDevice', function() {
       });
     });
 
-    it('should pass', function() {
-      assert(report.didPass);
-    });
-
     it('timestamps should be set', function() {
       assert(report.testTiming);
       assert(report.testTiming.duration);
@@ -94,30 +86,7 @@ describe('testOutputDevice', function() {
     });
   });
 
-  it('should report if passed normally', async function() {
-    await Promise.all([true, false].map(pass => (async () => {
-      const report: OutputTest.Report = await new Promise(resolve => {
-        const test = testOutputDevice({
-          audioContextFactory: mockAudioContextFactory({
-            analyserNodeOptions: { volumeValues },
-          }) as any,
-          audioElementFactory,
-          enumerateDevices: mockEnumerateDevicesFactory({
-            devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
-          }),
-          volumeEventIntervalMs: defaultVolumeEventIntervalMs,
-        });
-        test.on(OutputTest.Events.End, resolve);
-        setTimeout(() => {
-          test.stop(pass);
-        }, defaultDuration);
-      });
-      assert(report);
-      assert.equal(report.didPass, pass);
-    })()));
-  });
-
-  it('should report if passed normally', async function() {
+  it('should report if stopped normally', async function() {
     const report: OutputTest.Report = await new Promise(resolve => {
       const test = testOutputDevice({
         audioContextFactory: mockAudioContextFactory({
@@ -135,7 +104,6 @@ describe('testOutputDevice', function() {
       }, defaultDuration);
     });
     assert(report);
-    assert(report.didPass);
   });
 
   it('should report the default device if not passing in a deviceId', async function() {
@@ -187,40 +155,6 @@ describe('testOutputDevice', function() {
     assert.equal(report.deviceId, 'bar');
   });
 
-  it('should report a failure if allowed to timeout and `passOnTimeout === false`', async function() {
-    const result: { error?: DiagnosticError, report?: OutputTest.Report } = {};
-    await new Promise(resolve => {
-      const test = testOutputDevice({
-        audioContextFactory: mockAudioContextFactory() as any,
-        audioElementFactory,
-        duration: defaultDuration,
-        enumerateDevices: mockEnumerateDevicesFactory({
-          devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
-        }),
-        passOnTimeout: false,
-        volumeEventIntervalMs: defaultVolumeEventIntervalMs,
-      });
-      test.on(OutputTest.Events.Error, err => {
-        result['error'] = err;
-        if (result.error && result.report) {
-          resolve(result);
-        }
-      });
-      test.on(OutputTest.Events.End, (r) => {
-        result['report'] = r;
-        if (result.error && result.report) {
-          resolve(result);
-        }
-      });
-    });
-    assert(result.report);
-    assert(result.error);
-    assert.equal(result.error!.message, 'Test timed out.');
-    assert.equal(result.report!.didPass, false);
-    assert.equal(result.report!.errors.length, 1);
-    assert.equal(result.error, result.report!.errors[0]);
-  });
-
   describe('should immediately end and report an error', function() {
     // not providing the mock object here results in the test resorting to the
     // global
@@ -241,7 +175,6 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
-      assert.equal(report.didPass, false);
       assert.equal(report.errors.length, 1);
       const [error] = report.errors;
       assert(error instanceof DiagnosticError);
@@ -261,7 +194,6 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
-      assert.equal(report.didPass, false);
       assert.equal(report.errors.length, 1);
       const [error] = report.errors;
       assert(error instanceof DiagnosticError);
@@ -280,7 +212,6 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
-      assert.equal(report.didPass, false);
       assert.equal(report.errors.length, 1);
       const [error] = report.errors;
       assert(error instanceof DiagnosticError);
@@ -300,8 +231,8 @@ describe('testOutputDevice', function() {
         devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
       }),
     });
-    test.stop(false);
-    test.stop(false);
+    test.stop();
+    test.stop();
     assert(stub.callCount);
     stub.restore();
   });
@@ -359,7 +290,7 @@ describe('testOutputDevice', function() {
         volumeEventIntervalMs: defaultVolumeEventIntervalMs,
       });
       test.on(OutputTest.Events.End, (r) => resolve(r));
-      test.stop(true);
+      test.stop();
     });
     assert(report);
   });
@@ -384,7 +315,6 @@ describe('testOutputDevice', function() {
 
     assert(error);
     assert(report);
-    assert(!report.didPass);
   });
 
   it('should throw during setup when `enumerateDevices` is not supported', async function() {
