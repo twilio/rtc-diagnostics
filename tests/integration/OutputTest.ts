@@ -25,7 +25,6 @@ describe('testOutputDevice', function() {
         outputTestReport = await new Promise(resolve => {
           const test = testOutputDevice({
             duration: defaultTestDuration,
-            passOnTimeout: false,
             volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
           });
           test.on(OutputTest.Events.Volume, () => {
@@ -41,10 +40,6 @@ describe('testOutputDevice', function() {
         });
       });
 
-      it('should have failed', function() {
-        assert.equal(outputTestReport.didPass, false);
-      });
-
       it('should end with an `end` event', function() {
         assert.equal(
           outputTestEvents[outputTestEvents.length - 1],
@@ -53,7 +48,7 @@ describe('testOutputDevice', function() {
       });
     });
 
-    describe('when stopped with `didPass` set to `true`', function() {
+    describe('when stopped', function() {
       let outputTestReport: OutputTest.Report;
       const outputTestEvents: OutputTest.Events[] = [];
 
@@ -72,12 +67,8 @@ describe('testOutputDevice', function() {
             clearTimeout(timeoutId);
             setTimeout(() => resolve(report), defaultTestVolumeEventIntervalMs * 3);
           });
-          timeoutId = setTimeout(() => test.stop(true), defaultTestDuration);
+          timeoutId = setTimeout(() => test.stop(), defaultTestDuration);
         });
-      });
-
-      it('should pass', function() {
-        assert(outputTestReport.didPass);
       });
 
       it('should have some amount of `volume` events', function() {
@@ -100,34 +91,6 @@ describe('testOutputDevice', function() {
           1,
         );
       });
-    });
-  });
-
-  describe('when stopped with `didPass` set to `false`', function() {
-    let outputTestReport: OutputTest.Report;
-    const outputTestEvents: OutputTest.Events[] = [];
-
-    before(async function() {
-      outputTestReport = await new Promise(resolve => {
-        let timeoutId: any;
-        const test = testOutputDevice({
-          duration: Infinity,
-          volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
-        });
-        test.on(OutputTest.Events.Volume, () => {
-          outputTestEvents.push(OutputTest.Events.Volume);
-        });
-        test.on(OutputTest.Events.End, (report) => {
-          outputTestEvents.push(OutputTest.Events.End);
-          clearTimeout(timeoutId);
-          setTimeout(() => resolve(report), defaultTestVolumeEventIntervalMs * 3);
-        });
-        timeoutId = setTimeout(() => test.stop(false), defaultTestDuration);
-      });
-    });
-
-    it('should not pass', function() {
-      assert.equal(outputTestReport.didPass, false);
     });
   });
 
@@ -154,16 +117,12 @@ describe('testOutputDevice', function() {
         test.on(OutputTest.Events.Error, () => {
           outputTestEvents.push(OutputTest.Events.Error);
         });
-        timeoutId = setTimeout(() => test.stop(true), defaultTestDuration);
+        timeoutId = setTimeout(() => test.stop(), defaultTestDuration);
       });
     });
 
     it('should not have any errors', function() {
       assert.equal(outputTestReport.errors.length, 0);
-    });
-
-    it('should load the audio and pass', function() {
-      assert(outputTestReport.didPass);
     });
   });
 

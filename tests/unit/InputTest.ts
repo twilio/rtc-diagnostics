@@ -199,7 +199,6 @@ describe('testInputDevice', function() {
         assert(endHandler.calledOnce);
         const report: InputTest.Report = endHandler.args[0][0];
         assert(report);
-        assert(!report.didPass);
         assert.equal(report.values.length, volumeHandler.callCount);
         assert(report.values.every(v => v === 0));
       });
@@ -235,7 +234,6 @@ describe('testInputDevice', function() {
         assert(endHandler.calledOnce);
         const report: InputTest.Report = endHandler.args[0][0];
         assert(report);
-        assert(report.didPass);
         assert.equal(report.values.length, volumeHandler.callCount);
         assert(report.values.every(v => v === 100));
       });
@@ -261,7 +259,6 @@ describe('testInputDevice', function() {
           assert(endHandler.calledOnce);
           const report: InputTest.Report = endHandler.args[0][0];
           assert(report);
-          assert(!report.didPass);
           assert(errorHandler.calledOnce);
           assert(errorHandler.calledBefore(endHandler));
           assert(volumeHandler.notCalled);
@@ -297,7 +294,6 @@ describe('testInputDevice', function() {
         assert(handlers.end.calledOnce);
         const report: InputTest.Report = handlers.end.args[0][0];
         assert(report);
-        assert(!report.didPass);
         assert(handlers.error.calledOnce);
         assert(handlers.error.calledBefore(handlers.end));
         assert(handlers.volume.notCalled);
@@ -328,7 +324,6 @@ describe('testInputDevice', function() {
 
         const handledError = handlers.error.args[0][0];
         const report: InputTest.Report = handlers.end.args[0][0];
-        assert(!report.didPass);
         assert.equal(report.errors.length, 1);
         assert.equal(handledError, report.errors[0]);
       });
@@ -418,7 +413,6 @@ describe('testInputDevice', function() {
 
         sinon.assert.calledOnce(handlers.error);
         assert(!report.recordingUrl);
-        assert(!report.didPass);
         assert.equal(report.errors.length, 1);
         assert.equal(report.errors[0], 'foo-error');
       });

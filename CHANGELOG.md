@@ -1,3 +1,13 @@
+1.0.0-beta2 (In Progress)
+=========================
+
+Changes
+-------
+
+The audio device tests `InputTest` and `OutputTest` no longer perform any analysis on volume data. With this change, `InputTest.Report.didPass` and `OutputTest.Report.didPass` are no longer available and `InputTest.stop()` and `OutputTest.stop()` no longer accept a `pass: boolean` parameter.
+
+Your application will need to analyze the volume levels in the `Report.values` property to determine whether or not the volume levels are acceptable.
+
 1.0.0-beta1 (July 29, 2020)
 ============================
 
