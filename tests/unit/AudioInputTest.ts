@@ -2,12 +2,12 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import {
+  AudioInputTest,
+  testAudioInputDevice,
+} from '../../lib/AudioInputTest';
 import { WarningName } from '../../lib/constants';
 import { DiagnosticError } from '../../lib/errors/DiagnosticError';
-import {
-  InputTest,
-  testInputDevice,
-} from '../../lib/InputTest';
 import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
 import { mockGetUserMediaFactory } from '../mocks/mockGetUserMedia';
@@ -15,8 +15,8 @@ import { MockMediaStream } from '../mocks/MockMediaStream';
 import { MockTrack } from '../mocks/MockTrack';
 
 function createTestOptions(
-  overrides: Partial<InputTest.Options> = {},
-): InputTest.Options {
+  overrides: Partial<AudioInputTest.Options> = {},
+): AudioInputTest.Options {
   return {
     audioContextFactory: mockAudioContextFactory() as any,
     duration: 1000,
@@ -33,7 +33,7 @@ function createTestOptions(
   };
 }
 
-describe('testInputDevice', function() {
+describe('testAudioInputDevice', function() {
   let clock: sinon.SinonFakeTimers;
 
   before(function() {
@@ -45,29 +45,29 @@ describe('testInputDevice', function() {
   });
 
   function createBasicTest(
-    testOptions: InputTest.Options,
+    testOptions: AudioInputTest.Options,
   ) {
     const handlers = {
-      [InputTest.Events.End]: sinon.stub(),
-      [InputTest.Events.Error]: sinon.stub(),
-      [InputTest.Events.Volume]: sinon.stub(),
-      [InputTest.Events.Warning]: sinon.stub(),
-      [InputTest.Events.WarningCleared]: sinon.stub(),
+      [AudioInputTest.Events.End]: sinon.stub(),
+      [AudioInputTest.Events.Error]: sinon.stub(),
+      [AudioInputTest.Events.Volume]: sinon.stub(),
+      [AudioInputTest.Events.Warning]: sinon.stub(),
+      [AudioInputTest.Events.WarningCleared]: sinon.stub(),
     };
 
-    const inputTest = testInputDevice(testOptions);
-    inputTest.on(InputTest.Events.Error, handlers.error);
-    inputTest.on(InputTest.Events.Volume, handlers.volume);
-    inputTest.on(InputTest.Events.End, handlers.end);
-    inputTest.on(InputTest.Events.WarningCleared, handlers['warning-cleared']);
-    inputTest.on(InputTest.Events.Warning, handlers.warning);
+    const audioInputTest = testAudioInputDevice(testOptions);
+    audioInputTest.on(AudioInputTest.Events.Error, handlers.error);
+    audioInputTest.on(AudioInputTest.Events.Volume, handlers.volume);
+    audioInputTest.on(AudioInputTest.Events.End, handlers.end);
+    audioInputTest.on(AudioInputTest.Events.WarningCleared, handlers['warning-cleared']);
+    audioInputTest.on(AudioInputTest.Events.Warning, handlers.warning);
 
     const resetHandlers =
       () => Object.values(handlers).forEach(handler => handler.reset());
 
     return {
+      audioInputTest,
       handlers,
-      inputTest,
       resetHandlers,
     };
   }
@@ -102,7 +102,7 @@ describe('testInputDevice', function() {
     const consoleStub = sinon.stub(console, 'warn');
     try {
       const options = createTestOptions({ debug: true });
-      const test = testInputDevice(options);
+      const test = testAudioInputDevice(options);
       test.stop();
       test.stop();
       assert(consoleStub.calledOnce);
@@ -122,7 +122,7 @@ describe('testInputDevice', function() {
       });
       const {
         handlers,
-        inputTest,
+        audioInputTest,
         resetHandlers,
       } = createBasicTest(testOptions);
 
@@ -137,8 +137,8 @@ describe('testInputDevice', function() {
 
       resetHandlers();
 
-      const original = inputTest['_onVolume'].bind(inputTest);
-      inputTest['_onVolume'] = () => {
+      const original = audioInputTest['_onVolume'].bind(audioInputTest);
+      audioInputTest['_onVolume'] = () => {
         original(100);
       };
 
@@ -153,7 +153,7 @@ describe('testInputDevice', function() {
 
       resetHandlers();
 
-      inputTest.stop();
+      audioInputTest.stop();
 
       await clock.runAllAsync();
 
@@ -197,7 +197,7 @@ describe('testInputDevice', function() {
 
       it('should generate a valid report', function() {
         assert(endHandler.calledOnce);
-        const report: InputTest.Report = endHandler.args[0][0];
+        const report: AudioInputTest.Report = endHandler.args[0][0];
         assert(report);
         assert.equal(report.values.length, volumeHandler.callCount);
         assert(report.values.every(v => v === 0));
@@ -232,7 +232,7 @@ describe('testInputDevice', function() {
 
       it('should generate a valid report', function() {
         assert(endHandler.calledOnce);
-        const report: InputTest.Report = endHandler.args[0][0];
+        const report: AudioInputTest.Report = endHandler.args[0][0];
         assert(report);
         assert.equal(report.values.length, volumeHandler.callCount);
         assert(report.values.every(v => v === 100));
@@ -257,7 +257,7 @@ describe('testInputDevice', function() {
           const volumeHandler = handlers.volume;
 
           assert(endHandler.calledOnce);
-          const report: InputTest.Report = endHandler.args[0][0];
+          const report: AudioInputTest.Report = endHandler.args[0][0];
           assert(report);
           assert(errorHandler.calledOnce);
           assert(errorHandler.calledBefore(endHandler));
@@ -292,7 +292,7 @@ describe('testInputDevice', function() {
         const { handlers } = createBasicTest(options);
         await clock.runAllAsync();
         assert(handlers.end.calledOnce);
-        const report: InputTest.Report = handlers.end.args[0][0];
+        const report: AudioInputTest.Report = handlers.end.args[0][0];
         assert(report);
         assert(handlers.error.calledOnce);
         assert(handlers.error.calledBefore(handlers.end));
@@ -323,7 +323,7 @@ describe('testInputDevice', function() {
         assert(handlers.volume.notCalled);
 
         const handledError = handlers.error.args[0][0];
-        const report: InputTest.Report = handlers.end.args[0][0];
+        const report: AudioInputTest.Report = handlers.end.args[0][0];
         assert.equal(report.errors.length, 1);
         assert.equal(handledError, report.errors[0]);
       });
@@ -370,14 +370,14 @@ describe('testInputDevice', function() {
         });
         const { handlers } = createBasicTest(options);
         await clock.runAllAsync();
-        const report: InputTest.Report = handlers.end.args[0][0];
+        const report: AudioInputTest.Report = handlers.end.args[0][0];
 
         assert(!report.recordingUrl);
       });
     });
 
     describe('when enableRecording is true', () => {
-      let report: InputTest.Report;
+      let report: AudioInputTest.Report;
 
       beforeEach(async () => {
         const options = createTestOptions({

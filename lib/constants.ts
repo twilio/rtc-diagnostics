@@ -74,7 +74,7 @@ export enum ErrorName {
 export enum WarningName {
   /**
    * The `low-audio-level` warning is raised when the volume events recorded
-   * by the input audio device test [[InputTest]] are both low and constant.
+   * by the input audio device test [[AudioInputTest]] are both low and constant.
    *
    * The warning criteria is when the following are all true:
    * - If there are at least three seconds worth of audio samples.

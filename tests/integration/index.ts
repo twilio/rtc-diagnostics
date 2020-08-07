@@ -5,8 +5,8 @@ import * as sinon from 'sinon';
 /**
  * Import all tests.
  */
-import './InputTest';
-import './OutputTest';
+import './AudioInputTest';
+import './AudioOutputTest';
 
 /**
  * Recommended by Sinon.JS to prevent memory leaks.

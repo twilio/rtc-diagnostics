@@ -200,7 +200,7 @@ export function validateBoolean(option: any): Validity {
 
 /**
  * @internalapi
- * Validate input options to the [[InputTest]].
+ * Validate input options to the [[AudioInputTest]].
  * @param inputOptions The options to validate.
  * @param config A record of option names to either a single
  * [[ValidatorFunction]] or an array of [[ValidatorFunctions]].
