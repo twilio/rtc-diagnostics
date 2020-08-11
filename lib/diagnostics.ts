@@ -32,8 +32,8 @@ window.Twilio.Diagnostics = {
  * Expose the tests if installed as a npm module for both TS and JS
  */
 export {
-  AudioInputTest as AudioInputTest,
-  AudioOutputTest as AudioOutputTest,
+  AudioInputTest,
+  AudioOutputTest,
   BitrateTest,
   ErrorName,
   testAudioInputDevice,
