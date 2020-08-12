@@ -62,7 +62,7 @@ export interface VolumeStats {
 
 /**
  * Native MediaStream Recording APIs definitions
- * @internalapi
+ * @private
  */
 export namespace MediaStreamRecorder {
   export type AudioData = any;

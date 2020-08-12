@@ -1,6 +1,7 @@
 /**
  * The WebRTC API's [RTCIceCandidateStats](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidateStats)
  * dictionary which provides information related to an ICE candidate.
+ * @internalapi
  */
 export interface RTCIceCandidateStats {
   [key: string]: any;
@@ -8,6 +9,7 @@ export interface RTCIceCandidateStats {
 
 /**
  * Represents the WebRTC stats for the ICE candidate pair used to connect to media, if candidates were selected.
+ * @internalapi
  */
 export interface RTCSelectedIceCandidatePairStats {
   /**
@@ -25,6 +27,7 @@ export interface RTCSelectedIceCandidatePairStats {
 
 /**
  * A WebRTC stats report containing relevant information about selected and gathered ICE candidates.
+ * @internalapi
  */
 export interface RTCIceCandidateStatsReport {
   /**
@@ -42,6 +45,7 @@ export interface RTCIceCandidateStatsReport {
  * The RTCStats dictionary is the basic statistics object used by WebRTC's statistics monitoring model,
  * providing the properties required of all statistics data objects.
  * See [RTCStats](https://developer.mozilla.org/en-US/docs/Web/API/RTCStats)
+ * @internalapi
  */
 export interface RTCStats {
   [key: string]: any;
