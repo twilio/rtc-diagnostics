@@ -23,145 +23,145 @@ import {
   validateTime,
 } from './utils/optionValidation';
 
-export declare interface InputTest {
+export declare interface AudioInputTest {
   /**
    * This event is emitted with a test report when the test ends.
-   * @param event [[InputTest.Events.End]]
+   * @param event [[AudioInputTest.Events.End]]
    * @param report Summary of the test.
    * @private
    */
   emit(
-    event: InputTest.Events.End,
-    report: InputTest.Report,
+    event: AudioInputTest.Events.End,
+    report: AudioInputTest.Report,
   ): boolean;
   /**
    * This event is emitted with a [[DiagnosticError]] when the test encounters
    * an error, fatal or not.
-   * @param event [[InputTest.Events.Error]]
+   * @param event [[AudioInputTest.Events.Error]]
    * @param error The [[DiagnosticError]] that was encountered.
    * @private
    */
   emit(
-    event: InputTest.Events.Error,
+    event: AudioInputTest.Events.Error,
     error: DiagnosticError,
   ): boolean;
   /**
    * This event is emitted with a volume level every
-   * [[InputTest.Options.volumeEventIntervalMs]] after the test starts succesfully.
-   * @param event [[InputTest.Events.Volume]]
+   * [[AudioInputTest.Options.volumeEventIntervalMs]] after the test starts succesfully.
+   * @param event [[AudioInputTest.Events.Volume]]
    * @param value The current volume of the audio source.
    * @private
    */
   emit(
-    event: InputTest.Events.Volume,
+    event: AudioInputTest.Events.Volume,
     value: number,
   ): boolean;
   /**
    * This event is emitted when the test encounters a non-fatal warning during
    * its run-time.
-   * @param event [[InputTest.Events.Warning]]
+   * @param event [[AudioInputTest.Events.Warning]]
    * @param warning The warning that the test encountered.
    * @private
    */
   emit(
-    event: InputTest.Events.Warning,
+    event: AudioInputTest.Events.Warning,
     warning: WarningName,
   ): boolean;
   /**
    * This event is emitted when the test clears a previously encountered
    * non-fatal warning during its run-time.
-   * @param event [[InputTest.Events.WarningCleared]]
+   * @param event [[AudioInputTest.Events.WarningCleared]]
    * @param warning The warning that the test encountered that should be cleared.
    * @private
    */
   emit(
-    event: InputTest.Events.WarningCleared,
+    event: AudioInputTest.Events.WarningCleared,
     warning: WarningName,
   ): boolean;
 
   /**
    * Raised upon completion of the test.
-   * @param event [[InputTest.Events.End]]
+   * @param event [[AudioInputTest.Events.End]]
    * @param listener A callback that expects the following parameters:
-   *  An [[InputTest.Report]] that summarizes the test.
-   * @returns This [[InputTest]] instance.
+   *  An [[AudioInputTest.Report]] that summarizes the test.
+   * @returns This [[AudioInputTest]] instance.
    * @event
    */
   on(
-    event: InputTest.Events.End,
-    listener: (report: InputTest.Report) => any,
+    event: AudioInputTest.Events.End,
+    listener: (report: AudioInputTest.Report) => any,
   ): this;
   /**
    * Raised by the test when encountering an error with a parameter of type
    * [[DiagnosticError]].
-   * @param event [[InputTest.Events.Error]]
+   * @param event [[AudioInputTest.Events.Error]]
    * @param listener A callback that expects the following parameters:
    *  A [[DiagnosticError]] that the test encountered.
-   * @returns This [[InputTest]] instance.
+   * @returns This [[AudioInputTest]] instance.
    * @event
    */
   on(
-    event: InputTest.Events.Error,
+    event: AudioInputTest.Events.Error,
     listener: (error: DiagnosticError) => any,
   ): this;
   /**
    * Raised by the test every [[Options.volumeEventIntervalMs]] amount of
    * milliseconds with a parameter of type `number` that represents the
    * current volume of the audio stream.
-   * @param event [[InputTest.Events.Volume]]
+   * @param event [[AudioInputTest.Events.Volume]]
    * @param listener A callback that expects the following parameters:
    *  A `number` that represents the audio source's current volume.
-   * @returns This [[InputTest]] instance.
+   * @returns This [[AudioInputTest]] instance.
    * @event
    */
   on(
-    event: InputTest.Events.Volume,
+    event: AudioInputTest.Events.Volume,
     listener: (value: number) => any,
   ): this;
   /**
    * Raised by the test when the test encounters a non-fatal warning during
    * its run-time.
-   * @param event [[InputTest.Events.Warning]]
+   * @param event [[AudioInputTest.Events.Warning]]
    * @param listener A callback that expects the following parameters:
    *  A [[DiagnosticWarning]].
-   * @returns This [[InputTest]] instance.
+   * @returns This [[AudioInputTest]] instance.
    * @event
    */
   on(
-    event: InputTest.Events.Warning,
+    event: AudioInputTest.Events.Warning,
     listener: (warning: WarningName) => any,
   ): this;
   /**
    * Raised by the test when the test clears a previously encountered non-fatal
    * warning during its run-time.
-   * @param event [[InputTest.Events.WarningCleared]]
+   * @param event [[AudioInputTest.Events.WarningCleared]]
    * @param listener A callback that expects the following parameters:
    *  A [[DiagnosticWarning]] name.
-   * @returns This [[InputTest]] instance.
+   * @returns This [[AudioInputTest]] instance.
    * @event
    */
   on(
-    event: InputTest.Events.WarningCleared,
+    event: AudioInputTest.Events.WarningCleared,
     listener: (warning: WarningName) => any,
   ): this;
 }
 
 /**
- * [[InputTest]] class that parses options and starts an audio input device
+ * [[AudioInputTest]] class that parses options and starts an audio input device
  * test.
  *
- * Please see [[testInputDevice]] for details and recommended practices.
+ * Please see [[testAudioInputDevice]] for details and recommended practices.
  */
-export class InputTest extends EventEmitter {
+export class AudioInputTest extends EventEmitter {
   /**
    * Name of the test.
    */
   static testName: TestName.InputAudioDevice = TestName.InputAudioDevice;
 
   /**
-   * Default options for the `InputTest`.
+   * Default options for the [[AudioInputTest]].
    */
-  private static defaultOptions: InputTest.InternalOptions = {
+  private static defaultOptions: AudioInputTest.InternalOptions = {
     audioContextFactory: AudioContext,
     audioRecorderFactory: AudioRecorder,
     debug: false,
@@ -213,7 +213,7 @@ export class InputTest extends EventEmitter {
    * Options that are passed to and set in the constructor for use during the
    * test.
    */
-  private _options: InputTest.InternalOptions;
+  private _options: AudioInputTest.InternalOptions;
   /**
    * A timestamp that is set when the test starts after a successful call to getUserMedia.
    */
@@ -235,10 +235,10 @@ export class InputTest extends EventEmitter {
    * Initializes the `startTime` and `options`.
    * @param options Optional settings to pass to the test.
    */
-  constructor(options?: InputTest.Options) {
+  constructor(options?: AudioInputTest.Options) {
     super();
 
-    this._options = { ...InputTest.defaultOptions, ...options };
+    this._options = { ...AudioInputTest.defaultOptions, ...options };
 
     // We need to use a `setTimeout` here to prevent a race condition.
     // This allows event listeners to bind before the test starts.
@@ -246,7 +246,7 @@ export class InputTest extends EventEmitter {
   }
 
   /**
-   * Stop the currently running `InputTest`.
+   * Stop the currently running [[AudioInputTest]].
    */
   stop(): void {
     if (typeof this._endTime === 'number') {
@@ -255,13 +255,13 @@ export class InputTest extends EventEmitter {
     }
 
     this._endTime = Date.now();
-    const report: InputTest.Report = {
+    const report: AudioInputTest.Report = {
       deviceId: this._options.deviceId || (
         this._defaultDevices.audioinput &&
         this._defaultDevices.audioinput.deviceId
       ),
       errors: this._errors,
-      testName: InputTest.testName,
+      testName: AudioInputTest.testName,
       values: this._volumeStats.values,
     };
 
@@ -275,7 +275,7 @@ export class InputTest extends EventEmitter {
 
     const onEnd = () => {
       this._cleanup();
-      this.emit(InputTest.Events.End, report);
+      this.emit(AudioInputTest.Events.End, report);
     };
 
     if (this._options.enableRecording && this._audioRecorder) {
@@ -318,11 +318,11 @@ export class InputTest extends EventEmitter {
    */
   private _onError(error: DiagnosticError): void {
     this._errors.push(error);
-    this.emit(InputTest.Events.Error, error);
+    this.emit(AudioInputTest.Events.Error, error);
   }
 
   /**
-   * Called every `InputTest._options.volumeEventIntervalMs` amount of
+   * Called every `AudioInputTest._options.volumeEventIntervalMs` amount of
    * milliseconds, emits the volume passed to it as a `Events.Volume` event.
    * @param value the volume
    */
@@ -334,7 +334,7 @@ export class InputTest extends EventEmitter {
     }
     this._volumeStats.values.push(value);
     this._volumeStats.timestamps.push(now);
-    this.emit(InputTest.Events.Volume, value);
+    this.emit(AudioInputTest.Events.Volume, value);
 
     // Find the last 3 seconds worth of volume values.
     const startIndex = this._volumeStats.timestamps.findIndex(
@@ -372,11 +372,11 @@ export class InputTest extends EventEmitter {
     if (isConstantAudio && sampleAverage <= 2.55) {
       if (!this.activeWarnings.has(WarningName.LowAudioLevel)) {
         this.activeWarnings.add(WarningName.LowAudioLevel);
-        this.emit(InputTest.Events.Warning, WarningName.LowAudioLevel);
+        this.emit(AudioInputTest.Events.Warning, WarningName.LowAudioLevel);
       }
     } else if (this.activeWarnings.has(WarningName.LowAudioLevel)) {
       this.activeWarnings.delete(WarningName.LowAudioLevel);
-      this.emit(InputTest.Events.WarningCleared, WarningName.LowAudioLevel);
+      this.emit(AudioInputTest.Events.WarningCleared, WarningName.LowAudioLevel);
     }
   }
 
@@ -392,7 +392,7 @@ export class InputTest extends EventEmitter {
   }
 
   /**
-   * Entry point into the input device test. Uses the `MediaStream` that the
+   * Entry point into the audio input device test. Uses the `MediaStream` that the
    * object was set up with, and performs a fourier transform on the audio data
    * using an `AnalyserNode`. The output of the fourier transform are the
    * relative amplitudes of the frequencies of the audio data. The average of
@@ -406,8 +406,8 @@ export class InputTest extends EventEmitter {
       // Try to validate all of the inputs before starting the test.
       // We perform this check here so if the validation throws, it gets handled
       // properly as a fatal-error and we still emit a report with that error.
-      const invalidReasons: InvalidityRecord<InputTest.Options> | undefined =
-        await validateOptions<InputTest.Options>(this._options, {
+      const invalidReasons: InvalidityRecord<AudioInputTest.Options> | undefined =
+        await validateOptions<AudioInputTest.Options>(this._options, {
           deviceId: validateDeviceId,
           duration: validateTime,
           volumeEventIntervalMs: validateTime,
@@ -523,9 +523,9 @@ export class InputTest extends EventEmitter {
   }
 }
 
-export namespace InputTest {
+export namespace AudioInputTest {
   /**
-   * Possible events that an `InputTest` might emit. See [[InputTest.on]].
+   * Possible events that an [[AudioInputTest]] might emit. See [[AudioInputTest.on]].
    */
   export enum Events {
     End = 'end',
@@ -536,7 +536,7 @@ export namespace InputTest {
   }
 
   /**
-   * Represents the report generated from an [[InputTest]].
+   * Represents the report generated from an [[AudioInputTest]].
    */
   export interface Report {
     /**
@@ -550,15 +550,15 @@ export namespace InputTest {
     errors: DiagnosticError[];
 
     /**
-     * If [[InputTest.Options.enableRecording]] is set to true,
+     * If [[AudioInputTest.Options.enableRecording]] is set to true,
      * `recordingUrl` will be available in the report which can be used to playback captured audio from the microphone.
      * Your application should revoke this URL if it is no longer needed.
      *
      * Example:
      *
      * ```ts
-     * const inputTest: InputTest = testInputDevice({ enableRecording: true });
-     * inputTest.on(InputTest.Events.End, (report: InputTest.Report) => {
+     * const audioInputTest: AudioInputTest = testAudioInputDevice({ enableRecording: true });
+     * audioInputTest.on(AudioInputTest.Events.End, (report: AudioInputTest.Report) => {
      *   const audioEl = new Audio();
      *   audioEl.src = report.recordingUrl;
      *   audioEl.play();
@@ -573,7 +573,7 @@ export namespace InputTest {
     /**
      * The name of the test.
      */
-    testName: typeof InputTest.testName;
+    testName: typeof AudioInputTest.testName;
 
     /**
      * Time measurements of test run time.
@@ -587,7 +587,7 @@ export namespace InputTest {
   }
 
   /**
-   * Options passed to [[InputTest]] constructor.
+   * Options passed to [[AudioInputTest]] constructor.
    */
   export interface Options {
     /**
@@ -621,14 +621,14 @@ export namespace InputTest {
 
     /**
      * Whether the test should record the audio input or not.
-     * If set to true, [[InputTest.Report.recordingUrl]] will be available for audio playback.
+     * If set to true, [[AudioInputTest.Report.recordingUrl]] will be available for audio playback.
      * Your application should revoke this URL if it is no longer needed.
      *
      * Example:
      *
      * ```ts
-     * const inputTest: InputTest = testInputDevice({ enableRecording: true });
-     * inputTest.on(InputTest.Events.End, (report: InputTest.Report) => {
+     * const audioInputTest: AudioInputTest = testAudioInputDevice({ enableRecording: true });
+     * audioInputTest.on(AudioInputTest.Events.End, (report: AudioInputTest.Report) => {
      *   const audioEl = new Audio();
      *   audioEl.src = report.recordingUrl;
      *   audioEl.play();
@@ -668,25 +668,25 @@ export namespace InputTest {
 }
 
 /**
- * [[InputTest]] tests audio input capabilities. It serves to help diagnose
+ * [[AudioInputTest]] tests audio input capabilities. It serves to help diagnose
  * potential audio device issues that would prevent audio from being recognized
  * in a WebRTC call.
  *
  * ---
  *
- * The [[InputTest]] class is an `EventEmitter` (please see [[InputTest.on]] for
+ * The [[AudioInputTest]] class is an `EventEmitter` (please see [[AudioInputTest.on]] for
  * events and their details) and helps to diagnose issues by capturing user
  * audio and emitting the volume levels detected in that media.
  * ```ts
- * import { InputTest, testInputDevice } from '@twilio/rtc-diagnostics';
- * const options: InputTest.Options = { ... };
+ * import { AudioInputTest, testAudioInputDevice } from '@twilio/rtc-diagnostics';
+ * const options: AudioInputTest.Options = { ... };
  * // `options` may be left `undefined` to use default option values
- * const inputTest: InputTest = testInputDevice(options);
+ * const audioInputTest: AudioInputTest = testAudioInputDevice(options);
  * ```
  * Applications can use the volume events emitted by the test to update their UI
  * to show to the user whether or not their media was captured successfully.
  * ```ts
- * inputTest.on(InputTest.Events.Volume, (volume: number) => {
+ * audioInputTest.on(AudioInputTest.Events.Volume, (volume: number) => {
  *   ui.updateVolume(volume); // Update your UI with the volume value here.
  * });
  * ```
@@ -695,37 +695,37 @@ export namespace InputTest {
  *
  * To end the test manually, the application can ask the end-user to confirm
  * that the volume levels it emits are what the end-user expects. If so, the
- * application can call the [[InputTest.stop]] method with `true`. Otherwise,
+ * application can call the [[AudioInputTest.stop]] method with `true`. Otherwise,
  * if the audio values are not expected, the application can call
- * [[InputTest.stop]] with `false`.
+ * [[AudioInputTest.stop]] with `false`.
  * ```ts
  * // The UI should indicate that if the volume values are what the user
  * // expects, they can click this button to pass and stop the test...
  * const volumeCorrectButton = ...;
  * volumeCorrectButton.addEventListener('click', () => {
- *   inputTest.stop(true);
+ *   audioInputTest.stop(true);
  * });
  *
  * // ...otherwise, if the volume levels are not what they expect, they can
  * // click this.
  * const volumeIncorrectButton = ...;
  * volumeIncorrectButton.addEventListener('click', () => {
- *   inputTest.stop(false);
+ *   audioInputTest.stop(false);
  * });
  * ```
- * Calling [[InputTest.stop]] will immediately end the test.
+ * Calling [[AudioInputTest.stop]] will immediately end the test.
  *
  * ---
  *
- * The [[InputTest]] object will always emit a [[InputTest.Report]] with the
- * [[InputTest.Events.End]] event, regardless of the occurrence of errors during
+ * The [[AudioInputTest]] object will always emit a [[AudioInputTest.Report]] with the
+ * [[AudioInputTest.Events.End]] event, regardless of the occurrence of errors during
  * the runtime of the test.
  *
  * Fatal errors will immediately end the test and emit a report such that the
- * value of [[InputTest.Report.errors]] will contain the fatal error.
+ * value of [[AudioInputTest.Report.errors]] will contain the fatal error.
  *
  * Non-fatal errors will not end the test, but will be included in the value of
- * [[InputTest.Report.errors]] upon completion of the test.
+ * [[AudioInputTest.Report.errors]] upon completion of the test.
  *
  * ---
  *
@@ -753,19 +753,19 @@ export namespace InputTest {
  *
  * ---
  *
- * The function [[testInputDevice]] serves as a factory function that accepts
- * [[InputTest.Options]] as its only parameter and will instantiate an
- * [[InputTest]] object with those options.
+ * The function [[testAudioInputDevice]] serves as a factory function that accepts
+ * [[AudioInputTest.Options]] as its only parameter and will instantiate an
+ * [[AudioInputTest]] object with those options.
  * ```ts
- * import { InputTest, testInputDevice } from '@twilio/rtc-diagnostics';
- * const options: InputTest.Options = { ... };
- * const inputTest: InputTest = testInputDevice(options);
+ * import { AudioInputTest, testAudioInputDevice } from '@twilio/rtc-diagnostics';
+ * const options: AudioInputTest.Options = { ... };
+ * const audioInputTest: AudioInputTest = testAudioInputDevice(options);
  * ```
  *
- * @param options Options to pass to the [[InputTest]] constructor.
+ * @param options Options to pass to the [[AudioInputTest]] constructor.
  */
-export function testInputDevice(
-  options?: InputTest.Options,
-): InputTest {
-  return new InputTest(options);
+export function testAudioInputDevice(
+  options?: AudioInputTest.Options,
+): AudioInputTest {
+  return new AudioInputTest(options);
 }

@@ -4,14 +4,14 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 
 import {
-  InputTest,
-  testInputDevice,
-} from '../../lib/InputTest';
+  AudioInputTest,
+  testAudioInputDevice,
+} from '../../lib/AudioInputTest';
 
 const defaultTestDuration = 500;
 const defaultTestVolumeEventIntervalMs = 5;
 
-describe('testInputDevice', function() {
+describe('testAudioInputDevice', function() {
   describe('with a deviceId', function() {
     let volumeHandler: sinon.SinonSpy;
     let errorHandler: sinon.SinonSpy;
@@ -23,14 +23,14 @@ describe('testInputDevice', function() {
       endHandler = sinon.spy();
 
       await new Promise(resolve => {
-        const test = testInputDevice({
+        const test = testAudioInputDevice({
           debug: false,
           duration: defaultTestDuration,
           volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
         });
-        test.on(InputTest.Events.Error, errorHandler);
-        test.on(InputTest.Events.Volume, volumeHandler);
-        test.on(InputTest.Events.End, (r) => {
+        test.on(AudioInputTest.Events.Error, errorHandler);
+        test.on(AudioInputTest.Events.Volume, volumeHandler);
+        test.on(AudioInputTest.Events.End, (r) => {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
@@ -52,7 +52,7 @@ describe('testInputDevice', function() {
     });
 
     it('should have generated a valid report', function() {
-      const report: InputTest.Report = endHandler.args[0][0];
+      const report: AudioInputTest.Report = endHandler.args[0][0];
       assert(report);
 
       assert('deviceId' in report);
@@ -62,19 +62,19 @@ describe('testInputDevice', function() {
       assert('start' in report.testTiming!);
       assert('end' in report.testTiming!);
       assert('testName' in report);
-      assert(report.testName === InputTest.testName);
+      assert(report.testName === AudioInputTest.testName);
       assert('values' in report);
     });
 
     it('should contain the same amount of volume values as there were volume events', function() {
-      const report: InputTest.Report = endHandler.args[0][0];
+      const report: AudioInputTest.Report = endHandler.args[0][0];
       assert(report);
 
       assert.equal(report.values.length, volumeHandler.callCount);
     });
 
     it('should not contain any errors', function() {
-      const report: InputTest.Report = endHandler.args[0][0];
+      const report: AudioInputTest.Report = endHandler.args[0][0];
       assert(report);
 
       assert('errors' in report);
@@ -97,14 +97,14 @@ describe('testInputDevice', function() {
       endHandler = sinon.spy();
 
       await new Promise(resolve => {
-        const test = testInputDevice({
+        const test = testAudioInputDevice({
           debug: false,
           duration: defaultTestDuration,
           volumeEventIntervalMs: defaultTestVolumeEventIntervalMs,
         });
-        test.on(InputTest.Events.Error, errorHandler);
-        test.on(InputTest.Events.Volume, volumeHandler);
-        test.on(InputTest.Events.End, (r) => {
+        test.on(AudioInputTest.Events.Error, errorHandler);
+        test.on(AudioInputTest.Events.Volume, volumeHandler);
+        test.on(AudioInputTest.Events.End, (r) => {
           endHandler(r);
           // we want to wait before resolving so we can detect if the end handler
           // has been called multiple times
@@ -126,7 +126,7 @@ describe('testInputDevice', function() {
     });
 
     it('should have generated a valid report', function() {
-      const report: InputTest.Report = endHandler.args[0][0];
+      const report: AudioInputTest.Report = endHandler.args[0][0];
       assert(report);
 
       assert('deviceId' in report);
@@ -136,19 +136,19 @@ describe('testInputDevice', function() {
       assert('start' in report.testTiming!);
       assert('end' in report.testTiming!);
       assert('testName' in report);
-      assert(report.testName === InputTest.testName);
+      assert(report.testName === AudioInputTest.testName);
       assert('values' in report);
     });
 
     it('should contain the same amount of volume values as there were volume events', function() {
-      const report: InputTest.Report = endHandler.args[0][0];
+      const report: AudioInputTest.Report = endHandler.args[0][0];
       assert(report);
 
       assert.equal(report.values.length, volumeHandler.callCount);
     });
 
     it('should not contain any errors', function() {
-      const report: InputTest.Report = endHandler.args[0][0];
+      const report: AudioInputTest.Report = endHandler.args[0][0];
       assert(report);
 
       assert('errors' in report);

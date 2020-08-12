@@ -2,12 +2,12 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import {
+  AudioOutputTest,
+  testAudioOutputDevice,
+} from '../../lib/AudioOutputTest';
 import { ErrorName } from '../../lib/constants';
 import { DiagnosticError } from '../../lib/errors/DiagnosticError';
-import {
-  OutputTest,
-  testOutputDevice,
-} from '../../lib/OutputTest';
 import { AudioElement } from '../../lib/types';
 import { mockAudioContextFactory } from '../mocks/MockAudioContext';
 import { mockAudioElementFactory } from '../mocks/MockAudioElement';
@@ -16,18 +16,18 @@ import { mockEnumerateDevicesFactory } from '../mocks/mockEnumerateDevices';
 const defaultDuration = 100;
 const defaultVolumeEventIntervalMs = 1;
 
-describe('testOutputDevice', function() {
+describe('testAudioOutputDevice', function() {
   const audioElementFactory: (new () => AudioElement) = mockAudioElementFactory({
     supportSetSinkId: true,
   }) as any;
 
   const volumeValues = 100;
   describe(`with volume values of ${volumeValues}`, function() {
-    let report: OutputTest.Report;
+    let report: AudioOutputTest.Report;
 
     before(async function() {
       report = await new Promise(resolve => {
-        testOutputDevice({
+        testAudioOutputDevice({
           audioContextFactory: mockAudioContextFactory({
             analyserNodeOptions: { volumeValues },
           }) as any,
@@ -37,7 +37,7 @@ describe('testOutputDevice', function() {
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
           volumeEventIntervalMs: defaultVolumeEventIntervalMs,
-        }).on(OutputTest.Events.End, (r) => resolve(r));
+        }).on(AudioOutputTest.Events.End, (r) => resolve(r));
       });
     });
 
@@ -54,7 +54,7 @@ describe('testOutputDevice', function() {
   });
 
   describe('with volume values of 0', function() {
-    let report: OutputTest.Report;
+    let report: AudioOutputTest.Report;
 
     before(async function() {
       const audioContextFactory: typeof AudioContext = mockAudioContextFactory({
@@ -62,7 +62,7 @@ describe('testOutputDevice', function() {
       }) as any;
 
       report = await new Promise(resolve => {
-        testOutputDevice({
+        testAudioOutputDevice({
           audioContextFactory,
           audioElementFactory,
           duration: defaultDuration,
@@ -70,7 +70,7 @@ describe('testOutputDevice', function() {
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
           volumeEventIntervalMs: defaultVolumeEventIntervalMs,
-        }).on(OutputTest.Events.End, (r) => resolve(r));
+        }).on(AudioOutputTest.Events.End, (r) => resolve(r));
       });
     });
 
@@ -87,8 +87,8 @@ describe('testOutputDevice', function() {
   });
 
   it('should report if stopped normally', async function() {
-    const report: OutputTest.Report = await new Promise(resolve => {
-      const test = testOutputDevice({
+    const report: AudioOutputTest.Report = await new Promise(resolve => {
+      const test = testAudioOutputDevice({
         audioContextFactory: mockAudioContextFactory({
           analyserNodeOptions: { volumeValues },
         }) as any,
@@ -98,7 +98,7 @@ describe('testOutputDevice', function() {
         }),
         volumeEventIntervalMs: defaultVolumeEventIntervalMs,
       });
-      test.on(OutputTest.Events.End, resolve);
+      test.on(AudioOutputTest.Events.End, resolve);
       setTimeout(() => {
         test.stop();
       }, defaultDuration);
@@ -107,8 +107,8 @@ describe('testOutputDevice', function() {
   });
 
   it('should report the default device if not passing in a deviceId', async function() {
-    const report: OutputTest.Report = await new Promise(resolve => {
-      const test = testOutputDevice({
+    const report: AudioOutputTest.Report = await new Promise(resolve => {
+      const test = testAudioOutputDevice({
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory,
         enumerateDevices: mockEnumerateDevicesFactory({
@@ -121,7 +121,7 @@ describe('testOutputDevice', function() {
           }] as any,
         }),
       });
-      test.on(OutputTest.Events.End, resolve);
+      test.on(AudioOutputTest.Events.End, resolve);
       setTimeout(() => {
         test.stop();
       }, defaultDuration);
@@ -131,8 +131,8 @@ describe('testOutputDevice', function() {
   });
 
   it('should report the passed device if passing in a deviceId', async function() {
-    const report: OutputTest.Report = await new Promise(resolve => {
-      const test = testOutputDevice({
+    const report: AudioOutputTest.Report = await new Promise(resolve => {
+      const test = testAudioOutputDevice({
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory,
         deviceId: 'bar',
@@ -146,7 +146,7 @@ describe('testOutputDevice', function() {
           }] as any,
         }),
       });
-      test.on(OutputTest.Events.End, resolve);
+      test.on(AudioOutputTest.Events.End, resolve);
       setTimeout(() => {
         test.stop();
       }, defaultDuration);
@@ -162,17 +162,17 @@ describe('testOutputDevice', function() {
     // they are null and are essentially "not supported"
 
     it('when AudioContext is not supported', async function() {
-      const report: OutputTest.Report = await new Promise(resolve => {
-        const test = testOutputDevice({
+      const report: AudioOutputTest.Report = await new Promise(resolve => {
+        const test = testAudioOutputDevice({
           audioElementFactory,
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
         });
-        test.on(OutputTest.Events.Error, () => {
+        test.on(AudioOutputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(OutputTest.Events.End, (r) => resolve(r));
+        test.on(AudioOutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.errors.length, 1);
@@ -181,17 +181,17 @@ describe('testOutputDevice', function() {
       assert.equal(error.name, ErrorName.UnsupportedError);
     });
     it('when Audio is not supported', async function() {
-      const report: OutputTest.Report = await new Promise(resolve => {
-        const test = testOutputDevice({
+      const report: AudioOutputTest.Report = await new Promise(resolve => {
+        const test = testAudioOutputDevice({
           audioContextFactory: mockAudioContextFactory() as any,
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
         });
-        test.on(OutputTest.Events.Error, () => {
+        test.on(AudioOutputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(OutputTest.Events.End, (r) => resolve(r));
+        test.on(AudioOutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.errors.length, 1);
@@ -200,16 +200,16 @@ describe('testOutputDevice', function() {
       assert.equal(error.name, ErrorName.UnsupportedError);
     });
     it('when neither AudioContext or Audio is supported', async function() {
-      const report: OutputTest.Report = await new Promise(resolve => {
-        const test = testOutputDevice({
+      const report: AudioOutputTest.Report = await new Promise(resolve => {
+        const test = testAudioOutputDevice({
           enumerateDevices: mockEnumerateDevicesFactory({
             devices: [{ deviceId: 'default', kind: 'audiooutput' } as any],
           }),
         });
-        test.on(OutputTest.Events.Error, () => {
+        test.on(AudioOutputTest.Events.Error, () => {
           // do nothing, prevent rejection
         });
-        test.on(OutputTest.Events.End, (r) => resolve(r));
+        test.on(AudioOutputTest.Events.End, (r) => resolve(r));
       });
       assert(report);
       assert.equal(report.errors.length, 1);
@@ -221,7 +221,7 @@ describe('testOutputDevice', function() {
 
   it('should warn if stopped twice', function() {
     const stub = sinon.stub(console, 'warn');
-    const test = testOutputDevice({
+    const test = testAudioOutputDevice({
       audioContextFactory: mockAudioContextFactory({
         analyserNodeOptions: { volumeValues: 100 },
       }) as any,
@@ -244,11 +244,11 @@ describe('testOutputDevice', function() {
     [new Error(), 'an unknown error'],
   ] as const).forEach(([error, name]) => {
     describe(`should handle ${name}`, function() {
-      let report: OutputTest.Report | undefined;
+      let report: AudioOutputTest.Report | undefined;
 
       beforeEach(async function() {
         report = await new Promise(resolve => {
-          const test = testOutputDevice({
+          const test = testAudioOutputDevice({
             audioContextFactory: mockAudioContextFactory({
               throw: { construction: error },
             }) as any,
@@ -259,8 +259,8 @@ describe('testOutputDevice', function() {
             }),
             volumeEventIntervalMs: defaultVolumeEventIntervalMs,
           });
-          test.on(OutputTest.Events.Error, () => { /* no-op */ });
-          test.on(OutputTest.Events.End, resolve);
+          test.on(AudioOutputTest.Events.Error, () => { /* no-op */ });
+          test.on(AudioOutputTest.Events.End, resolve);
         });
       });
 
@@ -277,7 +277,7 @@ describe('testOutputDevice', function() {
 
   it('should allow `deviceId` if `setSinkId` is supported', async function() {
     const report = await new Promise(resolve => {
-      const test = testOutputDevice({
+      const test = testAudioOutputDevice({
         audioContextFactory: mockAudioContextFactory({
           analyserNodeOptions: { volumeValues: 100 },
         }) as any,
@@ -289,14 +289,14 @@ describe('testOutputDevice', function() {
         }),
         volumeEventIntervalMs: defaultVolumeEventIntervalMs,
       });
-      test.on(OutputTest.Events.End, (r) => resolve(r));
+      test.on(AudioOutputTest.Events.End, (r) => resolve(r));
       test.stop();
     });
     assert(report);
   });
 
   it('should not allow `deviceId` if `setSinkId` is unsupported', async function() {
-    const test = testOutputDevice({
+    const test = testAudioOutputDevice({
       audioContextFactory: mockAudioContextFactory() as any,
       audioElementFactory: mockAudioElementFactory({ supportSetSinkId: false }) as any,
       deviceId: 'foobar',
@@ -306,12 +306,12 @@ describe('testOutputDevice', function() {
     });
 
     const results = await Promise.all([
-      new Promise(resolve => test.on(OutputTest.Events.Error, resolve)),
-      new Promise(resolve => test.on(OutputTest.Events.End, resolve)),
+      new Promise(resolve => test.on(AudioOutputTest.Events.Error, resolve)),
+      new Promise(resolve => test.on(AudioOutputTest.Events.End, resolve)),
     ]);
 
     const error = results[0] as DiagnosticError;
-    const report = results[1] as OutputTest.Report;
+    const report = results[1] as AudioOutputTest.Report;
 
     assert(error);
     assert(report);
@@ -319,18 +319,18 @@ describe('testOutputDevice', function() {
 
   it('should throw during setup when `enumerateDevices` is not supported', async function() {
     await assert.rejects(() => new Promise((_, reject) => {
-      const test = testOutputDevice({
+      const test = testAudioOutputDevice({
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory,
         deviceId: 'foobar',
       });
-      test.on(OutputTest.Events.Error, err => reject(err));
+      test.on(AudioOutputTest.Events.Error, err => reject(err));
     }));
   });
 
   it('should throw during setup when there are no detected output devices', async function() {
     await assert.rejects(() => new Promise((_, reject) => {
-      const test = testOutputDevice({
+      const test = testAudioOutputDevice({
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory: mockAudioElementFactory() as any,
         deviceId: 'foobar',
@@ -338,13 +338,13 @@ describe('testOutputDevice', function() {
           devices: [],
         }),
       });
-      test.on(OutputTest.Events.Error, err => reject(err));
+      test.on(AudioOutputTest.Events.Error, err => reject(err));
     }));
   });
 
   it('should throw `InvalidOptions` error if passed invalid options', async function() {
-    const report: OutputTest.Report = await new Promise(resolve => {
-      const test = testOutputDevice({
+    const report: AudioOutputTest.Report = await new Promise(resolve => {
+      const test = testAudioOutputDevice({
         audioContextFactory: mockAudioContextFactory() as any,
         audioElementFactory: mockAudioElementFactory() as any,
         deviceId: {} as any, // is invalid because not type `string`
@@ -358,8 +358,8 @@ describe('testOutputDevice', function() {
           }],
         }) as any,
       });
-      test.on(OutputTest.Events.Error, () => { /* no-op */ });
-      test.on(OutputTest.Events.End, resolve);
+      test.on(AudioOutputTest.Events.Error, () => { /* no-op */ });
+      test.on(AudioOutputTest.Events.End, resolve);
     });
     assert.equal(report.errors.length, 1);
     assert(report.errors[0] instanceof DiagnosticError);

@@ -89,53 +89,53 @@ setTimeout(() => {
 ```
 See `BitrateTest.Options` for more information for how to obtain the `urls values`
 
-### InputTest Example
+### AudioInputTest Example
 ```ts
-import { testInputDevice, InputTest } from '@twilio/rtc-diagnostics';
+import { testAudioInputDevice, AudioInputTest } from '@twilio/rtc-diagnostics';
 
-const outputDeviceTest = testInputDevice({
+const audioInputDeviceTest = testAudioInputDevice({
   deviceId: ...,
 });
 
-inputDeviceTest.on(InputTest.Events.Volume, (volume) => {
+audioInputDeviceTest.on(AudioInputTest.Events.Volume, (volume) => {
   console.log(volume);
 });
 
-inputDeviceTest.on(InputTest.Events.Error, (error) => {
+audioInputDeviceTest.on(AudioInputTest.Events.Error, (error) => {
   console.error(error);
 });
 
-inputDeviceTest.on(InputTest.Events.End, (report) => {
+audioInputDeviceTest.on(AudioInputTest.Events.End, (report) => {
   console.log(report);
 });
 
 setTimeout(() => {
-  inputDeviceTest.stop();
+  audioInputDeviceTest.stop();
 }, 10000);
 ```
 
-### OutputTest Example
+### AudioOutputTest Example
 ```ts
-import { testOutputDevice, OutputTest } from '@twilio/rtc-diagnostics';
+import { testAudioOutputDevice, AudioOutputTest } from '@twilio/rtc-diagnostics';
 
-const outputDeviceTest = testOutputDevice({
+const audioOutputDeviceTest = testAudioOutputDevice({
   deviceId: ...,
 });
 
-outputDeviceTest.on(InputTest.Events.Volume, (volume) => {
+audioOutputDeviceTest.on(AudioOutputTest.Events.Volume, (volume) => {
   console.log(volume);
 });
 
-outputDeviceTest.on(InputTest.Events.Error, (error) => {
+audioOutputDeviceTest.on(AudioOutputTest.Events.Error, (error) => {
   console.error(error);
 });
 
-outputDeviceTest.on(InputTest.Events.End, (report) => {
+audioOutputDeviceTest.on(AudioOutputTest.Events.End, (report) => {
   console.log(report);
 });
 
 setTimeout(() => {
-  outputDeviceTest.stop();
+  audioOutputDeviceTest.stop();
 }, 10000);
 ```
 

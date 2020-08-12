@@ -17,6 +17,6 @@ import './recorder/audio';
 import './recorder/encoder';
 
 // Diagnostics tests
-import './InputTest';
-import './OutputTest';
+import './AudioInputTest';
+import './AudioOutputTest';
 import './BitrateTest';

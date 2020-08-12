@@ -1,7 +1,7 @@
+import { AudioInputTest, testAudioInputDevice } from './AudioInputTest';
+import { AudioOutputTest, testAudioOutputDevice } from './AudioOutputTest';
 import { BitrateTest, testBitrate } from './BitrateTest';
 import { ErrorName, WarningName } from './constants';
-import { InputTest, testInputDevice } from './InputTest';
-import { OutputTest, testOutputDevice } from './OutputTest';
 
 /**
  * @internalapi
@@ -23,21 +23,21 @@ declare global {
 window.Twilio = window.Twilio || {};
 window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
+  testAudioInputDevice,
+  testAudioOutputDevice,
   testBitrate,
-  testInputDevice,
-  testOutputDevice,
 };
 
 /**
  * Expose the tests if installed as a npm module for both TS and JS
  */
 export {
+  AudioInputTest,
+  AudioOutputTest,
   BitrateTest,
   ErrorName,
-  InputTest,
-  OutputTest,
+  testAudioInputDevice,
+  testAudioOutputDevice,
   testBitrate,
-  testInputDevice,
-  testOutputDevice,
   WarningName,
 };
