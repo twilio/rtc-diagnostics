@@ -243,7 +243,6 @@ export class MediaConnectionBitrateTest extends EventEmitter {
 
     const report: MediaConnectionBitrateTest.Report = {
       averageBitrate,
-      didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
       iceCandidateStats: this._iceCandidateStats,
       testName: MediaConnectionBitrateTest.testName,
@@ -465,13 +464,6 @@ export namespace MediaConnectionBitrateTest {
      * Average bitrate calculated during the test.
      */
     averageBitrate: number;
-
-    /**
-     * Whether or not the test passed.
-     * The test is considered to be passing if there were no errors detected and average bitrate is greater than the minimum bitrate required to make a call.
-     * See [Network Bandwidth Requirements](https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements#network-bandwidth-requirements)
-     */
-    didPass: boolean;
 
     /**
      * Any errors that occurred during the test.

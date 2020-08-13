@@ -416,7 +416,6 @@ describe('MediaConnectionBitrateTest', () => {
           mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert.deepStrictEqual(report, {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
-              didPass: false,
               errors: [],
               iceCandidateStats: [],
               testName: 'bitrate-test',
@@ -440,52 +439,6 @@ describe('MediaConnectionBitrateTest', () => {
           mediaConnectionBitrateTest.stop();
         });
 
-        it('should fail if average bitrate is below minimum', (done) => {
-          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
-            assert(!report.didPass);
-            done();
-          });
-
-          sendMessage(message);
-          clock.tick(1200);
-          mediaConnectionBitrateTest['_values'] = [99, 99, 99];
-          mediaConnectionBitrateTest.stop();
-        });
-
-        it('should pass if average bitrate is above minimum', (done) => {
-          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
-            assert(report.didPass);
-            done();
-          });
-
-          sendMessage(message);
-          clock.tick(1200);
-          mediaConnectionBitrateTest['_values'] = [101, 101, 101];
-          mediaConnectionBitrateTest.stop();
-        });
-
-        it('should pass if average bitrate is exactly equal to minimum', (done) => {
-          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
-            assert(report.didPass);
-            done();
-          });
-
-          sendMessage(message);
-          clock.tick(1200);
-          mediaConnectionBitrateTest['_values'] = [100, 100, 100];
-          mediaConnectionBitrateTest.stop();
-        });
-
-        it('should not pass test if no values are found', (done) => {
-          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
-            assert.deepStrictEqual(report.didPass, false);
-            done();
-          });
-
-          clock.tick(4000);
-          mediaConnectionBitrateTest.stop();
-        });
-
         it('should include errors in a report', (done) => {
           pcSenderContext.addIceCandidate = () => ({
             catch: (cb: Function) => {
@@ -497,7 +450,6 @@ describe('MediaConnectionBitrateTest', () => {
 
           mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert.deepStrictEqual(report.errors, errors);
-            assert.deepStrictEqual(report.didPass, false);
             done();
           });
 
@@ -595,7 +547,6 @@ describe('MediaConnectionBitrateTest', () => {
 
             mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
               sinon.assert.calledOnce(onError);
-              assert(!report.didPass);
               assert.equal(report.errors[0].domError, 'Foo error');
               done();
             });
