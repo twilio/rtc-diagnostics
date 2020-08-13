@@ -15,55 +15,55 @@ import {
   RTCSelectedIceCandidatePairStats,
 } from './utils/candidate';
 
-export declare interface BitrateTest {
+export declare interface MediaConnectionBitrateTest {
   /**
    * Raised every second with a `bitrate` parameter in kbps which represents the connection's bitrate since the last time this event was raised.
    * The bitrate value is limited by either your downlink or uplink, whichever is lower.
    * For example, if your downlink and uplink is 50mbps and 10mbps respectively, bitrate value will not exceed 10mbps.
-   * @param event [[BitrateTest.Events.Bitrate]].
+   * @param event [[MediaConnectionBitrateTest.Events.Bitrate]].
    * @param listener A callback with a `bitrate`(kbps) parameter since the last time this event was raised.
-   * @returns This [[BitrateTest]] instance.
+   * @returns This [[MediaConnectionBitrateTest]] instance.
    * @event
    */
   on(
-    event: BitrateTest.Events.Bitrate,
+    event: MediaConnectionBitrateTest.Events.Bitrate,
     listener: (bitrate: number) => any,
   ): this;
 
   /**
    * Raised when the test encounters an error.
-   * When this happens, the test will immediately stop and emit [[BitrateTest.Events.End]].
-   * @param event [[BitrateTest.Events.Error]].
+   * When this happens, the test will immediately stop and emit [[MediaConnectionBitrateTest.Events.End]].
+   * @param event [[MediaConnectionBitrateTest.Events.Error]].
    * @param listener A callback with a [[DiagnosticError]] parameter.
-   * @returns This [[BitrateTest]] instance.
+   * @returns This [[MediaConnectionBitrateTest]] instance.
    * @event
    */
   on(
-    event: BitrateTest.Events.Error,
+    event: MediaConnectionBitrateTest.Events.Error,
     listener: (error: DiagnosticError) => any,
   ): this;
 
   /**
    * Raised upon completion of the test.
-   * @param event [[BitrateTest.Events.End]].
-   * @param listener A callback with a [[BitrateTest.Report]] parameter.
-   * @returns This [[BitrateTest]] instance.
+   * @param event [[MediaConnectionBitrateTest.Events.End]].
+   * @param listener A callback with a [[MediaConnectionBitrateTest.Report]] parameter.
+   * @returns This [[MediaConnectionBitrateTest]] instance.
    * @event
    */
   on(
-    event: BitrateTest.Events.End,
-    listener: (report: BitrateTest.Report) => any,
+    event: MediaConnectionBitrateTest.Events.End,
+    listener: (report: MediaConnectionBitrateTest.Report) => any,
   ): this;
 }
 
 /**
- * BitrateTest uses two [RTCPeerConnections](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
+ * MediaConnectionBitrateTest uses two [RTCPeerConnections](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
  * connected via a [Twilio Network Traversal Service](https://www.twilio.com/docs/stun-turn).
  * Using [RTCDataChannel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel), one RTCPeerConnection will saturate the data channel buffer and will
  * constantly send data packets to the other RTCPeerConnection. The receiving peer will measure the bitrate base on the amount of packets received every second.
- * See [[BitrateTest.Options.iceServers]] for information how to use Twilio NTS.
+ * See [[MediaConnectionBitrateTest.Options.iceServers]] for information how to use Twilio NTS.
  */
-export class BitrateTest extends EventEmitter {
+export class MediaConnectionBitrateTest extends EventEmitter {
   /**
    * Name of this test
    */
@@ -100,9 +100,9 @@ export class BitrateTest extends EventEmitter {
   private _lastCheckedTimestamp: number = 0;
 
   /**
-   * The options passed to [[BitrateTest]] constructor.
+   * The options passed to [[MediaConnectionBitrateTest]] constructor.
    */
-  private _options: BitrateTest.ExtendedOptions;
+  private _options: MediaConnectionBitrateTest.ExtendedOptions;
 
   /**
    * The RTCPeerConnection that will receive data
@@ -113,11 +113,6 @@ export class BitrateTest extends EventEmitter {
    * The RTCPeerConnection that will send data
    */
   private _pcSender: RTCPeerConnection;
-
-  /**
-   * RTC configuration that will be used when initializing a RTCPeerConnection
-   */
-  private _rtcConfiguration: RTCConfiguration = {};
 
   /**
    * RTCDataChannel to use for sending data
@@ -142,7 +137,7 @@ export class BitrateTest extends EventEmitter {
 
   /**
    * Timeout reference that should be cleared when we receive any data. If this
-   * times out, it means something has timed out our BitrateTest.
+   * times out, it means something has timed out our [[MediaConnectionBitrateTest]].
    */
   private _timeout: NodeJS.Timer;
 
@@ -157,19 +152,19 @@ export class BitrateTest extends EventEmitter {
   private _values: number[] = [];
 
   /**
-   * Construct a [[BitrateTest]] instance. The test will start immediately.
-   * Test should be allowed to run for a minimum of 8 seconds. To stop the test, call [[BitrateTest.stop]].
+   * Construct a [[MediaConnectionBitrateTest]] instance. The test will start immediately.
+   * Test should be allowed to run for a minimum of 8 seconds. To stop the test, call [[MediaConnectionBitrateTest.stop]].
    * @constructor
    * @param options
    */
-  constructor(options: BitrateTest.ExtendedOptions) {
+  constructor(options: MediaConnectionBitrateTest.ExtendedOptions) {
     super();
 
     this._options = { ...options };
-    this._rtcConfiguration.iceServers = this._options.iceServers;
 
-    this._pcReceiver = new RTCPeerConnection(this._rtcConfiguration);
-    this._pcSender = new RTCPeerConnection(this._rtcConfiguration);
+    const iceServers = this._options.iceServers;
+    this._pcReceiver = new RTCPeerConnection({ iceServers, iceTransportPolicy: 'relay' });
+    this._pcSender = new RTCPeerConnection({ iceServers });
 
     this._pcReceiver.onicecandidate = (event: RTCPeerConnectionIceEvent) => this._onIceCandidate(this._pcSender, event);
     this._pcSender.onicecandidate = (event: RTCPeerConnectionIceEvent) => this._onIceCandidate(this._pcReceiver, event);
@@ -203,7 +198,7 @@ export class BitrateTest extends EventEmitter {
       this._pcReceiver.close();
       this._endTime = Date.now();
 
-      this.emit(BitrateTest.Events.End, this._getReport());
+      this.emit(MediaConnectionBitrateTest.Events.End, this._getReport());
     }
   }
 
@@ -229,13 +224,13 @@ export class BitrateTest extends EventEmitter {
     this._lastCheckedTimestamp = now;
     this._lastBytesChecked = this._totalBytesReceived;
     this._values.push(bitrate);
-    this.emit(BitrateTest.Events.Bitrate, bitrate);
+    this.emit(MediaConnectionBitrateTest.Events.Bitrate, bitrate);
   }
 
   /**
    * Generate and returns the report for this test
    */
-  private _getReport(): BitrateTest.Report {
+  private _getReport(): MediaConnectionBitrateTest.Report {
     let averageBitrate = this._values
       .reduce((total: number, value: number) => total += value, 0) / this._values.length;
     averageBitrate = isNaN(averageBitrate) ? 0 : averageBitrate;
@@ -246,12 +241,11 @@ export class BitrateTest extends EventEmitter {
       testTiming.duration = this._endTime - this._startTime;
     }
 
-    const report: BitrateTest.Report = {
+    const report: MediaConnectionBitrateTest.Report = {
       averageBitrate,
-      didPass: !this._errors.length && !!this._values.length && averageBitrate >= MIN_BITRATE_THRESHOLD,
       errors: this._errors,
       iceCandidateStats: this._iceCandidateStats,
-      testName: BitrateTest.testName,
+      testName: MediaConnectionBitrateTest.testName,
       testTiming,
       values: this._values,
     };
@@ -272,7 +266,7 @@ export class BitrateTest extends EventEmitter {
   private _onError(message: string, error?: DOMError): void {
     const diagnosticError = new DiagnosticError(error, message);
     this._errors.push(diagnosticError);
-    this.emit(BitrateTest.Events.Error, diagnosticError);
+    this.emit(MediaConnectionBitrateTest.Events.Error, diagnosticError);
     this.stop();
   }
 
@@ -282,11 +276,8 @@ export class BitrateTest extends EventEmitter {
    */
   private _onIceCandidate(remotePc: RTCPeerConnection, event: RTCPeerConnectionIceEvent): void {
     if (event.candidate) {
-      const candidate = event.candidate.candidate;
-      if (candidate.indexOf('relay') !== -1) {
-        remotePc.addIceCandidate(event.candidate)
-          .catch((error: DOMError) => this._onError('Unable to add candidate', error));
-      }
+      remotePc.addIceCandidate(event.candidate)
+        .catch((error: DOMError) => this._onError('Unable to add candidate', error));
     }
   }
 
@@ -381,7 +372,7 @@ export class BitrateTest extends EventEmitter {
    * Starts the test.
    */
   private _startTest(): void {
-    if (!this._rtcConfiguration.iceServers) {
+    if (!this._options.iceServers) {
       return this._onError('No iceServers found', undefined);
     }
 
@@ -395,9 +386,9 @@ export class BitrateTest extends EventEmitter {
   }
 }
 
-export namespace BitrateTest {
+export namespace MediaConnectionBitrateTest {
   /**
-   * Possible events that a [[BitrateTest]] might emit. See [[BitrateTest.on]].
+   * Possible events that a [[MediaConnectionBitrateTest]] might emit. See [[MediaConnectionBitrateTest.on]].
    */
   export enum Events {
     Bitrate = 'bitrate',
@@ -406,7 +397,7 @@ export namespace BitrateTest {
   }
 
   /**
-   * Options that may be passed to [[BitrateTest]] constructor for internal testing.
+   * Options that may be passed to [[MediaConnectionBitrateTest]] constructor for internal testing.
    * @internalapi
    */
   export interface ExtendedOptions extends Options {
@@ -418,13 +409,13 @@ export namespace BitrateTest {
   }
 
   /**
-   * Options passed to [[BitrateTest]] constructor.
+   * Options passed to [[MediaConnectionBitrateTest]] constructor.
    */
   export interface Options {
     /**
      * The array of [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer) configurations to use.
-     * You need to provide TURN server configurations to ensure that your network bitrate is tested.
-     * You you can use [Twilio's Network Traversal Service](https://www.twilio.com/stun-turn) to get TURN credentials.
+     * You need to provide STUN and TURN server configurations to ensure that your network bitrate is tested.
+     * You can use [Twilio's Network Traversal Service](https://www.twilio.com/stun-turn) to get STUN and TURN server configurations.
      *
      * The following example demonstrates how to use the [twilio npm module](https://www.npmjs.com/package/twilio) to generate
      * credentials with a ttl of 120 seconds, using UDP protocol, and specifying ashburn as the
@@ -432,26 +423,33 @@ export namespace BitrateTest {
      *
      * ```ts
      * import Client from 'twilio';
-     * import { testBitrate } from '@twilio/rtc-diagnostics';
+     * import { testMediaConnectionBitrate } from '@twilio/rtc-diagnostics';
      *
      * // Generate the STUN and TURN server credentials with a ttl of 120 seconds
      * const client = Client(twilioAccountSid, authToken);
      * const token = await client.tokens.create({ ttl: 120 });
+     * const iceServers = [];
      *
-     * // Filter for TURN servers.
+     * // Grab STUN server
+     * iceServers.push({ urls: token.iceServers.find(item => item.urls.includes('stun:global.stun.twilio.com')).urls });
+     *
+     * // Grab TURN servers.
      * // Use the following filters if you want to use UDP, TCP, or TLS
      * // UDP: turn:global.turn.twilio.com:3478?transport=udp
      * // TCP: turn:global.turn.twilio.com:3478?transport=tcp
      * // TLS: turn:global.turn.twilio.com:443?transport=tcp
      * let { urls, username, credential } = token.iceServers
      *   .find(item => item.url === 'turn:global.turn.twilio.com:3478?transport=udp');
+     * iceServers.push({ urls, username, credential });
      *
      * // By default, global will be used as the default edge location.
      * // You can replace global with a specific edge name.
-     * urls = urls.replace('global', 'ashburn');
+     * iceServers.forEach(iceServer => {
+     *   iceServer.urls = iceServer.urls.replace('global', 'ashburn');
+     * });
      *
      * // Use the TURN credentials using the iceServers parameter
-     * const bitrateTest = testBitrate({ iceServers: [{ urls, username, credential }] });
+     * const mediaConnectionBitrateTest = testMediaConnectionBitrate({ iceServers });
      * ```
      * Note, for production code, the above code should not be executed client side as it requires the authToken which must be treated like a private key.
      */
@@ -459,20 +457,13 @@ export namespace BitrateTest {
   }
 
   /**
-   * Represents the report generated from a [[BitrateTest]].
+   * Represents the report generated from a [[MediaConnectionBitrateTest]].
    */
   export interface Report {
     /**
      * Average bitrate calculated during the test.
      */
     averageBitrate: number;
-
-    /**
-     * Whether or not the test passed.
-     * The test is considered to be passing if there were no errors detected and average bitrate is greater than the minimum bitrate required to make a call.
-     * See [Network Bandwidth Requirements](https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements#network-bandwidth-requirements)
-     */
-    didPass: boolean;
 
     /**
      * Any errors that occurred during the test.
@@ -513,35 +504,37 @@ export namespace BitrateTest {
  *
  * Example:
  * ```ts
- *   import { testBitrate } from '@twilio/rtc-diagnostics';
+ *   import { testMediaConnectionBitrate } from '@twilio/rtc-diagnostics';
  *
- *   const bitrateTest = testBitrate({
+ *   const mediaConnectionBitrateTest = testMediaConnectionBitrate({
  *     iceServers: [{
+ *       urls: 'stun:global.stun.twilio.com:3478?transport=udp',
+ *     }, {
  *       credential: 'bar',
  *       username: 'foo',
  *       urls: 'turn:global.turn.twilio.com:3478?transport=udp',
  *     }],
  *   });
  *
- *   bitrateTest.on('bitrate', (bitrate) => {
+ *   mediaConnectionBitrateTest.on('bitrate', (bitrate) => {
  *     console.log(bitrate);
  *   });
  *
- *   bitrateTest.on('error', (error) => {
+ *   mediaConnectionBitrateTest.on('error', (error) => {
  *     console.log(error);
  *   });
  *
- *   bitrateTest.on('end', (report) => {
+ *   mediaConnectionBitrateTest.on('end', (report) => {
  *     console.log(report);
  *   });
  *
  *   // Run the test for 15 seconds
  *   setTimeout(() => {
- *     bitrateTest.stop();
+ *     mediaConnectionBitrateTest.stop();
  *   }, 15000);
  * ```
- * See [[BitrateTest.Options.iceServers]] for details on how to obtain TURN credentials.
+ * See [[MediaConnectionBitrateTest.Options.iceServers]] for details on how to obtain STUN and TURN server configurations.
  */
-export function testBitrate(options: BitrateTest.Options): BitrateTest {
-  return new BitrateTest(options);
+export function testMediaConnectionBitrate(options: MediaConnectionBitrateTest.Options): MediaConnectionBitrateTest {
+  return new MediaConnectionBitrateTest(options);
 }
