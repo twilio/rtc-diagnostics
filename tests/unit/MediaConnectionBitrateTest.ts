@@ -2,11 +2,11 @@ import * as assert from 'assert';
 import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { SinonFakeTimers } from 'sinon';
-import { BitrateTest, testBitrate } from '../../lib/BitrateTest';
 import { ErrorName } from '../../lib/constants';
 import { DiagnosticError } from '../../lib/errors/DiagnosticError';
+import { MediaConnectionBitrateTest, testMediaConnectionBitrate } from '../../lib/MediaConnectionBitrateTest';
 
-describe('BitrateTest', () => {
+describe('MediaConnectionBitrateTest', () => {
   const root = (global as any);
   const iceServers = [{
     credential: 'bar',
@@ -15,7 +15,7 @@ describe('BitrateTest', () => {
     username: 'foo',
   }];
 
-  let bitrateTest: BitrateTest;
+  let mediaConnectionBitrateTest: MediaConnectionBitrateTest;
   let originalRTCPeerConnection: any;
   let options: any;
   let pcReceiverContext: any;
@@ -72,21 +72,21 @@ describe('BitrateTest', () => {
     pcReceiverContext = null;
     pcSenderContext = null;
     root.RTCPeerConnection = originalRTCPeerConnection;
-    if (bitrateTest) {
-      bitrateTest.stop();
+    if (mediaConnectionBitrateTest) {
+      mediaConnectionBitrateTest.stop();
     }
   });
 
-  describe('testBitrate', () => {
-    it('should return BitrateTest instance', () => {
-      bitrateTest = testBitrate(options);
-      assert(!!bitrateTest);
+  describe('testMediaConnectionBitrate', () => {
+    it('should return MediaConnectionBitrateTest instance', () => {
+      mediaConnectionBitrateTest = testMediaConnectionBitrate(options);
+      assert(!!mediaConnectionBitrateTest);
     });
   });
 
   describe('constructor', () => {
     it('should use iceServers option', () => {
-      bitrateTest = new BitrateTest(options);
+      mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
       assert.deepEqual(pcReceiverContext.rtcConfiguration.iceServers, iceServers);
       assert.deepEqual(pcSenderContext.rtcConfiguration.iceServers, iceServers);
     });
@@ -104,7 +104,7 @@ describe('BitrateTest', () => {
           candidate: candidateRelay,
         },
       };
-      bitrateTest = new BitrateTest(options);
+      mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
     });
 
     context('receiver pc', () => {
@@ -133,7 +133,7 @@ describe('BitrateTest', () => {
 
         setTimeout(() => pcReceiverContext.onicecandidate(event));
 
-        return expectEvent('error', bitrateTest).then((result: any) => {
+        return expectEvent('error', mediaConnectionBitrateTest).then((result: any) => {
           assert.equal(result.domError, 'foo');
         });
       });
@@ -165,7 +165,7 @@ describe('BitrateTest', () => {
 
         setTimeout(() => pcSenderContext.onicecandidate(event));
 
-        return expectEvent('error', bitrateTest).then((result: any) => {
+        return expectEvent('error', mediaConnectionBitrateTest).then((result: any) => {
           assert.equal(result.domError, 'foo');
         });
       });
@@ -176,79 +176,79 @@ describe('BitrateTest', () => {
     const wait = () => new Promise(r => setTimeout(r, 1));
 
     beforeEach(() => {
-      bitrateTest = new BitrateTest(options);
-      bitrateTest.stop = sinon.spy(bitrateTest.stop);
+      mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
+      mediaConnectionBitrateTest.stop = sinon.spy(mediaConnectionBitrateTest.stop);
     });
 
     it('should throw error on createOffer failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on(BitrateTest.Events.Error, callback);
+      mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, callback);
       pcSenderContext.createOffer = () => Promise.reject('foo');
 
       return wait().then(() => {
         sinon.assert.calledWith(callback, sinon.match.has('domError', 'foo'));
         sinon.assert.calledWith(callback, sinon.match.has('message', 'Unable to create offer'));
-        sinon.assert.called(bitrateTest.stop as any);
+        sinon.assert.called(mediaConnectionBitrateTest.stop as any);
       });
     });
 
     it('should throw error on sender setLocalDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on(BitrateTest.Events.Error, callback);
+      mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, callback);
       pcSenderContext.setLocalDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
         sinon.assert.calledWith(callback, sinon.match.has('domError', 'foo'));
         sinon.assert.calledWith(callback, sinon.match.has('message', 'Unable to set local or remote description from createOffer'));
-        sinon.assert.called(bitrateTest.stop as any);
+        sinon.assert.called(mediaConnectionBitrateTest.stop as any);
       });
     });
 
     it('should throw error on receiver setRemoteDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on(BitrateTest.Events.Error, callback);
+      mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, callback);
       pcReceiverContext.setRemoteDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
         sinon.assert.calledWith(callback, sinon.match.has('domError', 'foo'));
         sinon.assert.calledWith(callback, sinon.match.has('message', 'Unable to set local or remote description from createOffer'));
-        sinon.assert.called(bitrateTest.stop as any);
+        sinon.assert.called(mediaConnectionBitrateTest.stop as any);
       });
     });
 
     it('should throw error on createAnswer failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on(BitrateTest.Events.Error, callback);
+      mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, callback);
       pcReceiverContext.createAnswer = () => Promise.reject('foo');
 
       return wait().then(() => {
         sinon.assert.calledWith(callback, sinon.match.has('domError', 'foo'));
         sinon.assert.calledWith(callback, sinon.match.has('message', 'Unable to create answer'));
-        sinon.assert.called(bitrateTest.stop as any);
+        sinon.assert.called(mediaConnectionBitrateTest.stop as any);
       });
     });
 
     it('should throw error on receiver setLocalDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on(BitrateTest.Events.Error, callback);
+      mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, callback);
       pcReceiverContext.setLocalDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
         sinon.assert.calledWith(callback, sinon.match.has('domError', 'foo'));
         sinon.assert.calledWith(callback, sinon.match.has('message', 'Unable to set local or remote description from createAnswer'));
-        sinon.assert.called(bitrateTest.stop as any);
+        sinon.assert.called(mediaConnectionBitrateTest.stop as any);
       });
     });
 
     it('should throw error on sender setRemoteDescription failure', () => {
       const callback = sinon.spy();
-      bitrateTest.on(BitrateTest.Events.Error, callback);
+      mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, callback);
       pcSenderContext.setRemoteDescription = () => Promise.reject('foo');
 
       return wait().then(() => {
         sinon.assert.calledWith(callback, sinon.match.has('domError', 'foo'));
         sinon.assert.calledWith(callback, sinon.match.has('message', 'Unable to set local or remote description from createAnswer'));
-        sinon.assert.called(bitrateTest.stop as any);
+        sinon.assert.called(mediaConnectionBitrateTest.stop as any);
       });
     });
   });
@@ -258,8 +258,8 @@ describe('BitrateTest', () => {
 
     beforeEach(() => {
       clock = sinon.useFakeTimers(0);
-      bitrateTest = new BitrateTest(options);
-      bitrateTest.stop = sinon.spy(bitrateTest.stop);
+      mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
+      mediaConnectionBitrateTest.stop = sinon.spy(mediaConnectionBitrateTest.stop);
     });
 
     afterEach(() => {
@@ -268,9 +268,9 @@ describe('BitrateTest', () => {
 
     it('should emit error on createDataChannel failure', (done) => {
       pcSenderContext.createDataChannel = () => { throw new Error(); };
-      bitrateTest.on(BitrateTest.Events.Error, (error: DiagnosticError) => {
+      mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, (error: DiagnosticError) => {
         assert.equal(error.message, 'Error creating data channel');
-        sinon.assert.notCalled(bitrateTest.stop as any);
+        sinon.assert.notCalled(mediaConnectionBitrateTest.stop as any);
         done();
       });
       clock.tick(1);
@@ -281,13 +281,13 @@ describe('BitrateTest', () => {
         rtcDataChannel.readyState = 'open';
 
         let errorName: string = '';
-        bitrateTest.on(BitrateTest.Events.Error, (error: DiagnosticError) => {
+        mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, (error: DiagnosticError) => {
           errorName = error.name;
         });
 
         clock.tick(15100);
 
-        sinon.assert.calledOnce(bitrateTest.stop as any);
+        sinon.assert.calledOnce(mediaConnectionBitrateTest.stop as any);
         assert.equal(errorName, ErrorName.DiagnosticError);
       });
     });
@@ -340,7 +340,7 @@ describe('BitrateTest', () => {
 
         beforeEach(() => {
           clock = sinon.useFakeTimers(0);
-          bitrateTest = new BitrateTest(options);
+          mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
           clock.tick(1);
           dataChannelEvent = {
             channel: {
@@ -358,7 +358,7 @@ describe('BitrateTest', () => {
 
         it('should not emit bitrate if no sample data is available', () => {
           const callback = sinon.stub();
-          bitrateTest.on(BitrateTest.Events.Bitrate, callback);
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Bitrate, callback);
 
           sendMessage(message);
           clock.tick(1000);
@@ -368,7 +368,7 @@ describe('BitrateTest', () => {
 
         it('should emit bitrate', () => {
           const callback = sinon.stub();
-          bitrateTest.on(BitrateTest.Events.Bitrate, callback);
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Bitrate, callback);
 
           sendMessage(message);
           clock.tick(1500);
@@ -382,7 +382,7 @@ describe('BitrateTest', () => {
 
         it('should stop emitting bitrate on stop', () => {
           const callback = sinon.stub();
-          bitrateTest.on(BitrateTest.Events.Bitrate, callback);
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Bitrate, callback);
 
           sendMessage(message);
           clock.tick(1200);
@@ -390,7 +390,7 @@ describe('BitrateTest', () => {
           sendMessage(message);
           clock.tick(1200);
 
-          bitrateTest.stop();
+          mediaConnectionBitrateTest.stop();
           sendMessage(message);
           clock.tick(1200);
 
@@ -399,7 +399,7 @@ describe('BitrateTest', () => {
 
         it('should emit end event on stop', () => {
           const callback = sinon.stub();
-          bitrateTest.on(BitrateTest.Events.End, callback);
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, callback);
           sendMessage(message);
           clock.tick(1200);
           sendMessage(message);
@@ -407,15 +407,15 @@ describe('BitrateTest', () => {
           sendMessage(message);
           clock.tick(1200);
 
-          bitrateTest.stop();
+          mediaConnectionBitrateTest.stop();
           sinon.assert.calledOnce(callback);
         });
 
         it('should generate a report', (done) => {
           const values: number[] = [];
-          bitrateTest.on(BitrateTest.Events.Bitrate, (bitrate: number) => values.push(bitrate));
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Bitrate, (bitrate: number) => values.push(bitrate));
 
-          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert.deepStrictEqual(report, {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
               didPass: false,
@@ -439,53 +439,53 @@ describe('BitrateTest', () => {
           sendMessage(message);
           clock.tick(1200);
 
-          bitrateTest.stop();
+          mediaConnectionBitrateTest.stop();
         });
 
         it('should fail if average bitrate is below minimum', (done) => {
-          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert(!report.didPass);
             done();
           });
 
           sendMessage(message);
           clock.tick(1200);
-          bitrateTest['_values'] = [99, 99, 99];
-          bitrateTest.stop();
+          mediaConnectionBitrateTest['_values'] = [99, 99, 99];
+          mediaConnectionBitrateTest.stop();
         });
 
         it('should pass if average bitrate is above minimum', (done) => {
-          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert(report.didPass);
             done();
           });
 
           sendMessage(message);
           clock.tick(1200);
-          bitrateTest['_values'] = [101, 101, 101];
-          bitrateTest.stop();
+          mediaConnectionBitrateTest['_values'] = [101, 101, 101];
+          mediaConnectionBitrateTest.stop();
         });
 
         it('should pass if average bitrate is exactly equal to minimum', (done) => {
-          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert(report.didPass);
             done();
           });
 
           sendMessage(message);
           clock.tick(1200);
-          bitrateTest['_values'] = [100, 100, 100];
-          bitrateTest.stop();
+          mediaConnectionBitrateTest['_values'] = [100, 100, 100];
+          mediaConnectionBitrateTest.stop();
         });
 
         it('should not pass test if no values are found', (done) => {
-          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert.deepStrictEqual(report.didPass, false);
             done();
           });
 
           clock.tick(4000);
-          bitrateTest.stop();
+          mediaConnectionBitrateTest.stop();
         });
 
         it('should include errors in a report', (done) => {
@@ -495,9 +495,9 @@ describe('BitrateTest', () => {
             },
           });
           const errors: DiagnosticError[] = [];
-          bitrateTest.on(BitrateTest.Events.Error, (error: DiagnosticError) => errors.push(error));
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, (error: DiagnosticError) => errors.push(error));
 
-          bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+          mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
             assert.deepStrictEqual(report.errors, errors);
             assert.deepStrictEqual(report.didPass, false);
             done();
@@ -519,7 +519,7 @@ describe('BitrateTest', () => {
         });
 
         describe('ICE Candidate Stats', () => {
-          const runBitrateTest = (shouldStop: boolean) => {
+          const runMediaConnectionBitrateTest = (shouldStop: boolean) => {
             ['new', 'checking', 'connected', 'completed', 'disconnected', 'closed'].forEach(state => {
               pcSenderContext.iceConnectionState = state;
               pcSenderContext.oniceconnectionstatechange();
@@ -531,12 +531,12 @@ describe('BitrateTest', () => {
             sendMessage(message);
 
             if (shouldStop) {
-              bitrateTest.stop();
+              mediaConnectionBitrateTest.stop();
             }
           };
 
           it('should include ICE Candidate stats in the report', (done) => {
-            bitrateTest = new BitrateTest({
+            mediaConnectionBitrateTest = new MediaConnectionBitrateTest({
               ...options,
               getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
                 cb({
@@ -550,7 +550,7 @@ describe('BitrateTest', () => {
               }}),
             });
 
-            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+            mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
               assert.deepStrictEqual(report.iceCandidateStats, ['foo', 'bar']);
               assert.deepStrictEqual(report.selectedIceCandidatePairStats, {
                 localCandidate: 'foo',
@@ -559,11 +559,11 @@ describe('BitrateTest', () => {
               done();
             });
 
-            runBitrateTest(true);
+            runMediaConnectionBitrateTest(true);
           });
 
           it('should not include selected ICE Candidate stats in the report if no candidates were selected', (done) => {
-            bitrateTest = new BitrateTest({
+            mediaConnectionBitrateTest = new MediaConnectionBitrateTest({
               ...options,
               getRTCIceCandidateStatsReport: () => ({then: (cb: Function) => {
                 cb({
@@ -573,17 +573,17 @@ describe('BitrateTest', () => {
               }}),
             });
 
-            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+            mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
               assert.deepStrictEqual(report.iceCandidateStats, ['foo', 'bar']);
               assert(!report.selectedIceCandidatePairStats);
               done();
             });
 
-            runBitrateTest(true);
+            runMediaConnectionBitrateTest(true);
           });
 
           it('should fail the test if stats are not available', (done) => {
-            bitrateTest = new BitrateTest({
+            mediaConnectionBitrateTest = new MediaConnectionBitrateTest({
               ...options,
               getRTCIceCandidateStatsReport: () => ({then: () => {
                 return {catch: (cb: Function) => {
@@ -593,16 +593,16 @@ describe('BitrateTest', () => {
             });
 
             const onError = sinon.stub();
-            bitrateTest.on(BitrateTest.Events.Error, onError);
+            mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Error, onError);
 
-            bitrateTest.on(BitrateTest.Events.End, (report: BitrateTest.Report) => {
+            mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.End, (report: MediaConnectionBitrateTest.Report) => {
               sinon.assert.calledOnce(onError);
               assert(!report.didPass);
               assert.equal(report.errors[0].domError, 'Foo error');
               done();
             });
 
-            runBitrateTest(false);
+            runMediaConnectionBitrateTest(false);
           });
         });
       });

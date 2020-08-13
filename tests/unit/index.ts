@@ -1,5 +1,5 @@
 /**
- * The following rule is necessary as having `BitrateTest` imported first causes
+ * The following rule is necessary as having `MediaConnectionBitrateTest` imported first causes
  * unit tests to crash.
  */
 /* tslint:disable ordered-imports */
@@ -19,4 +19,4 @@ import './recorder/encoder';
 // Diagnostics tests
 import './AudioInputTest';
 import './AudioOutputTest';
-import './BitrateTest';
+import './MediaConnectionBitrateTest';

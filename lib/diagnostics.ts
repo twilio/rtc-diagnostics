@@ -1,7 +1,7 @@
 import { AudioInputTest, testAudioInputDevice } from './AudioInputTest';
 import { AudioOutputTest, testAudioOutputDevice } from './AudioOutputTest';
-import { BitrateTest, testBitrate } from './BitrateTest';
 import { ErrorName, WarningName } from './constants';
+import { MediaConnectionBitrateTest, testMediaConnectionBitrate } from './MediaConnectionBitrateTest';
 
 /**
  * @internalapi
@@ -25,7 +25,7 @@ window.Twilio.Diagnostics = {
   ...window.Twilio.Diagnostics,
   testAudioInputDevice,
   testAudioOutputDevice,
-  testBitrate,
+  testMediaConnectionBitrate,
 };
 
 /**
@@ -34,10 +34,10 @@ window.Twilio.Diagnostics = {
 export {
   AudioInputTest,
   AudioOutputTest,
-  BitrateTest,
+  MediaConnectionBitrateTest,
   ErrorName,
   testAudioInputDevice,
   testAudioOutputDevice,
-  testBitrate,
+  testMediaConnectionBitrate,
   WarningName,
 };

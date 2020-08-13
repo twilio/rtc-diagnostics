@@ -42,7 +42,7 @@ npm install /local-path-to-repo/rtc-diagnostics
 
 Using this method, you can import `rtc-diagnostics` like so:
 ```ts
-import { testBitrate } from '@twilio/rtc-diagnostics';
+import { testMediaConnectionBitrate } from '@twilio/rtc-diagnostics';
 ```
 
 ### Script tag
@@ -53,17 +53,17 @@ You can also include `rtc-diagnostics.js` directly in your web app using a `<scr
 
  Using this method, `rtc-diagnostics.js` will set a browser global:
  ```ts
- const { testBitrate } = Twilio.Diagnostics;
+ const { testMediaConnectionBitrate } = Twilio.Diagnostics;
  ```
 
 ## Usage
 The following are examples for running tests. For more information, please refer to the [API Docs](https://twilio.github.io/rtc-diagnostics/globals.html)
 
-### BitrateTest Example
+### MediaConnectionBitrateTest Example
 ```ts
-import { testBitrate } from '@twilio/rtc-diagnostics';
+import { testMediaConnectionBitrate } from '@twilio/rtc-diagnostics';
 
-const bitrateTest = testBitrate({
+const mediaConnectionBitrateTest = testMediaConnectionBitrate({
  iceServers: [{
    credential: 'bar',
    username: 'foo',
@@ -71,23 +71,23 @@ const bitrateTest = testBitrate({
  }],
 });
 
-bitrateTest.on('bitrate', (bitrate) => {
+mediaConnectionBitrateTest.on('bitrate', (bitrate) => {
  console.log(bitrate);
 });
 
-bitrateTest.on('error', (error) => {
+mediaConnectionBitrateTest.on('error', (error) => {
  console.log(error);
 });
 
-bitrateTest.on('end', (report) => {
+mediaConnectionBitrateTest.on('end', (report) => {
  console.log(report);
 });
 
 setTimeout(() => {
- bitrateTest.stop();
+ mediaConnectionBitrateTest.stop();
 }, 10000);
 ```
-See `BitrateTest.Options` for more information for how to obtain the `urls values`
+See `MediaConnectionBitrateTest.Options` for more information for how to obtain the `urls values`
 
 ### AudioInputTest Example
 ```ts
