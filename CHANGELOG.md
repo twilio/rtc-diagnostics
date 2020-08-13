@@ -6,14 +6,20 @@ Changes
 
 * The audio device tests `InputTest` and `OutputTest` no longer perform any analysis on volume data. With this change, `InputTest.Report.didPass` and `OutputTest.Report.didPass` are no longer available and `InputTest.stop()` and `OutputTest.stop()` no longer accept a `pass: boolean` parameter. Your application will need to analyze the volume levels in the `Report.values` property to determine whether or not the volume levels are acceptable.
 
-* The following classes and methods for audio device tests has been changed
+* The following classes and methods has been changed
 
-  | Old                | New                     |
-  |:-------------------|:------------------------|
-  | `InputTest`        | `AudioInputTest`        |
-  | `OutputTest`       | `AudioOutputTest`       |
-  | `testInputDevice`  | `testAudioInputDevice`  |
-  | `testOutputDevice` | `testAudioOutputDevice` |
+  | Old                | New                          |
+  |:-------------------|:-----------------------------|
+  | `InputTest`        | `AudioInputTest`             |
+  | `OutputTest`       | `AudioOutputTest`            |
+  | `BitrateTest`      | `MediaConnectionBitrateTest` |
+  | `testInputDevice`  | `testAudioInputDevice`       |
+  | `testOutputDevice` | `testAudioOutputDevice`      |
+  | `testBitrate`      | `testMediaConnectionBitrate` |
+
+* `MediaConnectionBitrateTest` now uses TURN server on only one of the Peer Connections. With this change, you need to provide a STUN server in addition to the TURN server configurations. See `MediaConnectionBitrateTest.Options.iceServers` for details.
+
+* `MediaConnectionBitrateTest` no longer perform any analysis on bitrate data and `MediaConnectionBitrateTest.Report.didPass` is no longer available. Your application will need to analyze the bitrate values in `MediaConnectionBitrateTest.Report.values` and `MediaConnectionBitrateTest.Report.averageBitrate` properties to determine whether or not the values are acceptable.
 
 1.0.0-beta1 (July 29, 2020)
 ============================
