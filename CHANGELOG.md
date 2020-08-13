@@ -6,7 +6,7 @@ Changes
 
 * The audio device tests `InputTest` and `OutputTest` no longer perform any analysis on volume data. With this change, `InputTest.Report.didPass` and `OutputTest.Report.didPass` are no longer available and `InputTest.stop()` and `OutputTest.stop()` no longer accept a `pass: boolean` parameter. Your application will need to analyze the volume levels in the `Report.values` property to determine whether or not the volume levels are acceptable.
 
-* The following classes and methods has been changed
+* The following classes and methods have been changed
 
   | Old                | New                          |
   |:-------------------|:-----------------------------|
