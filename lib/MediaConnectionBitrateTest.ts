@@ -115,11 +115,6 @@ export class MediaConnectionBitrateTest extends EventEmitter {
   private _pcSender: RTCPeerConnection;
 
   /**
-   * RTC configuration that will be used when initializing a RTCPeerConnection
-   */
-  private _rtcConfiguration: RTCConfiguration = {};
-
-  /**
    * RTCDataChannel to use for sending data
    */
   private _rtcDataChannel: RTCDataChannel | undefined;
@@ -166,10 +161,10 @@ export class MediaConnectionBitrateTest extends EventEmitter {
     super();
 
     this._options = { ...options };
-    this._rtcConfiguration.iceServers = this._options.iceServers;
 
-    this._pcReceiver = new RTCPeerConnection(this._rtcConfiguration);
-    this._pcSender = new RTCPeerConnection(this._rtcConfiguration);
+    const iceServers = this._options.iceServers;
+    this._pcReceiver = new RTCPeerConnection({ iceServers, iceTransportPolicy: 'relay' });
+    this._pcSender = new RTCPeerConnection({ iceServers });
 
     this._pcReceiver.onicecandidate = (event: RTCPeerConnectionIceEvent) => this._onIceCandidate(this._pcSender, event);
     this._pcSender.onicecandidate = (event: RTCPeerConnectionIceEvent) => this._onIceCandidate(this._pcReceiver, event);
@@ -282,11 +277,8 @@ export class MediaConnectionBitrateTest extends EventEmitter {
    */
   private _onIceCandidate(remotePc: RTCPeerConnection, event: RTCPeerConnectionIceEvent): void {
     if (event.candidate) {
-      const candidate = event.candidate.candidate;
-      if (candidate.indexOf('relay') !== -1) {
-        remotePc.addIceCandidate(event.candidate)
-          .catch((error: DOMError) => this._onError('Unable to add candidate', error));
-      }
+      remotePc.addIceCandidate(event.candidate)
+        .catch((error: DOMError) => this._onError('Unable to add candidate', error));
     }
   }
 
@@ -381,7 +373,7 @@ export class MediaConnectionBitrateTest extends EventEmitter {
    * Starts the test.
    */
   private _startTest(): void {
-    if (!this._rtcConfiguration.iceServers) {
+    if (!this._options.iceServers) {
       return this._onError('No iceServers found', undefined);
     }
 
@@ -423,8 +415,8 @@ export namespace MediaConnectionBitrateTest {
   export interface Options {
     /**
      * The array of [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer) configurations to use.
-     * You need to provide TURN server configurations to ensure that your network bitrate is tested.
-     * You you can use [Twilio's Network Traversal Service](https://www.twilio.com/stun-turn) to get TURN credentials.
+     * You need to provide STUN and TURN server configurations to ensure that your network bitrate is tested.
+     * You can use [Twilio's Network Traversal Service](https://www.twilio.com/stun-turn) to get STUN and TURN server configurations.
      *
      * The following example demonstrates how to use the [twilio npm module](https://www.npmjs.com/package/twilio) to generate
      * credentials with a ttl of 120 seconds, using UDP protocol, and specifying ashburn as the
@@ -437,21 +429,28 @@ export namespace MediaConnectionBitrateTest {
      * // Generate the STUN and TURN server credentials with a ttl of 120 seconds
      * const client = Client(twilioAccountSid, authToken);
      * const token = await client.tokens.create({ ttl: 120 });
+     * const iceServers = [];
      *
-     * // Filter for TURN servers.
+     * // Grab STUN server
+     * iceServers.push({ urls: token.iceServers.find(item => item.urls.includes('stun:global.stun.twilio.com')).urls });
+     *
+     * // Grab TURN servers.
      * // Use the following filters if you want to use UDP, TCP, or TLS
      * // UDP: turn:global.turn.twilio.com:3478?transport=udp
      * // TCP: turn:global.turn.twilio.com:3478?transport=tcp
      * // TLS: turn:global.turn.twilio.com:443?transport=tcp
      * let { urls, username, credential } = token.iceServers
      *   .find(item => item.url === 'turn:global.turn.twilio.com:3478?transport=udp');
+     * iceServers.push({ urls, username, credential });
      *
      * // By default, global will be used as the default edge location.
      * // You can replace global with a specific edge name.
-     * urls = urls.replace('global', 'ashburn');
+     * iceServers.forEach(iceServer => {
+     *   iceServer.urls = iceServer.urls.replace('global', 'ashburn');
+     * });
      *
      * // Use the TURN credentials using the iceServers parameter
-     * const mediaConnectionBitrateTest = testMediaConnectionBitrate({ iceServers: [{ urls, username, credential }] });
+     * const mediaConnectionBitrateTest = testMediaConnectionBitrate({ iceServers });
      * ```
      * Note, for production code, the above code should not be executed client side as it requires the authToken which must be treated like a private key.
      */
@@ -517,6 +516,8 @@ export namespace MediaConnectionBitrateTest {
  *
  *   const mediaConnectionBitrateTest = testMediaConnectionBitrate({
  *     iceServers: [{
+ *       urls: 'stun:global.stun.twilio.com:3478?transport=udp',
+ *     }, {
  *       credential: 'bar',
  *       username: 'foo',
  *       urls: 'turn:global.turn.twilio.com:3478?transport=udp',
@@ -540,7 +541,7 @@ export namespace MediaConnectionBitrateTest {
  *     mediaConnectionBitrateTest.stop();
  *   }, 15000);
  * ```
- * See [[MediaConnectionBitrateTest.Options.iceServers]] for details on how to obtain TURN credentials.
+ * See [[MediaConnectionBitrateTest.Options.iceServers]] for details on how to obtain STUN and TURN server configurations.
  */
 export function testMediaConnectionBitrate(options: MediaConnectionBitrateTest.Options): MediaConnectionBitrateTest {
   return new MediaConnectionBitrateTest(options);

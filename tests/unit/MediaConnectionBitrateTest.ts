@@ -90,6 +90,16 @@ describe('MediaConnectionBitrateTest', () => {
       assert.deepEqual(pcReceiverContext.rtcConfiguration.iceServers, iceServers);
       assert.deepEqual(pcSenderContext.rtcConfiguration.iceServers, iceServers);
     });
+
+    it('should use relay on the receiving peer connection', () => {
+      mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
+      assert.equal(pcReceiverContext.rtcConfiguration.iceTransportPolicy, 'relay');
+    });
+
+    it('should not use relay on the sending peer connection', () => {
+      mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
+      assert.equal(pcSenderContext.rtcConfiguration.iceTransportPolicy, undefined);
+    });
   });
 
   describe('onicecandidate', () => {
@@ -118,12 +128,6 @@ describe('MediaConnectionBitrateTest', () => {
         sinon.assert.notCalled(pcSenderContext.addIceCandidate);
       });
 
-      it('should not add ICE candidate if candidate is not relay', () => {
-        event.candidate.candidate = candidateHost;
-        pcReceiverContext.onicecandidate(event);
-        sinon.assert.notCalled(pcSenderContext.addIceCandidate);
-      });
-
       it('should emit error on addIceCandidate failure', () => {
         pcSenderContext.addIceCandidate = () => ({
           catch: (cb: Function) => {
@@ -147,12 +151,6 @@ describe('MediaConnectionBitrateTest', () => {
 
       it('should not add ICE candidate if candidate event is empty', () => {
         pcSenderContext.onicecandidate({});
-        sinon.assert.notCalled(pcReceiverContext.addIceCandidate);
-      });
-
-      it('should not add ICE candidate if candidate is not relay', () => {
-        event.candidate.candidate = candidateHost;
-        pcSenderContext.onicecandidate(event);
         sinon.assert.notCalled(pcReceiverContext.addIceCandidate);
       });
 
