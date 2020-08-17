@@ -22,6 +22,20 @@ export const MIN_BITRATE_THRESHOLD = 100;
 
 /**
  * @private
+ * Minimum bitrate samples required to emit warnings.
+ * See [[WarningName.LowBitrate]]
+ */
+export const MIN_BITRATE_SAMPLE_COUNT = 5;
+
+/**
+ * @private
+ * Minimum number of failing bitrate values before emitting a warning.
+ * See [[WarningName.LowBitrate]]
+ */
+export const MIN_BITRATE_FAIL_COUNT = 3;
+
+/**
+ * @private
  * Data channel buffered amount
  */
 export const BYTES_KEEP_BUFFERED = 1024 * MAX_NUMBER_PACKETS;
@@ -69,24 +83,40 @@ export enum ErrorName {
 }
 
 /**
- * All of the expected warnings to be thrown by the diagnostics tests.
+ * All of the expected warnings raised by the diagnostics tests.
+ * A `warning-cleared` event is raised if there is an active warning
+ * and if the criteria of the warning are no longer met.
+ *
+ * Example:
+ *
+ * ```ts
+ * test.on(AudioInputTest.Events.Warning, (warningName: WarningName) => {
+ *  console.log(`Warning detected: ${warningName}`);
+ * });
+ *
+ * test.on(AudioInputTest.Events.WarningCleared, (warningName: WarningName) => {
+ *  console.log(`Warning cleared: ${warningName}`);
+ * });
+ * ```
+ *
  */
 export enum WarningName {
   /**
-   * The `low-audio-level` warning is raised when the volume events recorded
-   * by the input audio device test [[AudioInputTest]] are both low and constant.
-   *
-   * The warning criteria is when the following are all true:
+   * Raised by the [[AudioInputTest]] when the volume events recorded are both low and constant.
+   * The criteria for raising this warning are:
    * - If there are at least three seconds worth of audio samples.
    * - The standard deviation of those samples is less than 1% of the max
    *   possible volume value (255).
    * - The average of those samples is less than 1% of the max possible volume
    *   value (255).
-   *
-   * When any of the previous criteria are no longer met, the `warning-cleared`
-   * event for `low-audio-level` is raised if `low-audio-level` has been raised.
-   * Only one `low-audio-level` warning will be raised until the
-   * `warning-cleared` event has been raised.
    */
   LowAudioLevel = 'low-audio-level',
+
+  /**
+   * Raised by the [[MediaConnectionBitrateTest]] when the recorded bitrates are consistently lower than a certain threshold.
+   * The criteria for raising this warning are:
+   *  - At least 5 seconds worth of bitrate values have been recorded.
+   *  - 3 out of last 5 bitrate values are less than [[MediaConnectionBitrateTest.Options.minBitrateThreshold]].
+   */
+  LowBitrate = 'low-bitrate',
 }

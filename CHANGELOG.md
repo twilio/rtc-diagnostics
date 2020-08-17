@@ -21,6 +21,35 @@ Changes
 
 * `MediaConnectionBitrateTest` no longer perform any analysis on bitrate data and `MediaConnectionBitrateTest.Report.didPass` is no longer available. Your application will need to analyze the bitrate values in `MediaConnectionBitrateTest.Report.values` and `MediaConnectionBitrateTest.Report.averageBitrate` properties to determine whether or not the values are acceptable.
 
+* `MediaConnectionBitrateTest` now emits warnings when certain criteria are met. See [WarningNames](https://twilio.github.io/rtc-diagnostics/enums/warningname.html) and [minBitrateThreshold](https://twilio.github.io/rtc-diagnostics/interfaces/mediaconnectionbitratetest.options.html#minbitratethreshold) for details.
+
+  Example usage:
+  ```ts
+  import { MediaConnectionBitrateTest, testMediaConnectionBitrate, WarningName } from '@twilio/rtc-diagnostics';
+
+  const test = testMediaConnectionBitrate({ iceServers: [...], minBitrateThreshold: 500 });
+
+  test.on(MediaConnectionBitrateTest.Events.Warning, (warningName: WarningName) => {
+    // The application can listen for specific warnings...
+    if (warningName === WarningName.LowBitrate) {
+      // update the ui
+    }
+
+    // ...or access all active warnings.
+    test.activeWarnings.values().forEach(...);
+  });
+
+  test.on(MediaConnectionBitrateTest.Events.WarningCleared, (warningName: WarningName) => {
+    // The application can listen for specific warnings...
+    if (warningName === WarningName.LowBitrate) {
+      // update the ui
+    }
+
+    // ...or access all active warnings.
+    test.activeWarnings.values().forEach(...);
+  });
+  ```
+
 1.0.0-beta1 (July 29, 2020)
 ============================
 
