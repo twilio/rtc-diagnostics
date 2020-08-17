@@ -46,25 +46,14 @@ export const INCOMING_SOUND_URL: string =
 export const BITRATE_TEST_TIMEOUT_MS: number = 15000;
 
 /**
- * @private
- * Test names.
- */
-export enum TestName {
-  InputAudioDevice = 'input-volume',
-  OutputAudioDevice = 'output-volume',
-}
-
-/**
  * All of the expected error names to be thrown by the diagnostics tests.
  * These names are set in the error objects as the `.name` member.
  */
 export enum ErrorName {
   AlreadyStoppedError = 'already-stopped',
   DiagnosticError = 'diagnostic',
-  InvalidOptionError = 'invalid-option',
   InvalidOptionsError = 'invalid-options',
   InvalidStateError = 'invalid-state',
-  PromiseTimedOutError = 'promise-timed-out',
   UnsupportedError = 'unsupported',
 }
 
