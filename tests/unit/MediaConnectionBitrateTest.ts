@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { SinonFakeTimers } from 'sinon';
-import { ErrorName } from '../../lib/constants';
+import { ErrorName, WarningName } from '../../lib/constants';
 import { DiagnosticError } from '../../lib/errors/DiagnosticError';
 import { MediaConnectionBitrateTest, testMediaConnectionBitrate } from '../../lib/MediaConnectionBitrateTest';
 
@@ -336,7 +336,7 @@ describe('MediaConnectionBitrateTest', () => {
         let dataChannelEvent: any;
         let sendMessage: Function;
 
-        beforeEach(() => {
+        const initBitrateTestObj = () => {
           clock = sinon.useFakeTimers(0);
           mediaConnectionBitrateTest = new MediaConnectionBitrateTest(options);
           clock.tick(1);
@@ -348,6 +348,10 @@ describe('MediaConnectionBitrateTest', () => {
           rtcDataChannel.onopen();
           pcReceiverContext.ondatachannel(dataChannelEvent);
           sendMessage = dataChannelEvent.channel.onmessage;
+        };
+
+        beforeEach(() => {
+          initBitrateTestObj();
         });
 
         afterEach(() => {
@@ -466,6 +470,109 @@ describe('MediaConnectionBitrateTest', () => {
           clock.tick(1200);
           sendMessage(message);
           clock.tick(1200);
+        });
+
+        describe('warnings', () => {
+          const populateBitrateValues = (values: number[]) => {
+            sendMessage(message);
+            clock.tick(1200);
+            sendMessage(message);
+            mediaConnectionBitrateTest['_values'] = values;
+            clock.tick(1200);
+          };
+
+          describe('when using minBitrateThreshold option', () => {
+            beforeEach(() => {
+              options.minBitrateThreshold = 500;
+              initBitrateTestObj();
+            });
+
+            it('should emit warnings', () => {
+              const callback = sinon.stub();
+              mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Warning, callback);
+
+              populateBitrateValues([500, 500, 499, 499, 499]);
+              sinon.assert.calledWithExactly(callback, WarningName.LowBitrate);
+            });
+
+            it('should not emit warnings', () => {
+              const callback = sinon.stub();
+              mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Warning, callback);
+
+              populateBitrateValues([500, 500, 500, 500, 500]);
+              sinon.assert.notCalled(callback);
+            });
+          });
+
+          describe('when using default threshold', () => {
+            [
+              [100, 100, 99, 99, 99],
+              [100, 99, 99, 100, 99],
+              [100, 100, 100, 99, 99, 99],
+            ].forEach(values => {
+              it(`should emit warning when values are ${values.join()}`, () => {
+                const callback = sinon.stub();
+                mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Warning, callback);
+
+                populateBitrateValues(values);
+                sinon.assert.calledWithExactly(callback, WarningName.LowBitrate);
+              });
+            });
+
+            [
+              [100, 99, 99],
+              [100, 99, 99, 100, 100],
+              [99, 100, 100, 100, 99],
+              [100, 100, 100, 99, 99],
+            ].forEach(values => {
+              it(`should not emit warning when values are ${values.join()}`, () => {
+                const callback = sinon.stub();
+                mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Warning, callback);
+
+                populateBitrateValues(values);
+                sinon.assert.notCalled(callback);
+              });
+            });
+
+            it('should not emit warning more than once', () => {
+              const callback = sinon.stub();
+              mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Warning, callback);
+
+              populateBitrateValues([100, 100, 99, 99, 99]);
+              populateBitrateValues([99, 99, 99, 99, 99]);
+              sinon.assert.calledWithExactly(callback, WarningName.LowBitrate);
+              sinon.assert.calledOnce(callback);
+            });
+
+            it('should clear warning', () => {
+              const onWarning = sinon.stub();
+              const onWarningCleared = sinon.stub();
+              mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Warning, onWarning);
+              mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.WarningCleared, onWarningCleared);
+
+              populateBitrateValues([100, 100, 99, 99, 99]);
+              populateBitrateValues([100, 100, 100, 100, 100]);
+              sinon.assert.calledWithExactly(onWarning, WarningName.LowBitrate);
+              sinon.assert.calledOnce(onWarning);
+              sinon.assert.calledWithExactly(onWarningCleared, WarningName.LowBitrate);
+              sinon.assert.calledOnce(onWarningCleared);
+            });
+
+            it('should not emit warning-cleared more than once', () => {
+              const onWarning = sinon.stub();
+              const onWarningCleared = sinon.stub();
+              mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.Warning, onWarning);
+              mediaConnectionBitrateTest.on(MediaConnectionBitrateTest.Events.WarningCleared, onWarningCleared);
+
+              populateBitrateValues([100, 100, 99, 99, 99]);
+              populateBitrateValues([100, 100, 100, 100, 100]);
+              populateBitrateValues([100, 100, 100, 100, 100]);
+              sinon.assert.calledWithExactly(onWarning, WarningName.LowBitrate);
+              sinon.assert.calledOnce(onWarning);
+              sinon.assert.calledWithExactly(onWarningCleared, WarningName.LowBitrate);
+              sinon.assert.calledOnce(onWarningCleared);
+            });
+          });
         });
 
         describe('ICE Candidate Stats', () => {

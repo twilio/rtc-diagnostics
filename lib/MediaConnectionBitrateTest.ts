@@ -3,8 +3,11 @@ import {
   BITRATE_TEST_TIMEOUT_MS,
   BYTES_KEEP_BUFFERED,
   MAX_NUMBER_PACKETS,
+  MIN_BITRATE_FAIL_COUNT,
+  MIN_BITRATE_SAMPLE_COUNT,
   MIN_BITRATE_THRESHOLD,
   TEST_PACKET,
+  WarningName,
 } from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { TimeMeasurement } from './types';
@@ -54,6 +57,30 @@ export declare interface MediaConnectionBitrateTest {
     event: MediaConnectionBitrateTest.Events.End,
     listener: (report: MediaConnectionBitrateTest.Report) => any,
   ): this;
+
+  /**
+   * Raised when the test encounters a non-fatal warning during its run-time.
+   * @param event [[MediaConnectionBitrateTest.Events.Warning]].
+   * @param listener A callback with a [[WarningName]] parameter.
+   * @returns This [[MediaConnectionBitrateTest]] instance.
+   * @event
+   */
+  on(
+    event: MediaConnectionBitrateTest.Events.Warning,
+    listener: (warningName: WarningName) => any,
+  ): this;
+
+  /**
+   * Raised when the test clears a previously encountered non-fatal warning during its run-time.
+   * @param event [[MediaConnectionBitrateTest.Events.WarningCleared]].
+   * @param listener A callback with a [[WarningName]] parameter.
+   * @returns This [[MediaConnectionBitrateTest]] instance.
+   * @event
+   */
+  on(
+    event: MediaConnectionBitrateTest.Events.WarningCleared,
+    listener: (warningName: WarningName) => any,
+  ): this;
 }
 
 /**
@@ -68,6 +95,11 @@ export class MediaConnectionBitrateTest extends EventEmitter {
    * Name of this test
    */
   static readonly testName: string = 'media-connection-bitrate-test';
+
+  /**
+   * Active warnings to keep track of.
+   */
+  readonly activeWarnings: Set<WarningName> = new Set();
 
   /**
    * Interval id for checking bitrate
@@ -225,6 +257,7 @@ export class MediaConnectionBitrateTest extends EventEmitter {
     this._lastBytesChecked = this._totalBytesReceived;
     this._values.push(bitrate);
     this.emit(MediaConnectionBitrateTest.Events.Bitrate, bitrate);
+    this._maybeEmitWarning();
   }
 
   /**
@@ -255,6 +288,31 @@ export class MediaConnectionBitrateTest extends EventEmitter {
     }
 
     return report;
+  }
+
+  /**
+   * Check current bitrate values and emit warnings
+   * if [[WarningName.LowBitrate]] criteria are met.
+   */
+  private _maybeEmitWarning(): void {
+    if (this._values.length < MIN_BITRATE_SAMPLE_COUNT) {
+      return;
+    }
+
+    if (this._values
+      .slice(this._values.length - MIN_BITRATE_SAMPLE_COUNT)
+      .filter((bitrate: number) => bitrate < (this._options.minBitrateThreshold ?? MIN_BITRATE_THRESHOLD))
+      .length > MIN_BITRATE_FAIL_COUNT) {
+
+      if (!this.activeWarnings.has(WarningName.LowBitrate)) {
+        this.activeWarnings.add(WarningName.LowBitrate);
+        this.emit(MediaConnectionBitrateTest.Events.Warning, WarningName.LowBitrate);
+      }
+
+    } else if (this.activeWarnings.has(WarningName.LowBitrate)) {
+      this.activeWarnings.delete(WarningName.LowBitrate);
+      this.emit(MediaConnectionBitrateTest.Events.WarningCleared, WarningName.LowBitrate);
+    }
   }
 
   /**
@@ -394,6 +452,8 @@ export namespace MediaConnectionBitrateTest {
     Bitrate = 'bitrate',
     End = 'end',
     Error = 'error',
+    Warning = 'warning',
+    WarningCleared = 'warning-cleared',
   }
 
   /**
@@ -454,6 +514,13 @@ export namespace MediaConnectionBitrateTest {
      * Note, for production code, the above code should not be executed client side as it requires the authToken which must be treated like a private key.
      */
     iceServers: RTCIceServer[];
+
+    /**
+     * The minimum bitrate in kilobits per second expected to be available.
+     * This value is used to determine when to raise [[WarningName.LowBitrate]] warning.
+     * @default 100
+     */
+    minBitrateThreshold: number;
   }
 
   /**

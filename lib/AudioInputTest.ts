@@ -123,26 +123,26 @@ export declare interface AudioInputTest {
    * its run-time.
    * @param event [[AudioInputTest.Events.Warning]]
    * @param listener A callback that expects the following parameters:
-   *  A [[DiagnosticWarning]].
+   *  A [[WarningName]].
    * @returns This [[AudioInputTest]] instance.
    * @event
    */
   on(
     event: AudioInputTest.Events.Warning,
-    listener: (warning: WarningName) => any,
+    listener: (warningName: WarningName) => any,
   ): this;
   /**
    * Raised by the test when the test clears a previously encountered non-fatal
    * warning during its run-time.
    * @param event [[AudioInputTest.Events.WarningCleared]]
    * @param listener A callback that expects the following parameters:
-   *  A [[DiagnosticWarning]] name.
+   *  A [[WarningName]] name.
    * @returns This [[AudioInputTest]] instance.
    * @event
    */
   on(
     event: AudioInputTest.Events.WarningCleared,
-    listener: (warning: WarningName) => any,
+    listener: (warningName: WarningName) => any,
   ): this;
 }
 
