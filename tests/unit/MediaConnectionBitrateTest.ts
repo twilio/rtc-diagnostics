@@ -422,7 +422,7 @@ describe('MediaConnectionBitrateTest', () => {
               averageBitrate: values.reduce((total: number, value: number) => total += value, 0) / values.length,
               errors: [],
               iceCandidateStats: [],
-              testName: 'bitrate-test',
+              testName: 'media-connection-bitrate-test',
               testTiming: {
                 duration: 3601,
                 end: 3601,

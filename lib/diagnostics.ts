@@ -1,6 +1,7 @@
 import { AudioInputTest, testAudioInputDevice } from './AudioInputTest';
 import { AudioOutputTest, testAudioOutputDevice } from './AudioOutputTest';
 import { ErrorName, WarningName } from './constants';
+import { DiagnosticError } from './errors/DiagnosticError';
 import { MediaConnectionBitrateTest, testMediaConnectionBitrate } from './MediaConnectionBitrateTest';
 
 /**
@@ -34,6 +35,7 @@ window.Twilio.Diagnostics = {
 export {
   AudioInputTest,
   AudioOutputTest,
+  DiagnosticError,
   MediaConnectionBitrateTest,
   ErrorName,
   testAudioInputDevice,

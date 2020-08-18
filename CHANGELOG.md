@@ -50,6 +50,26 @@ Changes
   });
   ```
 
+* `DiagnosticError` can now be imported directly. Example:
+
+  ```ts
+  import {
+    DiagnosticError,
+    MediaConnectionBitrateTest,
+    testMediaConnectionBitrate,
+  } from '@twilio/rtc-diagnostics';
+
+  const test = testMediaConnectionBitrate(...);
+
+  test.on(MediaConnectionBitrateTest.Events.Error, (error: DiagnosticError) => {
+    console.log(error);
+  });
+  ```
+
+* Updated test names to `audio-input-test`, `audio-output-test`, and `media-connection-bitrate-test` for consistency.
+
+* Removed unused `promise-timed-out` and `invalid-option` error.
+
 1.0.0-beta1 (July 29, 2020)
 ============================
 

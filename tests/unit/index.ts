@@ -10,7 +10,6 @@ import './mock.ts';
 // Utils
 import './utils/candidate';
 import './utils/optionValidation';
-import './utils/waitForPromise';
 
 // Recorder
 import './recorder/audio';

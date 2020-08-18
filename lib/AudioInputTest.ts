@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { TestName, WarningName } from './constants';
+import { WarningName } from './constants';
 import {
   AlreadyStoppedError,
   DiagnosticError,
@@ -156,7 +156,7 @@ export class AudioInputTest extends EventEmitter {
   /**
    * Name of the test.
    */
-  static testName: TestName.InputAudioDevice = TestName.InputAudioDevice;
+  static readonly testName: string = 'audio-input-test';
 
   /**
    * Default options for the [[AudioInputTest]].

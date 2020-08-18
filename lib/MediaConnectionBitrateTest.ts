@@ -94,7 +94,7 @@ export class MediaConnectionBitrateTest extends EventEmitter {
   /**
    * Name of this test
    */
-  static readonly testName: string = 'bitrate-test';
+  static readonly testName: string = 'media-connection-bitrate-test';
 
   /**
    * Active warnings to keep track of.
@@ -550,7 +550,7 @@ export namespace MediaConnectionBitrateTest {
     /**
      * The name of the test.
      */
-    testName: string;
+    testName: typeof MediaConnectionBitrateTest.testName;
 
     /**
      * Time measurements of test run time.
