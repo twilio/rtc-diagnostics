@@ -76,3 +76,11 @@ export namespace MediaStreamRecorder {
     stop: Function;
   }
 }
+
+/**
+ * Description of a video resolution.
+ */
+export interface VideoResolution {
+  height: number;
+  width: number;
+}

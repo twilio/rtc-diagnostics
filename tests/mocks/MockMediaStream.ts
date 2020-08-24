@@ -11,6 +11,11 @@ export class MockMediaStream {
   getTracks() {
     return this.options.tracks as any[];
   }
+  getVideoTracks() {
+    return this.options.tracks.filter(
+      (track: MockTrack) => track.kind === 'video',
+    );
+  }
 }
 
 export declare namespace MockMediaStream {

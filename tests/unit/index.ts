@@ -19,3 +19,4 @@ import './recorder/encoder';
 import './AudioInputTest';
 import './AudioOutputTest';
 import './MediaConnectionBitrateTest';
+import './VideoInputTest';
