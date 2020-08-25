@@ -160,6 +160,11 @@ describe('testVideoInputDevice', function() {
         errorHandler = handlers.error;
       });
 
+      it('should have ended successfully', function() {
+        assert(endHandler.calledOnce);
+        assert(errorHandler.notCalled);
+      });
+
       it('should have called play on the element', function() {
         assert(playStub.calledOnce);
       });

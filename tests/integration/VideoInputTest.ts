@@ -37,7 +37,7 @@ describe('testVideoInputDevice', function() {
   });
 
   it('should have called the end handler once', function() {
-    assert(endHandler.callCount === 1);
+    assert.equal(endHandler.callCount, 1);
   });
 
   it('should have generated a valid report', function() {
