@@ -180,6 +180,7 @@ export class VideoInputTest extends EventEmitter {
       this._userMediaStream.getTracks().forEach((track: MediaStreamTrack) => {
         track.stop();
       });
+      this._userMediaStream = null
       if (this._options.element) {
         this._options.element.srcObject = null;
         if (this._playPromise) {
@@ -191,6 +192,7 @@ export class VideoInputTest extends EventEmitter {
     }
     if (this._timeoutId) {
       clearTimeout(this._timeoutId);
+      this._timeoutId = null;
     }
   }
 
