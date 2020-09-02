@@ -80,7 +80,7 @@ export class VideoInputTest extends EventEmitter {
   /**
    * The name of the test.
    */
-  static testName: string = 'video-input-test';
+  static readonly testName: string = 'video-input-test';
   /**
    * Default options for the test.
    */
@@ -91,7 +91,7 @@ export class VideoInputTest extends EventEmitter {
   };
 
   /**
-   * Teststamp of when the test was ended.
+   * Timestamp of when the test was ended.
    */
   private _endTime: number | null = null;
   /**
@@ -108,9 +108,9 @@ export class VideoInputTest extends EventEmitter {
    */
   private _playPromise: Promise<void> | null = null;
   /**
-   * Teststamp of when the test was constructed and started.
+   * Timestamp of when the test was started.
    */
-  private _startTime: number;
+  private _startTime: number | undefined;
   /**
    * Timer ID of the test duration timeout.
    */
@@ -138,8 +138,6 @@ export class VideoInputTest extends EventEmitter {
 
   /**
    * Stops the test. Emits a report upon the end of the test.
-   *
-   * @event VideoInputTest.Events.End
    */
   stop(): void {
     if (typeof this._endTime === 'number') {
@@ -160,12 +158,15 @@ export class VideoInputTest extends EventEmitter {
       errors: this._errors,
       resolution: { width: streamWidth || 0, height: streamHeight || 0 },
       testName: VideoInputTest.testName,
-      testTiming: {
+    };
+
+    if (this._startTime) {
+      report.testTiming = {
         duration: this._endTime - this._startTime,
         end: this._endTime,
         start: this._startTime,
-      },
-    };
+      };
+    }
 
     this.emit(VideoInputTest.Events.End, report);
 
@@ -182,12 +183,14 @@ export class VideoInputTest extends EventEmitter {
       });
       this._userMediaStream = null;
       if (this._options.element) {
-        this._options.element.srcObject = null;
         if (this._playPromise) {
           this._playPromise.then(() => {
             this._options.element!.pause();
           });
         }
+        this._options.element.srcObject = null;
+        this._options.element.src = '';
+        this._options.element.load();
       }
     }
     if (this._timeoutId) {
@@ -307,7 +310,7 @@ export namespace VideoInputTest {
     /**
      * Time measurements of test run time.
      */
-    testTiming: TimeMeasurement;
+    testTiming?: TimeMeasurement;
   }
 
   export interface Options {
@@ -322,8 +325,10 @@ export namespace VideoInputTest {
     deviceId?: string;
     /**
      * Duration of time to run the test in milliseconds. If not specified, then
-     * the VideoInputTest will keep running until `VideoInputTest.stop()` is
+     * the [[VideoInputTest]] will keep running until [[VideoInputTest.stop]] is
      * called.
+     *
+     * @default Infinity
      */
     duration?: number;
     /**

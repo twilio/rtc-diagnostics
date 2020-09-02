@@ -46,6 +46,6 @@ export {
   testMediaConnectionBitrate,
   testVideoInputDevice,
   VideoInputTest,
-  WarningName,
   VideoResolution,
+  WarningName,
 };

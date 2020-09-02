@@ -79,6 +79,7 @@ export namespace MediaStreamRecorder {
 
 /**
  * Description of a video resolution.
+ * @internalapi
  */
 export interface VideoResolution {
   height: number;
