@@ -137,17 +137,27 @@ describe('testVideoInputDevice', function() {
       let pauseStub: sinon.SinonStub;
       let playStub: sinon.SinonStub;
       let setSrcObjectStub: sinon.SinonStub;
+      let setSrcStub: sinon.SinonStub;
+      let loadStub: sinon.SinonStub;
       let mediaStream: MockMediaStream;
 
       before(async function() {
         const element: any = new MockHTMLMediaElement();
+
         pauseStub = sinon.stub(element, 'pause');
         playStub = sinon.stub(element, 'play').resolves();
+        loadStub = sinon.stub(element, 'load');
+
         setSrcObjectStub = sinon.stub();
         sinon.stub(element, 'srcObject').set(setSrcObjectStub);
+
+        setSrcStub = sinon.stub();
+        sinon.stub(element, 'src').set(setSrcStub);
+
         mediaStream = new MockMediaStream({
           tracks: [new MockTrack({ kind: 'video' })],
         });
+
         const options = createTestOptions({
           element,
           getUserMedia: mockGetUserMediaFactory({
@@ -174,9 +184,19 @@ describe('testVideoInputDevice', function() {
       });
 
       it('should clean up the element', function() {
-        assert.equal(setSrcObjectStub.args[1][0], null);
         assert(pauseStub.calledAfter(playStub));
         assert(pauseStub.calledOnce);
+
+        assert.equal(setSrcObjectStub.args[1][0], null);
+        assert(setSrcObjectStub.calledAfter(pauseStub));
+
+        assert(setSrcStub.calledOnce);
+        assert.equal(setSrcStub.args[0][0], '');
+        assert(setSrcStub.calledAfter(pauseStub));
+
+        assert(loadStub.calledOnce);
+        assert(loadStub.calledAfter(setSrcStub));
+        assert(loadStub.calledAfter(setSrcObjectStub));
       });
     });
   });
@@ -200,6 +220,23 @@ describe('testVideoInputDevice', function() {
         });
       });
     });
+  });
+
+  it('`testTiming` should not be in the report if gUM throws', async function() {
+    const options = createTestOptions({
+      getUserMedia: mockGetUserMediaFactory({ throw: new DiagnosticError() }),
+    });
+    const { handlers } = createBasicTest(options);
+    await clock.runAllAsync();
+    assert(handlers.end.calledOnce);
+    assert(handlers.error.calledOnce);
+    assert(handlers.end.calledAfter(handlers.error));
+
+    const handledError = handlers.error.args[0][0];
+    const report: VideoInputTest.Report = handlers.end.args[0][0];
+    assert.equal(report.errors.length, 1);
+    assert.equal(handledError, report.errors[0]);
+    assert(!('testTiming' in report));
   });
 
   describe('should handle when an error is thrown during the test', function() {
@@ -244,6 +281,7 @@ describe('testVideoInputDevice', function() {
         const report: VideoInputTest.Report = handlers.end.args[0][0];
         assert.equal(report.errors.length, 1);
         assert.equal(handledError, report.errors[0]);
+        assert(!('testTiming' in report));
       });
     });
   });

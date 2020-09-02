@@ -126,7 +126,7 @@ export class VideoInputTest extends EventEmitter {
    */
   constructor(options?: VideoInputTest.Options) {
     super();
-    this._startTime = Date.now();
+
     this._options = { ...VideoInputTest.defaultOptions, ...options };
 
     /**
@@ -183,14 +183,17 @@ export class VideoInputTest extends EventEmitter {
       });
       this._userMediaStream = null;
       if (this._options.element) {
-        if (this._playPromise) {
-          this._playPromise.then(() => {
-            this._options.element!.pause();
-          });
-        }
-        this._options.element.srcObject = null;
-        this._options.element.src = '';
-        this._options.element.load();
+        const element: HTMLMediaElement = this._options.element;
+        const pausePromise: Promise<void> = this._playPromise
+          ? this._playPromise.then(() => {
+              element.pause();
+            })
+          : Promise.resolve();
+        pausePromise.finally(() => {
+          element.srcObject = null;
+          element.src = '';
+          element.load();
+        });
       }
     }
     if (this._timeoutId) {
@@ -242,6 +245,8 @@ export class VideoInputTest extends EventEmitter {
         deviceId: this._options.deviceId,
         ...this._options.resolution,
       } });
+
+      this._startTime = Date.now();
 
       if (this._options.element) {
         this._options.element.srcObject = this._userMediaStream;
