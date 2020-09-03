@@ -94,24 +94,24 @@ npm run build</code></pre>
 				<p>You can install directly from npm.</p>
 				<pre><code>npm <span class="hljs-keyword">install</span> @twilio/rtc-<span class="hljs-keyword">diagnostics</span> <span class="hljs-comment">--save</span></code></pre><p>Or install from a local directory.</p>
 				<pre><code>npm <span class="hljs-keyword">install</span> /<span class="hljs-keyword">local</span>-<span class="hljs-keyword">path</span>-<span class="hljs-keyword">to</span>-repo/rtc-<span class="hljs-keyword">diagnostics</span></code></pre><p>Using this method, you can import <code>rtc-diagnostics</code> like so:</p>
-				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;</code></pre>
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testMediaConnectionBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;</code></pre>
 				<a href="#script-tag" id="script-tag" style="color: inherit; text-decoration: none;">
 					<h3>Script tag</h3>
 				</a>
 				<p>You can also include <code>rtc-diagnostics.js</code> directly in your web app using a <code>&lt;script&gt;</code> tag.</p>
 				<pre><code class="language-html"> <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://my-server-path/rtc-diagnostics.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 				<p> Using this method, <code>rtc-diagnostics.js</code> will set a browser global:</p>
-				<pre><code class="language-ts"> <span class="hljs-keyword">const</span> { testBitrate } = Twilio.Diagnostics;</code></pre>
+				<pre><code class="language-ts"> <span class="hljs-keyword">const</span> { testMediaConnectionBitrate } = Twilio.Diagnostics;</code></pre>
 				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 					<h2>Usage</h2>
 				</a>
 				<p>The following are examples for running tests. For more information, please refer to the <a href="https://twilio.github.io/rtc-diagnostics/globals.html">API Docs</a></p>
-				<a href="#bitratetest-example" id="bitratetest-example" style="color: inherit; text-decoration: none;">
-					<h3>BitrateTest Example</h3>
+				<a href="#mediaconnectionbitratetest-example" id="mediaconnectionbitratetest-example" style="color: inherit; text-decoration: none;">
+					<h3>MediaConnectionBitrateTest Example</h3>
 				</a>
-				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testMediaConnectionBitrate } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
 
-<span class="hljs-keyword">const</span> bitrateTest = testBitrate({
+<span class="hljs-keyword">const</span> mediaConnectionBitrateTest = testMediaConnectionBitrate({
  iceServers: [{
    credential: <span class="hljs-string">'bar'</span>,
    username: <span class="hljs-string">'foo'</span>,
@@ -119,69 +119,69 @@ npm run build</code></pre>
  }],
 });
 
-bitrateTest.on(<span class="hljs-string">'bitrate'</span>, <span class="hljs-function">(<span class="hljs-params">bitrate</span>) =&gt;</span> {
+mediaConnectionBitrateTest.on(<span class="hljs-string">'bitrate'</span>, <span class="hljs-function">(<span class="hljs-params">bitrate</span>) =&gt;</span> {
  <span class="hljs-built_in">console</span>.log(bitrate);
 });
 
-bitrateTest.on(<span class="hljs-string">'error'</span>, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+mediaConnectionBitrateTest.on(<span class="hljs-string">'error'</span>, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
  <span class="hljs-built_in">console</span>.log(error);
 });
 
-bitrateTest.on(<span class="hljs-string">'end'</span>, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
+mediaConnectionBitrateTest.on(<span class="hljs-string">'end'</span>, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
  <span class="hljs-built_in">console</span>.log(report);
 });
 
 setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
- bitrateTest.stop();
+ mediaConnectionBitrateTest.stop();
 }, <span class="hljs-number">10000</span>);</code></pre>
-				<p>See <code>BitrateTest.Options</code> for more information for how to obtain the <code>urls values</code></p>
-				<a href="#inputtest-example" id="inputtest-example" style="color: inherit; text-decoration: none;">
-					<h3>InputTest Example</h3>
+				<p>See <code>MediaConnectionBitrateTest.Options</code> for more information for how to obtain the <code>urls values</code></p>
+				<a href="#audioinputtest-example" id="audioinputtest-example" style="color: inherit; text-decoration: none;">
+					<h3>AudioInputTest Example</h3>
 				</a>
-				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testInputDevice, InputTest } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testAudioInputDevice, AudioInputTest } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
 
-<span class="hljs-keyword">const</span> outputDeviceTest = testInputDevice({
+<span class="hljs-keyword">const</span> audioInputDeviceTest = testAudioInputDevice({
   deviceId: ...,
 });
 
-inputDeviceTest.on(InputTest.Events.Volume, <span class="hljs-function">(<span class="hljs-params">volume</span>) =&gt;</span> {
+audioInputDeviceTest.on(AudioInputTest.Events.Volume, <span class="hljs-function">(<span class="hljs-params">volume</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(volume);
 });
 
-inputDeviceTest.on(InputTest.Events.Error, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+audioInputDeviceTest.on(AudioInputTest.Events.Error, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.error(error);
 });
 
-inputDeviceTest.on(InputTest.Events.End, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
+audioInputDeviceTest.on(AudioInputTest.Events.End, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(report);
 });
 
 setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-  inputDeviceTest.stop();
+  audioInputDeviceTest.stop();
 }, <span class="hljs-number">10000</span>);</code></pre>
-				<a href="#outputtest-example" id="outputtest-example" style="color: inherit; text-decoration: none;">
-					<h3>OutputTest Example</h3>
+				<a href="#audiooutputtest-example" id="audiooutputtest-example" style="color: inherit; text-decoration: none;">
+					<h3>AudioOutputTest Example</h3>
 				</a>
-				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testOutputDevice, OutputTest } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testAudioOutputDevice, AudioOutputTest } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
 
-<span class="hljs-keyword">const</span> outputDeviceTest = testOutputDevice({
+<span class="hljs-keyword">const</span> audioOutputDeviceTest = testAudioOutputDevice({
   deviceId: ...,
 });
 
-outputDeviceTest.on(InputTest.Events.Volume, <span class="hljs-function">(<span class="hljs-params">volume</span>) =&gt;</span> {
+audioOutputDeviceTest.on(AudioOutputTest.Events.Volume, <span class="hljs-function">(<span class="hljs-params">volume</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(volume);
 });
 
-outputDeviceTest.on(InputTest.Events.Error, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+audioOutputDeviceTest.on(AudioOutputTest.Events.Error, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.error(error);
 });
 
-outputDeviceTest.on(InputTest.Events.End, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
+audioOutputDeviceTest.on(AudioOutputTest.Events.End, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(report);
 });
 
 setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-  outputDeviceTest.stop();
+  audioOutputDeviceTest.stop();
 }, <span class="hljs-number">10000</span>);</code></pre>
 				<a href="#related" id="related" style="color: inherit; text-decoration: none;">
 					<h2>Related</h2>
@@ -203,7 +203,7 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 					<!--<li class="globals  ">
                 <a href="globals.html"><em>Globals</em></a>
             </li>-->
-					<li class=" tsd-kind-module">
+					<li class=" tsd-kind-module tsd-is-private">
 						<a href="modules/mediastreamrecorder.html">Media<wbr>Stream<wbr>Recorder</a>
 					</li>
 				</ul>
@@ -213,32 +213,26 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 					<li class=" tsd-kind-enum">
 						<a href="enums/errorname.html" class="tsd-kind-icon">Error<wbr>Name</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-is-private">
-						<a href="enums/testname.html" class="tsd-kind-icon">Test<wbr>Name</a>
-					</li>
 					<li class=" tsd-kind-enum">
 						<a href="enums/warningname.html" class="tsd-kind-icon">Warning<wbr>Name</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/alreadystoppederror.html" class="tsd-kind-icon">Already<wbr>Stopped<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/audiorecorder.html" class="tsd-kind-icon">Audio<wbr>Recorder</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/audioinputtest.html" class="tsd-kind-icon">Audio<wbr>Input<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/bitratetest.html" class="tsd-kind-icon">Bitrate<wbr>Test</a>
+						<a href="classes/audiooutputtest.html" class="tsd-kind-icon">Audio<wbr>Output<wbr>Test</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/audiorecorder.html" class="tsd-kind-icon">Audio<wbr>Recorder</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/diagnosticerror.html" class="tsd-kind-icon">Diagnostic<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/encoder.html" class="tsd-kind-icon">Encoder</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/inputtest.html" class="tsd-kind-icon">Input<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/invalidoptionerror.html" class="tsd-kind-icon">Invalid<wbr>Option<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
 						<a href="classes/invalidoptionserror.html" class="tsd-kind-icon">Invalid<wbr>Options<wbr>Error</a>
@@ -247,13 +241,13 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 						<a href="classes/invalidstateerror.html" class="tsd-kind-icon">Invalid<wbr>State<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/outputtest.html" class="tsd-kind-icon">Output<wbr>Test</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/promisetimedouterror.html" class="tsd-kind-icon">Promise<wbr>Timed<wbr>Out<wbr>Error</a>
+						<a href="classes/mediaconnectionbitratetest.html" class="tsd-kind-icon">Media<wbr>Connection<wbr>Bitrate<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/unsupportederror.html" class="tsd-kind-icon">Unsupported<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/videoinputtest.html" class="tsd-kind-icon">Video<wbr>Input<wbr>Test</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/audiodevicevalidatoroptions.html" class="tsd-kind-icon">Audio<wbr>Device<wbr>Validator<wbr>Options</a>
@@ -261,20 +255,23 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/audioelement.html" class="tsd-kind-icon">Audio<wbr>Element</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/rtcicecandidatestats.html" class="tsd-kind-icon">RTCIce<wbr>Candidate<wbr>Stats</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/rtcicecandidatestatsreport.html" class="tsd-kind-icon">RTCIce<wbr>Candidate<wbr>Stats<wbr>Report</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/rtcselectedicecandidatepairstats.html" class="tsd-kind-icon">RTCSelected<wbr>Ice<wbr>Candidate<wbr>Pair<wbr>Stats</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/rtcstats.html" class="tsd-kind-icon">RTCStats</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/timemeasurement.html" class="tsd-kind-icon">Time<wbr>Measurement</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/videoresolution.html" class="tsd-kind-icon">Video<wbr>Resolution</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/volumestats.html" class="tsd-kind-icon">Volume<wbr>Stats</a>
@@ -313,6 +310,12 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 						<a href="globals.html#max_number_packets" class="tsd-kind-icon">MAX_<wbr>NUMBER_<wbr>PACKETS</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="globals.html#min_bitrate_fail_count" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>FAIL_<wbr>COUNT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
+						<a href="globals.html#min_bitrate_sample_count" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>SAMPLE_<wbr>COUNT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-private">
 						<a href="globals.html#min_bitrate_threshold" class="tsd-kind-icon">MIN_<wbr>BITRATE_<wbr>THRESHOLD</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-private">
@@ -325,19 +328,19 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 						<a href="globals.html#createworker" class="tsd-kind-icon">create<wbr>Worker</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#detectsilence" class="tsd-kind-icon">detect<wbr>Silence</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#getrtcicecandidatestatsreport" class="tsd-kind-icon">getRTCIce<wbr>Candidate<wbr>Stats<wbr>Report</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#testbitrate" class="tsd-kind-icon">test<wbr>Bitrate</a>
+						<a href="globals.html#testaudioinputdevice" class="tsd-kind-icon">test<wbr>Audio<wbr>Input<wbr>Device</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#testinputdevice" class="tsd-kind-icon">test<wbr>Input<wbr>Device</a>
+						<a href="globals.html#testaudiooutputdevice" class="tsd-kind-icon">test<wbr>Audio<wbr>Output<wbr>Device</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#testoutputdevice" class="tsd-kind-icon">test<wbr>Output<wbr>Device</a>
+						<a href="globals.html#testmediaconnectionbitrate" class="tsd-kind-icon">test<wbr>Media<wbr>Connection<wbr>Bitrate</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#testvideoinputdevice" class="tsd-kind-icon">test<wbr>Video<wbr>Input<wbr>Device</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#validateboolean" class="tsd-kind-icon">validate<wbr>Boolean</a>
@@ -356,9 +359,6 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#validatetime" class="tsd-kind-icon">validate<wbr>Time</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-						<a href="globals.html#waitforpromise" class="tsd-kind-icon">wait<wbr>For<wbr>Promise</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#waveencoder" class="tsd-kind-icon">wave<wbr>Encoder</a>

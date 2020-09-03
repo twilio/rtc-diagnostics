@@ -57,8 +57,18 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>All of the expected warnings to be thrown by the diagnostics tests.</p>
+						<p>All of the expected warnings raised by the diagnostics tests.
+							A <code>warning-cleared</code> event is raised if there is an active warning
+						and if the criteria of the warning are no longer met.</p>
 					</div>
+					<p>Example:</p>
+					<pre><code class="language-ts">test.on(AudioInputTest.Events.Warning, <span class="hljs-function">(<span class="hljs-params">warningName: WarningName</span>) =&gt;</span> {
+ <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`Warning detected: <span class="hljs-subst">${warningName}</span>`</span>);
+});
+
+test.on(AudioInputTest.Events.WarningCleared, <span class="hljs-function">(<span class="hljs-params">warningName: WarningName</span>) =&gt;</span> {
+ <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`Warning cleared: <span class="hljs-subst">${warningName}</span>`</span>);
+});</code></pre>
 				</div>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -69,6 +79,7 @@
 							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="warningname.html#lowaudiolevel" class="tsd-kind-icon">Low<wbr>Audio<wbr>Level</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="warningname.html#lowbitrate" class="tsd-kind-icon">Low<wbr>Bitrate</a></li>
 							</ul>
 						</section>
 					</div>
@@ -82,26 +93,41 @@
 					<div class="tsd-signature tsd-kind-icon">Low<wbr>Audio<wbr>Level<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;low-audio-level&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/607974d/lib/constants.ts#L91">lib/constants.ts:91</a></li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/4ab76c0/lib/constants.ts#L102">lib/constants.ts:102</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The <code>low-audio-level</code> warning is raised when the volume events recorded
-							by the input audio device test <a href="../classes/inputtest.html">InputTest</a> are both low and constant.</p>
+							<p>Raised by the <a href="../classes/audioinputtest.html">AudioInputTest</a> when the volume events recorded are both low and constant.
+							The criteria for raising this warning are:</p>
+							<ul>
+								<li>If there are at least three seconds worth of audio samples.</li>
+								<li>The standard deviation of those samples is less than 1% of the max
+								possible volume value (255).</li>
+								<li>The average of those samples is less than 1% of the max possible volume
+								value (255).</li>
+							</ul>
 						</div>
-						<p>The warning criteria is when the following are all true:</p>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="lowbitrate" class="tsd-anchor"></a>
+					<h3>Low<wbr>Bitrate</h3>
+					<div class="tsd-signature tsd-kind-icon">Low<wbr>Bitrate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;low-bitrate&quot;</span></div>
+					<aside class="tsd-sources">
 						<ul>
-							<li>If there are at least three seconds worth of audio samples.</li>
-							<li>The standard deviation of those samples is less than 1% of the max
-							possible volume value (255).</li>
-							<li>The average of those samples is less than 1% of the max possible volume
-							value (255).</li>
+							<li>Defined in <a href="https://github.com/twilio/rtc-diagnostics/blob/4ab76c0/lib/constants.ts#L110">lib/constants.ts:110</a></li>
 						</ul>
-						<p>When any of the previous criteria are no longer met, the <code>warning-cleared</code>
-							event for <code>low-audio-level</code> is raised if <code>low-audio-level</code> has been raised.
-							Only one <code>low-audio-level</code> warning will be raised until the
-						<code>warning-cleared</code> event has been raised.</p>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Raised by the <a href="../classes/mediaconnectionbitratetest.html">MediaConnectionBitrateTest</a> when the recorded bitrates are consistently lower than a certain threshold.
+							The criteria for raising this warning are:</p>
+							<ul>
+								<li>At least 5 seconds worth of bitrate values have been recorded.</li>
+								<li>3 out of last 5 bitrate values are less than <a href="../interfaces/mediaconnectionbitratetest.options.html#minbitratethreshold">MediaConnectionBitrateTest.Options.minBitrateThreshold</a>.</li>
+							</ul>
+						</div>
 					</div>
 				</section>
 			</section>
@@ -123,6 +149,9 @@
 						<ul>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
 								<a href="warningname.html#lowaudiolevel" class="tsd-kind-icon">Low<wbr>Audio<wbr>Level</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="warningname.html#lowbitrate" class="tsd-kind-icon">Low<wbr>Bitrate</a>
 							</li>
 						</ul>
 					</li>
