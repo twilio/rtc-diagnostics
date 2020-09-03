@@ -3,6 +3,8 @@ import { AudioOutputTest, testAudioOutputDevice } from './AudioOutputTest';
 import { ErrorName, WarningName } from './constants';
 import { DiagnosticError } from './errors/DiagnosticError';
 import { MediaConnectionBitrateTest, testMediaConnectionBitrate } from './MediaConnectionBitrateTest';
+import { VideoResolution } from './types';
+import { testVideoInputDevice, VideoInputTest } from './VideoInputTest';
 
 /**
  * @internalapi
@@ -27,6 +29,7 @@ window.Twilio.Diagnostics = {
   testAudioInputDevice,
   testAudioOutputDevice,
   testMediaConnectionBitrate,
+  testVideoInputDevice,
 };
 
 /**
@@ -41,5 +44,8 @@ export {
   testAudioInputDevice,
   testAudioOutputDevice,
   testMediaConnectionBitrate,
+  testVideoInputDevice,
+  VideoInputTest,
+  VideoResolution,
   WarningName,
 };

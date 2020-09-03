@@ -25,7 +25,7 @@ function createTestOptions(
     }),
     getUserMedia: mockGetUserMediaFactory({
       mediaStream: new MockMediaStream({
-        tracks: [new MockTrack()],
+        tracks: [new MockTrack({ kind: 'audio' })],
       }),
     }) as any,
     volumeEventIntervalMs: 100,

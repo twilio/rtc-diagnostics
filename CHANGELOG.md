@@ -1,6 +1,29 @@
 1.0.0-beta2 (In Progress)
 =========================
 
+New Features
+------------
+
+* Support for Video Diagnostics is introduced with the addition of `VideoInputTest` and `testVideoInputDevice`. This test helps to diagnose possible issues with video input devices by capturing a video stream from a user and displaying it on a video element for the user to confirm. See the [API Docs](https://twilio.github.io/rtc-diagnostics/classes/videoinputtest.html) for details.
+
+  **Example Usage**
+  ```ts
+  import {
+    DiagnosticError,
+    testVideoInputDevice,
+    VideoInputTest,
+  } from '@twilio/rtc-diagnostics';
+
+  const videoEl: HTMLMediaElement = document.getElementById(...);
+  const test: VideoInputTest = testVideoInputDevice({
+    element: videoEl,
+  });
+  test.on(VideoInputTest.Events.End, (report: VideoInputTest.Report) => { ... });
+  test.on(VideoInputTest.Events.Error, (error: DiagnosticError) => { ... });
+  ```
+
+  As soon as the test object is instantiated, an attempt to capture the user video stream will be performed and if successful then the stream will be bound to the video element. When the test is stopped, either by timeout or manually, then the video element is paused and the stream is removed from it.
+
 Changes
 -------
 
