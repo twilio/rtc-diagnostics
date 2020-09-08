@@ -520,7 +520,7 @@ export namespace MediaConnectionBitrateTest {
      * This value is used to determine when to raise [[WarningName.LowBitrate]] warning.
      * @default 100
      */
-    minBitrateThreshold: number;
+    minBitrateThreshold?: number;
   }
 
   /**
