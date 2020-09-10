@@ -1,6 +1,7 @@
 /* tslint:disable only-arrow-functions */
 
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as request from 'request';
 import * as sinon from 'sinon';
 
@@ -11,14 +12,13 @@ import {
 
 const defaultTestDuration = 500;
 
-let creds: any;
-if (process.env.ACCOUNTSID && process.env.AUTHTOKEN) {
-  creds = {
-    accountSid: process.env.ACCOUNTSID,
-    authToken: process.env.AUTHTOKEN,
-  };
-} else {
-  creds = require('../../credentials.json');
+const creds: any = {
+  accountSid: (window as any).__env__.ACCOUNTSID,
+  authToken: (window as any).__env__.AUTHTOKEN,
+};
+
+if (!creds.accountSid || !creds.authToken) {
+  throw new Error('Missing credentials. Please use credentials.json or environment variables ACCOUNTSID and AUTHTOKEN.');
 }
 
 function getTurnCreds() {

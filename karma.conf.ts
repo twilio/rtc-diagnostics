@@ -39,7 +39,13 @@ export default function(config: any) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       './**/*.ts': 'karma-typescript',
+      './tests/integration/*.ts': 'env',
     },
+
+    envPreprocessor: [
+      'ACCOUNTSID',
+      'AUTHTOKEN',
+    ],
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
