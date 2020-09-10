@@ -29,6 +29,9 @@ npm install
 npm run build
 ```
 
+In order to run integration tests, you'll need to copy over the `credentials.example.json` file
+to `credentials.json` in the same folder, and replace the empty fields with valid values.
+
 ### NPM
 You can install directly from npm.
 ```
