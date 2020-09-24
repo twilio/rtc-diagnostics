@@ -1,7 +1,7 @@
 # RTC Diagnostics SDK
-The RTC Diagnostics SDK provides functions to test input and output devices, and the functionality to test network bandwidth requirements towards Twilio’s servers.
+The RTC Diagnostics SDK provides functions to test input and output devices (microphone, speaker, camera) as well as functionality to confirm that you meet the network bandwidth requirements required to make a voice call or join a video room.
 
-This SDK requires the use of Twilio NTS or your own STUN/TURN servers to perform the network tests. Using NTS will incur charges as per [NTS pricing](https://www.twilio.com/stun-turn/pricing).
+This SDK requires the use of Twilio NTS or your own STUN/TURN servers to perform the network tests. Using Twilio NTS will mirror how Twilio uses STUN/TURN in Programmable Video when connecting to a Twilio Video Room and will incur charges as per [NTS pricing](https://www.twilio.com/stun-turn/pricing).
 
 ## Features
 * Input audio device tests
