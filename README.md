@@ -1,16 +1,17 @@
-# Voice Diagnostics SDK
-The Voice Diagnostics SDK provides functions to test input and output audio devices, and the functionality to test network bandwidth requirements towards Twilio’s servers.
+# RTC Diagnostics SDK
+The RTC Diagnostics SDK provides functions to test input and output devices (microphone, speaker, camera) as well as functionality to confirm that you meet the network bandwidth requirements required to make a voice call or join a video room.
 
-This SDK requires the use of Twilio NTS to perform the network tests. Using NTS will incur charges as per [NTS pricing](https://www.twilio.com/stun-turn/pricing).
+This SDK requires the use of Twilio NTS or your own STUN/TURN servers to perform the network tests. Using Twilio NTS will mirror how Twilio uses STUN/TURN in Programmable Video when connecting to a Twilio Video Room and will incur charges as per [NTS pricing](https://www.twilio.com/stun-turn/pricing).
 
 ## Features
-* Input audio device tests include volume calculation
-* Output audio device tests are done by playing a sound file to the selected device
+* Input audio device tests
+* Input video device tests
+* Output audio device tests
 * Bandwidth requirements tests
 
 ## Prerequisites
 * A Twilio account. Sign up for free [here](https://www.twilio.com/try-twilio)
-* Node.js v10+
+* Node.js v12+
 * NPM v6+ (comes installed with newer Node versions)
 
 ## Installation
@@ -117,6 +118,25 @@ setTimeout(() => {
 }, 10000);
 ```
 
+### VideoInputTest Example
+```ts
+import { testVideoInputDevice, VideoInputTest } from '@twilio/rtc-diagnostics';
+
+const videoInputDeviceTest = testVideoInputDevice({ element: videoElement });
+
+videoInputDeviceTest.on(VideoInputTest.Events.Error, (error) => {
+  console.error(error);
+});
+
+videoInputDeviceTest.on(VideoInputTest.Events.End, (report) => {
+  console.log(report);
+});
+
+setTimeout(() => {
+  videoInputDeviceTest.stop();
+}, 10000);
+```
+
 ### AudioOutputTest Example
 ```ts
 import { testAudioOutputDevice, AudioOutputTest } from '@twilio/rtc-diagnostics';
@@ -145,6 +165,8 @@ setTimeout(() => {
 ## Related
 * [Twilio Voice Client JS SDK](https://github.com/twilio/twilio-client.js)
 * [Twilio Voice Client JS Quickstart](https://github.com/TwilioDevEd/client-quickstart-js)
+* [Twilio Video JS SDK](https://github.com/twilio/twilio-video.js)
+* [Twilio Video JS Quickstart](https://github.com/twilio/video-quickstart-js)
 * [Twilio Client connectivity requirements](https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements)
 
 ## License
