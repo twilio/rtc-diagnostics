@@ -1,4 +1,4 @@
-1.0.0-beta2 (In Progress)
+1.0.0-beta2 (Sept 25, 2020)
 =========================
 
 New Features
