@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../tests/integration/index.ts"],"names":[],"mappings":";;AAAA;;GAEG;AACH,4BAA0B;AAC1B,6BAA2B;AAC3B,wCAAsC;AACtC,4BAA0B","sourcesContent":["/**\n * Import all tests.\n */\nimport './AudioInputTest';\nimport './AudioOutputTest';\nimport './MediaConnectionBitrateTest';\nimport './VideoInputTest';\n"]}
