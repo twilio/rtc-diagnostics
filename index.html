@@ -52,17 +52,18 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#voice-diagnostics-sdk" id="voice-diagnostics-sdk" style="color: inherit; text-decoration: none;">
-					<h1>Voice Diagnostics SDK</h1>
+				<a href="#rtc-diagnostics-sdk" id="rtc-diagnostics-sdk" style="color: inherit; text-decoration: none;">
+					<h1>RTC Diagnostics SDK</h1>
 				</a>
-				<p>The Voice Diagnostics SDK provides functions to test input and output audio devices, and the functionality to test network bandwidth requirements towards Twilio’s servers.</p>
-				<p>This SDK requires the use of Twilio NTS to perform the network tests. Using NTS will incur charges as per <a href="https://www.twilio.com/stun-turn/pricing">NTS pricing</a>.</p>
+				<p>The RTC Diagnostics SDK provides functions to test input and output devices (microphone, speaker, camera) as well as functionality to confirm that you meet the network bandwidth requirements required to make a voice call or join a video room.</p>
+				<p>This SDK requires the use of Twilio NTS or your own STUN/TURN servers to perform the network tests. Using Twilio NTS will mirror how Twilio uses STUN/TURN in Programmable Video when connecting to a Twilio Video Room and will incur charges as per <a href="https://www.twilio.com/stun-turn/pricing">NTS pricing</a>.</p>
 				<a href="#features" id="features" style="color: inherit; text-decoration: none;">
 					<h2>Features</h2>
 				</a>
 				<ul>
-					<li>Input audio device tests include volume calculation</li>
-					<li>Output audio device tests are done by playing a sound file to the selected device</li>
+					<li>Input audio device tests</li>
+					<li>Input video device tests</li>
+					<li>Output audio device tests</li>
 					<li>Bandwidth requirements tests</li>
 				</ul>
 				<a href="#prerequisites" id="prerequisites" style="color: inherit; text-decoration: none;">
@@ -70,7 +71,7 @@
 				</a>
 				<ul>
 					<li>A Twilio account. Sign up for free <a href="https://www.twilio.com/try-twilio">here</a></li>
-					<li>Node.js v10+</li>
+					<li>Node.js v12+</li>
 					<li>NPM v6+ (comes installed with newer Node versions)</li>
 				</ul>
 				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
@@ -88,6 +89,8 @@ npm install
 
 <span class="hljs-comment"># Build the artifacts under dist folder</span>
 npm run build</code></pre>
+				<p>In order to run integration tests, you&#39;ll need to copy over the <code>credentials.example.json</code> file
+				to <code>credentials.json</code> in the same folder, and replace the empty fields with valid values.</p>
 				<a href="#npm" id="npm" style="color: inherit; text-decoration: none;">
 					<h3>NPM</h3>
 				</a>
@@ -159,6 +162,24 @@ audioInputDeviceTest.on(AudioInputTest.Events.End, <span class="hljs-function">(
 setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
   audioInputDeviceTest.stop();
 }, <span class="hljs-number">10000</span>);</code></pre>
+				<a href="#videoinputtest-example" id="videoinputtest-example" style="color: inherit; text-decoration: none;">
+					<h3>VideoInputTest Example</h3>
+				</a>
+				<pre><code class="language-ts"><span class="hljs-keyword">import</span> { testVideoInputDevice, VideoInputTest } <span class="hljs-keyword">from</span> <span class="hljs-string">'@twilio/rtc-diagnostics'</span>;
+
+<span class="hljs-keyword">const</span> videoInputDeviceTest = testVideoInputDevice({ element: videoElement });
+
+videoInputDeviceTest.on(VideoInputTest.Events.Error, <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.error(error);
+});
+
+videoInputDeviceTest.on(VideoInputTest.Events.End, <span class="hljs-function">(<span class="hljs-params">report</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(report);
+});
+
+setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  videoInputDeviceTest.stop();
+}, <span class="hljs-number">10000</span>);</code></pre>
 				<a href="#audiooutputtest-example" id="audiooutputtest-example" style="color: inherit; text-decoration: none;">
 					<h3>AudioOutputTest Example</h3>
 				</a>
@@ -189,6 +210,8 @@ setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;
 				<ul>
 					<li><a href="https://github.com/twilio/twilio-client.js">Twilio Voice Client JS SDK</a></li>
 					<li><a href="https://github.com/TwilioDevEd/client-quickstart-js">Twilio Voice Client JS Quickstart</a></li>
+					<li><a href="https://github.com/twilio/twilio-video.js">Twilio Video JS SDK</a></li>
+					<li><a href="https://github.com/twilio/video-quickstart-js">Twilio Video JS Quickstart</a></li>
 					<li><a href="https://www.twilio.com/docs/voice/client/javascript/voice-client-js-and-mobile-sdks-network-connectivity-requirements">Twilio Client connectivity requirements</a></li>
 				</ul>
 				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
