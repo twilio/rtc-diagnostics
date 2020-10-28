@@ -274,6 +274,13 @@ export class VideoInputTest extends EventEmitter {
           error,
           'A `DOMError` has occurred.',
         ));
+      } else if (
+        typeof Error !== 'undefined' && error instanceof Error
+      ) {
+        this._onError(new DiagnosticError(
+          error,
+          'An `Error` has occurred.',
+        ));
       } else {
         this._onError(new DiagnosticError(
           undefined,
