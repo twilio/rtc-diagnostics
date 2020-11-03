@@ -49,7 +49,9 @@
     },
     "publish": {
       "commands": [
-        "echo \"publish command not implemented\""
+        "git checkout ${RELEASE_VERSION}",
+        "echo \"//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}\" >~/.npmrc",
+        "npm publish"
       ]
     }
   }
