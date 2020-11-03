@@ -1,3 +1,9 @@
+1.0.0 (Nov 3, 2020)
+===================
+
+1.0.0-beta2 has been promoted to 1.0.0 GA. RTC Diagnostics SDK will use [Semantic Versioning 2.0.0](https://semver.org/#semantic-versioning-200) for all future changes.
+
+
 1.0.0-beta2 (Sept 25, 2020)
 =========================
 
