@@ -265,7 +265,9 @@ describe('testVideoInputDevice', function() {
     ], [
       'DOMError', new (global as any).DOMError(),
     ], [
-      'unknown error', new Error(),
+      'Error', new Error(),
+    ], [
+      'unknown error', {},
     ] ] as const).forEach(([title, error]) => {
       it(`of type ${title}`, async function() {
         const options = createTestOptions({

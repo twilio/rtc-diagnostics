@@ -241,7 +241,8 @@ describe('testAudioOutputDevice', function() {
     [new DiagnosticError(), 'DiagnosticError'],
     [new (global as any).DOMError(), 'DOMError'],
     [new (global as any).DOMException(), 'DOMException'],
-    [new Error(), 'an unknown error'],
+    [new Error(), 'Error'],
+    [{}, 'an unknown error'],
   ] as const).forEach(([error, name]) => {
     describe(`should handle ${name}`, function() {
       let report: AudioOutputTest.Report | undefined;
