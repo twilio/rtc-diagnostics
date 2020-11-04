@@ -415,7 +415,7 @@ export class AudioOutputTest extends EventEmitter {
       ) {
         this._onError(new DiagnosticError(
           error,
-          'An `Error` has occurred.',
+          'An error has occurred.',
         ));
       } else {
         this._onError(new DiagnosticError(
