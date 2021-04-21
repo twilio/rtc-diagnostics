@@ -10,7 +10,6 @@ This SDK requires the use of Twilio NTS or your own STUN/TURN servers to perform
 * Bandwidth requirements tests
 
 ## Prerequisites
-* A Twilio account. Sign up for free [here](https://www.twilio.com/try-twilio)
 * Node.js v12+
 * NPM v6+ (comes installed with newer Node versions)
 
