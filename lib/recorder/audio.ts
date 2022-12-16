@@ -76,7 +76,10 @@ export class AudioRecorder {
    */
   private _generateObjectUrl(): void {
     // Use wav for faster and simple encoding
-    const blob = new Blob(this._audioData, { type: 'audio/wav' });
+    // Due to an iOS 16 MediaStream Recording issue found in iOS 16,
+    // We need to generate mp4 to work around this.
+    // https://bugs.webkit.org/show_bug.cgi?id=249250
+    const blob = new Blob(this._audioData, { type: 'audio/mp4' });
     this._url = URL.createObjectURL(blob);
     this._audioData = [];
   }
