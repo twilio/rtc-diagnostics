@@ -73,13 +73,12 @@ export class AudioRecorder {
 
   /**
    * Generates the object url that can be used for audio playback from raw audio data
-   */
-  private _generateObjectUrl(): void {
-    // Use wav for faster and simple encoding
-    // Due to an iOS 16 MediaStream Recording issue found in iOS 16,
-    // We need to generate mp4 to work around this.
-    // https://bugs.webkit.org/show_bug.cgi?id=249250
-    const blob = new Blob(this._audioData, { type: 'audio/mp4' });
+  */
+ private _generateObjectUrl(): void {
+    // Select default browser mime type if it exists.
+    // Otherwise, use wav for faster and simple encoding.
+    const type: string = this._mediaRecorder ? this._mediaRecorder.mimeType : 'audio/wav';
+    const blob = new Blob(this._audioData, { type });
     this._url = URL.createObjectURL(blob);
     this._audioData = [];
   }

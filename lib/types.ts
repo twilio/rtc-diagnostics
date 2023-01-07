@@ -70,6 +70,7 @@ export namespace MediaStreamRecorder {
     data: AudioData;
   }
   export interface MediaRecorder {
+    mimeType?: string;
     ondataavailable: Function;
     onstop: Function;
     start: Function;
