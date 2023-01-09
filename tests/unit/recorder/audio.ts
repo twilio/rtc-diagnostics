@@ -92,4 +92,16 @@ describe('AudioRecorder', () => {
     audioRecorder.stop();
     assert.equal(audioRecorder.url, 'foo,bar,baz');
   });
+
+  [ 'audio/mp4', 'audio/webm', undefined ].forEach(mimeType => {
+    MediaRecorderFactory.mimeType = mimeType;
+    it('should use mime type chosen by browser', () => {
+      audioRecorder.stop();
+      if(mimeType) {
+        assert.equal(mediaRecorderInstance.mimeType, mimeType);
+      } else {
+        assert.equal(mediaRecorderInstance.mimeType, 'audio/wav');
+      }
+    });
+  });
 });
