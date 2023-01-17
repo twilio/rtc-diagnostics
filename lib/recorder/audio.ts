@@ -74,10 +74,10 @@ export class AudioRecorder {
   /**
    * Generates the object url that can be used for audio playback from raw audio data
   */
- private _generateObjectUrl(): void {
+  private _generateObjectUrl(): void {
     // Select default browser mime type if it exists.
     // Otherwise, use wav for faster and simple encoding.
-    const type: string = this._mediaRecorder ? this._mediaRecorder.mimeType : 'audio/wav';
+    const type: string = this._mediaRecorder && this._mediaRecorder.mimeType ? this._mediaRecorder.mimeType : 'audio/wav';
     const blob = new Blob(this._audioData, { type });
     this._url = URL.createObjectURL(blob);
     this._audioData = [];
