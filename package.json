@@ -11,7 +11,7 @@
     "build:es5": "rimraf ./es5 && tsc",
     "build:release": "npm-run-all lint build status",
     "clean": "rimraf ./dist ./coverage ./es5 ./docs",
-    "docs": "rimraf ./docs && typedoc --internal-aliases internal,publicapi --external-aliases external,internalapi --excludePrivate --excludeProtected --theme ./node_modules/typedoc-twilio-theme/bin/default",
+    "docs": "rimraf ./docs && typedoc --internal-aliases internal,publicapi --external-aliases external,internalapi --excludePrivate --excludeProtected",
     "lint": "tslint -c ./tslint.json --project ./tsconfig.json -t stylish",
     "release": "release",
     "status": "git status",
@@ -33,6 +33,11 @@
     "voice",
     "voip"
   ],
+  "overrides": {
+    "@types/express-serve-static-core": "4.17.8",
+    "@types/mime": "2.0.2",
+    "@types/express": "4.17.7"
+  },
   "dependencies": {
     "@types/events": "3.0.0",
     "@types/node": "12.12.11",
@@ -64,9 +69,8 @@
     "twilio-release-tool": "1.0.1",
     "typedoc": "0.16.11",
     "typedoc-plugin-as-member-of": "1.0.2",
-    "typedoc-plugin-external-module-name": "3.0.0",
+    "typedoc-plugin-external-module-name": "4.0.6",
     "typedoc-plugin-internal-external": "2.1.1",
-    "typedoc-twilio-theme": "github:charliesantos/typedoc-twilio-theme#1.0.1",
     "typescript": "3.7.2",
     "vinyl-fs": "3.0.3",
     "vinyl-source-stream": "2.0.0"
