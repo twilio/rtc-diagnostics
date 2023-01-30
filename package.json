@@ -33,17 +33,13 @@
     "voice",
     "voip"
   ],
-  "overrides": {
-    "@types/express-serve-static-core": "4.17.8",
-    "@types/mime": "2.0.2",
-    "@types/express": "4.17.7"
-  },
   "dependencies": {
     "@types/events": "3.0.0",
     "@types/node": "12.12.11",
     "events": "3.0.0"
   },
   "devDependencies": {
+    "@types/mime": "2.0.2",
     "@types/mocha": "5.2.7",
     "@types/request": "^2.48.5",
     "@types/sinon": "9.0.4",
