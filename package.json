@@ -39,6 +39,7 @@
     "events": "3.0.0"
   },
   "devDependencies": {
+    "@types/mime": "2.0.2",
     "@types/mocha": "5.2.7",
     "@types/request": "^2.48.5",
     "@types/sinon": "9.0.4",
@@ -64,9 +65,9 @@
     "twilio-release-tool": "1.0.1",
     "typedoc": "0.16.11",
     "typedoc-plugin-as-member-of": "1.0.2",
-    "typedoc-plugin-external-module-name": "3.0.0",
+    "typedoc-plugin-external-module-name": "4.0.6",
     "typedoc-plugin-internal-external": "2.1.1",
-    "typedoc-twilio-theme": "github:charliesantos/typedoc-twilio-theme#1.0.1",
+    "typedoc-twilio-theme": "1.0.1",
     "typescript": "3.7.2",
     "vinyl-fs": "3.0.3",
     "vinyl-source-stream": "2.0.0"
