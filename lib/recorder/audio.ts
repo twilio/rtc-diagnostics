@@ -73,7 +73,7 @@ export class AudioRecorder {
 
   /**
    * Generates the object url that can be used for audio playback from raw audio data
-  */
+   */
   private _generateObjectUrl(): void {
     // Select default browser mime type if it exists.
     // Otherwise, use wav for faster and simple encoding.
