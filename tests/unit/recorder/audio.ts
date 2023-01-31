@@ -97,7 +97,7 @@ describe('AudioRecorder', () => {
     MediaRecorderFactory.mimeType = mimeType;
     it('should use mime type chosen by browser', () => {
       audioRecorder.stop();
-      if(mimeType) {
+      if (mimeType) {
         assert.equal(mediaRecorderInstance.mimeType, mimeType);
       } else {
         assert.equal(mediaRecorderInstance.mimeType, 'audio/wav');
