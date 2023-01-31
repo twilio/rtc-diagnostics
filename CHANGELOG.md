@@ -1,3 +1,11 @@
+1.0.1 (Jan 30, 2023)
+====================
+
+Bug Fixes
+---------
+
+* Fixed a bug on iOS 16 Safari where the user could not play back the audio recorded during an audio output test. This is due to the following [WebKit bug](https://bugs.webkit.org/show_bug.cgi?id=249250). (VIDEO-11571)
+
 1.0.0 (Nov 3, 2020)
 ===================
 
