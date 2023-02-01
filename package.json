@@ -61,7 +61,7 @@
     "ts-node": "8.5.2",
     "tsify": "4.0.1",
     "tslint": "5.20.1",
-    "twilio": "3.39.1",
+    "twilio": "4.7.0",
     "twilio-release-tool": "1.0.1",
     "typedoc": "0.16.11",
     "typedoc-plugin-as-member-of": "1.0.2",
