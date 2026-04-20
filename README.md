@@ -164,7 +164,7 @@ setTimeout(() => {
 ## Related
 
 ### Testing Voice and Video calling readiness
-* [Twilio Voice Client JS Preflight Test](https://github.com/twilio/twilio-client.js/blob/preflight/PREFLIGHT.md)
+* [Twilio Voice JS Preflight Test](https://github.com/twilio/twilio-voice.js/blob/master/PREFLIGHT.md)
 * [Twilio Video JS Preflight Test](https://github.com/twilio/twilio-video.js/blob/preflight_api/CHANGELOG.md#280-beta1-september-28-2020)
 
 ### Applications using Diagnostics and Preflight tests
@@ -172,8 +172,8 @@ setTimeout(() => {
 * [Twilio Video JS React App](https://github.com/twilio/twilio-video-app-react)
 
 ### Voice and Video JS SDKs
-* [Twilio Voice Client JS SDK](https://github.com/twilio/twilio-client.js)
-* [Twilio Voice Client JS Quickstart](https://github.com/TwilioDevEd/client-quickstart-js)
+* [Twilio Voice JS SDK](https://github.com/twilio/twilio-voice.js)
+* [Twilio Voice JS Quickstart](https://www.twilio.com/docs/voice/sdks/javascript/get-started)
 * [Twilio Video JS SDK](https://github.com/twilio/twilio-video.js)
 * [Twilio Video JS Quickstart](https://github.com/twilio/video-quickstart-js)
 
