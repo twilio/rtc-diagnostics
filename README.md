@@ -164,7 +164,7 @@ setTimeout(() => {
 ## Related
 
 ### Testing Voice and Video calling readiness
-* [Twilio Voice Voice JS Preflight Test](https://github.com/twilio/twilio-voice.js/blob/master/PREFLIGHT.md)
+* [Twilio Voice JS Preflight Test](https://github.com/twilio/twilio-voice.js/blob/master/PREFLIGHT.md)
 * [Twilio Video JS Preflight Test](https://github.com/twilio/twilio-video.js/blob/preflight_api/CHANGELOG.md#280-beta1-september-28-2020)
 
 ### Applications using Diagnostics and Preflight tests
