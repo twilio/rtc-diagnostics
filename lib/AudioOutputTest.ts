@@ -555,7 +555,7 @@ export namespace AudioOutputTest {
  *
  * The [[AudioOutputTest]] class is an `EventEmitter` (please see [[AudioOutputTest.on]] for
  * events and their details) and helps to diagnose issues by playing a sound clip
- * (by default the sound clip is the ringing tone from the `twilio-client.js`
+ * (by default the sound clip is the ringing tone from the `twilio-voice.js`
  * SDK) and emitting volume events of the sound clip as it plays.
  * ```ts
  * import { AudioOutputTest, testAudioOutputDevice } from '@twilio/rtc-diagnostics';

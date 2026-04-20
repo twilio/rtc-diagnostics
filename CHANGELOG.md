@@ -191,7 +191,7 @@ Changes
   }
   ```
 
-* Removed network related timings and warnings. It is recommended to use `twilio-client.js` [preflight timing APIs](https://github.com/twilio/twilio-client.js/blob/preflight/PREFLIGHT.md) instead for more accurate timing information. With this change, the following are no longer available:
+* Removed network related timings and warnings. It is recommended to use `twilio-voice.js` [preflight timing APIs](https://github.com/twilio/twilio-voice.js/blob/master/PREFLIGHT.md) instead for more accurate timing information. With this change, the following are no longer available:
   - `bitrateTest.on('warning', handler(warning))`
   - `BitrateTest.Report.warnings`
   - `BitrateTest.Report.networkTiming`
